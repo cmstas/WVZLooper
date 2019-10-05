@@ -7,6 +7,8 @@
 ###########################################
 
 #____________________________________________________________________________________
+from __future__ import absolute_import
+import six
 def main_analysis_make_plot_userfilter():
 
     import plottery_wrapper as p
@@ -150,7 +152,7 @@ def main_analysis_make_plot_userfilter():
                 "ratio_range":[0.,2.],
                 "xaxis_label":args.xaxis_label,
                 "ratio_xaxis_title":args.xaxis_label,
-                "yaxis_range":[float(x) for x in args.yaxis_range.split(",")] if isinstance(args.yaxis_range, basestring) and len(args.yaxis_range) > 0 else [],
+                "yaxis_range":[float(x) for x in args.yaxis_range.split(",")] if isinstance(args.yaxis_range, six.string_types) and len(args.yaxis_range) > 0 else [],
                 "no_ratio": False if unblind else True,
                 },
             # _plotter=p.plot_cut_scan,

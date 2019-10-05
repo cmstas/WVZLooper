@@ -1,5 +1,7 @@
 #!/bin/env python
 
+from __future__ import absolute_import
+from __future__ import print_function
 from plottery import plottery as ply
 import plottery_wrapper as p
 import ROOT as r
@@ -10,6 +12,7 @@ from errors import E
 from array import array
 import pyrootutil as pr
 import math
+from six.moves import zip
 
 Ntuple_Version = "v0.1.12.7"
 Baseline_Version = "syst"
@@ -235,34 +238,34 @@ def run_for_variation(variation=""):
     denominator = "ChannelBTagEMu{}__Yield".format(variation)
     numerator = "ChannelBTagEMuHighMET{}__Yield".format(variation)
     # print "Cut denominator:", denominator
-    print "Cut numerator:", numerator
-    print get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "ttz")
-    print ""
-    print ""
+    print("Cut numerator:", numerator)
+    print(get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "ttz"))
+    print("")
+    print("")
 
     denominator = "ChannelBTagEMu{}__Yield".format(variation)
     numerator = "ChannelBTagEMuHighMT{}__Yield".format(variation)
     # print "Cut denominator:", denominator
-    print "Cut numerator:", numerator
-    print get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "ttz")
-    print ""
-    print ""
+    print("Cut numerator:", numerator)
+    print(get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "ttz"))
+    print("")
+    print("")
 
     denominator = "ChannelOnZ{}__Yield".format(variation)
     numerator = "ChannelOnZHighMET{}__Yield".format(variation)
     # print "Cut denominator:", denominator
-    print "Cut numerator:", numerator
-    print get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "zz")
-    print ""
-    print ""
+    print("Cut numerator:", numerator)
+    print(get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "zz"))
+    print("")
+    print("")
 
     denominator = "ChannelOnZ{}__Yield".format(variation)
     numerator = "ChannelOnZHighMT{}__Yield".format(variation)
     # print "Cut denominator:", denominator
-    print "Cut numerator:", numerator
-    print get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "zz")
-    print ""
-    print ""
+    print("Cut numerator:", numerator)
+    print(get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "zz"))
+    print("")
+    print("")
 
 def run(process, region, variable, variation="", valopt="ratio"):
     ntuple_version = "WVZ2016_{}_WVZ2017_{}_WVZ2018_{}".format(Ntuple_Version,Ntuple_Version,Ntuple_Version)
