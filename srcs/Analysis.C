@@ -34,6 +34,9 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     doSkim = doskim;
     newbranchesadded = false; // This is needed to check whether the branches were added to the skim tree
 
+    // To whether or not run eventlist
+    bool doEventList = false;
+
     // Parsing year
     if (ntupleVersion.Contains("v0.0.5")) year = -1; // Meaning use this sets to scale it up to 137
     else if (ntupleVersion.Contains("2016")) year = 2016;
@@ -209,28 +212,17 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.addCutToLastActiveCut("WZCRPresel",
                 [&]()
                 {
-                    // if (wvz.evt() == 4045993)
-                    // {
-                    // std::cout <<  " lep_wzcr_idx1: " << lep_wzcr_idx1 <<  " lep_wzcr_idx2: " << lep_wzcr_idx2 <<  " lep_wzcr_idx3: " << lep_wzcr_idx3 <<  " lep_wzcr_idxe: " << lep_wzcr_idxe <<  std::endl;
-                    // std::cout <<  " this->CutHLT({lep_wzcr_idx1,lep_wzcr_idx2,lep_wzcr_idx3,lep_wzcr_idxe}): " << this->CutHLT({lep_wzcr_idx1,lep_wzcr_idx2,lep_wzcr_idx3,lep_wzcr_idxe}) <<  std::endl;
-                    // std::cout <<  " wvz.HLT_DoubleEl(): " << wvz.HLT_DoubleEl() <<  " wvz.HLT_MuEG(): " << wvz.HLT_MuEG() <<  " wvz.HLT_DoubleMu(): " << wvz.HLT_DoubleMu() <<  std::endl;
-                    // std::cout <<  " wvz.passesMETfiltersRun2(): " << wvz.passesMETfiltersRun2() <<  std::endl;
-                    // }
                     if (lep_wzcr_idx1 < 0) return false;
                     if (lep_wzcr_idxe < 0) return false;
                     if (not (this->CutHLT({lep_wzcr_idx1, lep_wzcr_idx2, lep_wzcr_idx3, lep_wzcr_idxe}))) return false;
                     return (wvz.lep_relIso04DB()[lep_wzcr_idx1] < 0.25 and
                             wvz.lep_relIso04DB()[lep_wzcr_idx2] < 0.25 and 
                             wvz.lep_relIso04DB()[lep_wzcr_idx3] < 0.25 and
-                            wvz.lep_relIso03EA()[lep_wzcr_idxe] >=
-                            (fabs(wvz.lep_eta()[lep_wzcr_idxe]) <= 1.479 ?
-                             0.198 + (0.506 / wvz.lep_pt()[lep_wzcr_idxe]) :
-                             0.203 + (0.963 / wvz.lep_pt()[lep_wzcr_idxe])
-                            )
+                            wvz.lep_relIso03EA()[lep_wzcr_idxe] >= 0.2
                            );
+
                 } , UNITY );
-        // cutflow.addCutToLastActiveCut("WZCRBveto", [&]() { return this->Cut4LepBVeto(); }, [&](){ return this->BTagSF(); });
-        cutflow.addCutToLastActiveCut("WZCRBveto", [&]() { return this->Cut4LepBVeto(); }, UNITY);
+        cutflow.addCutToLastActiveCut("WZCRBveto", [&]() { return this->Cut4LepBVeto(); }, [&](){ return this->BTagSF(); });
         cutflow.addCutToLastActiveCut("WZCRZtag",
                 [&]()
                 {
@@ -802,8 +794,9 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     //==========================
 
     // // Book Cutflow
-    cutflow.bookCutflows();
-    cutflow.bookEventLists();
+    // cutflow.bookCutflows();
+    if (doEventList)
+        cutflow.bookEventLists();
 
     // Book histograms
     if (ntupleVersion.Contains("WVZ"))
@@ -880,8 +873,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         // If new file in chain set some things may need to be set
         if (looper->isNewFileInChain())
         {
-            useMVAID = looper->getCurrentFileName().Contains("WVZMVA") and looper->getCurrentFileName().Contains("v0.1.15");
-            doNotApplyMETSmear = looper->getCurrentFileName().Contains("WVZMVA") and looper->getCurrentFileName().Contains("v0.1.15");
+            useMVAID = looper->getCurrentFileName().Contains("WVZMVA") and (looper->getCurrentFileName().Contains("v0.1.15") or looper->getCurrentFileName().Contains("v0.1.20"));
+            doNotApplyMETSmear = looper->getCurrentFileName().Contains("WVZMVA") and (looper->getCurrentFileName().Contains("v0.1.15") or looper->getCurrentFileName().Contains("v0.1.20"));
             // theoryweight.setFile(looper->getCurrentFileName());
             if (ntupleVersion.Contains("WVZ") and doSkim)
             {
@@ -889,7 +882,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             }
         }
 
-        cutflow.setEventID(wvz.run(), wvz.lumi(), wvz.evt());
+        if (doEventList)
+            cutflow.setEventID(wvz.run(), wvz.lumi(), wvz.evt());
 
         // Once it enters loop it's 1, and then 2, and so on.
         // So need to subtract one and set it to 'ii' so fTTree can load event
@@ -951,7 +945,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         theoryweight.histmap_neventsinfile->hist->Write();
     }
 
-    cutflow.getCut("WZCRElPt").writeEventList("eventlist.txt");
+    if (doEventList)
+        cutflow.getCut("WZCRElPt").writeEventList("eventlist.txt");
 
 
 }//end of whole function
@@ -1635,24 +1630,14 @@ void Analysis::selectWZCRLeptons()
     {
         if (abs(wvz.lep_id()[ii]) == 13)
         {
-            if (
-                    wvz.lep_isMediumPOG()[ii] and fabs(wvz.lep_sip3d()[ii]) < 4.
-                // and wvz.lep_relIso04DB()[ii] < 0.25
-                )
+            if ( wvz.lep_isMediumPOG()[ii] and wvz.lep_isVVVVeto()[ii] and fabs(wvz.lep_sip3d()[ii]) < 4.  and wvz.lep_relIso04DB()[ii] < 0.25 )
             {
                 lep_muon_idxs.push_back(ii);
             }
         }
         else if (abs(wvz.lep_id()[ii]) == 11)
         {
-            if (
-                    wvz.lep_isCutBasedNoIsoVetoPOG()[ii] and fabs(wvz.lep_sip3d()[ii]) < 4.
-                // and wvz.lep_relIso03EA()[ii] <
-                //     (fabs(wvz.lep_eta()[ii]) <= 1.479 ?
-                //      0.198 + (0.506 / wvz.lep_pt()[ii]) :
-                //      0.203 + (0.963 / wvz.lep_pt()[ii])
-                //     )
-                )
+            if ( wvz.lep_isMVAwpLooseNoIsoPOG()[ii] and fabs(wvz.lep_sip3d()[ii]) < 4. and wvz.lep_relIso03EA()[ii] > 0.2 )
             {
                 lep_elec_idxs.push_back(ii);
             }
