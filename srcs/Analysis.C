@@ -873,8 +873,16 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         // If new file in chain set some things may need to be set
         if (looper->isNewFileInChain())
         {
-            useMVAID = looper->getCurrentFileName().Contains("WVZMVA") and (looper->getCurrentFileName().Contains("v0.1.15") or looper->getCurrentFileName().Contains("v0.1.20"));
-            doNotApplyMETSmear = looper->getCurrentFileName().Contains("WVZMVA") and (looper->getCurrentFileName().Contains("v0.1.15") or looper->getCurrentFileName().Contains("v0.1.20"));
+            useMVAID = looper->getCurrentFileName().Contains("WVZMVA")
+                and (looper->getCurrentFileName().Contains("v0.1.15")
+                        or looper->getCurrentFileName().Contains("v0.1.20")
+                        or looper->getCurrentFileName().Contains("v0.1.21")
+                        );
+            doNotApplyMETSmear = looper->getCurrentFileName().Contains("WVZMVA")
+                and (looper->getCurrentFileName().Contains("v0.1.15")
+                        or looper->getCurrentFileName().Contains("v0.1.20")
+                        or looper->getCurrentFileName().Contains("v0.1.21")
+                        );
             // theoryweight.setFile(looper->getCurrentFileName());
             if (ntupleVersion.Contains("WVZ") and doSkim)
             {
@@ -2150,7 +2158,9 @@ float Analysis::EventWeight()
         if (looper->getCurrentFileName().Contains("v0.1.12.7")
                 and looper->getCurrentFileName().Contains("ttz_llvv_mll10"))
             fixXsec = 0.2728/0.2529; // TTZ AN2018-025 has 0.2728 while we used 0.2529
-        if ((looper->getCurrentFileName().Contains("v0.1.15"))
+        if ((looper->getCurrentFileName().Contains("v0.1.15")
+                    or looper->getCurrentFileName().Contains("v0.1.20")
+                    or looper->getCurrentFileName().Contains("v0.1.21"))
                 and year == 2018
                 and looper->getCurrentFileName().Contains("wwz_4l2v_amcatnlo"))
             fixXsec = 3.528723e-7 / 3.1019e-7 ; // Error from wrong scale1fb
