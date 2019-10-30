@@ -109,6 +109,9 @@ def main_analysis_make_plot_userfilter():
             ]
     bkgnamesddfake = ["Other", "DY", "t#bar{t}", "WZ"]
 
+    # sigfiles = sigfiles_detail
+    sig_labels = ["WWZ", "WZZ", "ZZZ", "VVV"]
+    # sig_labels = ["WWZ", "ZH#rightarrowWW", "WZZ", "WH#rightarrowZZ", "ZZZ", "ZH#rightarrowZZ"]
 
     colors = [2001, 2005, 2007, 2003, 2011, 920, 2012, 2011, 2002]
     if args.stack_signal:
@@ -125,7 +128,7 @@ def main_analysis_make_plot_userfilter():
             data_fname="outputs/{}/{}/data.root".format(ntuple_version, tag) if unblind else None,
             usercolors=fakeVRcolors if "PlusX" in filter_pattern else colors,
             legend_labels=bkgnamesddfake if "PlusX" in filter_pattern else bkgnames,
-            signal_labels=["VVV"] if args.one_signal else ["WWZ", "WZZ", "ZZZ", "VVV"],
+            signal_labels=["VVV"] if args.one_signal else sig_labels,
             dirname="plots/{}/{}/{}".format(ntuple_version, tag, dirname),
             filter_pattern=filter_pattern,
             dogrep=True,

@@ -2164,6 +2164,18 @@ float Analysis::EventWeight()
                 and year == 2018
                 and looper->getCurrentFileName().Contains("wwz_4l2v_amcatnlo"))
             fixXsec = 3.528723e-7 / 3.1019e-7 ; // Error from wrong scale1fb
+        if ((looper->getCurrentFileName().Contains("v0.1.15")
+                    or looper->getCurrentFileName().Contains("v0.1.20")
+                    or looper->getCurrentFileName().Contains("v0.1.21"))
+                and year == 2016
+                and looper->getCurrentFileName().Contains("zh_ww_4l_powheg"))
+            fixXsec = 9.9601593625; // BR of Z->ll / Z->all (calculated from zh_ww_4l_powheg sample itself (is this the correct thing to do? maybe?)
+        if ((looper->getCurrentFileName().Contains("v0.1.15")
+                    or looper->getCurrentFileName().Contains("v0.1.20")
+                    or looper->getCurrentFileName().Contains("v0.1.21"))
+                and year == 2016
+                and looper->getCurrentFileName().Contains("ggzh_ww_4l_powheg"))
+            fixXsec = 2.9735355337; // BR of Z->ll / Z->ll/vv (calculated from ggzh_ww_4l_powheg sample itself (is this the correct thing to do? maybe?)
         if (year == 2016)
             // return fixXsec * evt_scale1fb * 35.9 * getTruePUw2016(wvz.nTrueInt());
             return fixXsec * evt_scale1fb * 35.9;
@@ -2175,6 +2187,7 @@ float Analysis::EventWeight()
             return fixXsec * evt_scale1fb * 59.74;
         else
             return fixXsec * evt_scale1fb * 137;
+
     }
 }
 
