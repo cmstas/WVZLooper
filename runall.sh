@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap "kill 0" EXIT
+# trap "kill 0" EXIT
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -65,7 +65,7 @@ if [ -z ${NTUPLEVERSION}  ]; then usage; fi
 if [ -z ${FORCELOOPER}  ]; then FORCELOOPER=false; fi
 if [ -z ${FORCEHADDER}  ]; then FORCEHADDER=false; fi
 if [ -z ${DIRNAME}  ]; then DIRNAME="yield"; fi
-if [ -z ${PATTERN}  ]; then PATTERN="ChannelEMuHighMT__Yield,ChannelOffZHighMET__Yield,ChannelOnZ__Yield,ChannelBTagEMu__Yield,FiveLeptonsMT5th__Yield"; fi
+if [ -z ${PATTERN}  ]; then PATTERN="ChannelEMuHighMT__Yield,ChannelOffZHighMET__Yield,ChannelOnZ__Yield,ChannelBTagEMu__Yield,FiveLeptonsMT5th__Yield,ChannelEMu__Yield,ChannelOffZ__Yield"; fi
 if [ -z "${NBINS}" ]; then NBINS=""; fi
 if [ -z ${UNBLIND}  ]; then UNBLIND=""; fi
 if [ -z ${YAXISLOG}  ]; then YAXISLOG=""; fi

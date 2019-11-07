@@ -43,10 +43,40 @@ echo "SAMPLESET      : ${SAMPLESET}"
 echo "TAG            : ${TAG}"
 echo "================================================"
 
+# combineCards.py \
+#     emu1=stats/${SAMPLESET}/${TAG}/emu_datacard_bin1.txt \
+#     emu2=stats/${SAMPLESET}/${TAG}/emu_datacard_bin2.txt \
+#     emu3=stats/${SAMPLESET}/${TAG}/emu_datacard_bin3.txt \
+#     emu4=stats/${SAMPLESET}/${TAG}/emu_datacard_bin4.txt \
+#     emu5=stats/${SAMPLESET}/${TAG}/emu_datacard_bin5.txt \
+#     offz=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+
+# combineCards.py \
+#     emu1=stats/${SAMPLESET}/${TAG}/emu_datacard_bin1.txt \
+#     emu2=stats/${SAMPLESET}/${TAG}/emu_datacard_bin2.txt \
+#     emu3=stats/${SAMPLESET}/${TAG}/emu_datacard_bin3.txt \
+#     emu4=stats/${SAMPLESET}/${TAG}/emu_datacard_bin4.txt \
+#     emu5=stats/${SAMPLESET}/${TAG}/emu_datacard_bin5.txt \
+#     offzA=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt \
+#     offzB=stats/${SAMPLESET}/${TAG}/offz_datacard_bin2.txt \
+#     offzC=stats/${SAMPLESET}/${TAG}/offz_datacard_bin3.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+
 combineCards.py \
     emu1=stats/${SAMPLESET}/${TAG}/emu_datacard_bin1.txt \
     emu2=stats/${SAMPLESET}/${TAG}/emu_datacard_bin2.txt \
     emu3=stats/${SAMPLESET}/${TAG}/emu_datacard_bin3.txt \
     emu4=stats/${SAMPLESET}/${TAG}/emu_datacard_bin4.txt \
-    emu5=stats/${SAMPLESET}/${TAG}/emu_datacard_bin5.txt \
-    offz=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+    offzA=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt \
+    offzB=stats/${SAMPLESET}/${TAG}/offz_datacard_bin2.txt \
+    offzC=stats/${SAMPLESET}/${TAG}/offz_datacard_bin3.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+    # emu5=stats/${SAMPLESET}/${TAG}/emu_datacard_bin5.txt \
+
+# combineCards.py \
+#     offzA=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt \
+#     offzB=stats/${SAMPLESET}/${TAG}/offz_datacard_bin2.txt \
+#     offzC=stats/${SAMPLESET}/${TAG}/offz_datacard_bin3.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+#     # emu1=stats/${SAMPLESET}/${TAG}/emu_datacard_bin1.txt \
+#     # emu2=stats/${SAMPLESET}/${TAG}/emu_datacard_bin2.txt \
+#     # emu3=stats/${SAMPLESET}/${TAG}/emu_datacard_bin3.txt \
+#     # emu4=stats/${SAMPLESET}/${TAG}/emu_datacard_bin4.txt \
+#     # emu5=stats/${SAMPLESET}/${TAG}/emu_datacard_bin5.txt  > stats/${SAMPLESET}/${TAG}/stat.txt

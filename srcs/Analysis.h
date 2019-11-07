@@ -333,10 +333,14 @@ public:
     bool Cut4LepLowMll(bool=false);
     bool Cut4LepBVeto(int=0);
     bool Cut4LepBTag(int=0);
+    bool CutEMuSig(int=0);
     bool CutHighMT(int=0);
     bool CutHighMET(int=0);
+    bool CutMedMET(int=0);
     bool CutHighMTAR(int=0);
     bool CutLowPtZeta(int=0);
+    bool CutHighPt4l();
+    bool CutMedPt4l();
 
     bool IsChannelEMu(bool=false);
     bool IsChannelOnZ(bool=false);

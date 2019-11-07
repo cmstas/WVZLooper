@@ -67,10 +67,25 @@ def main_analysis_make_plot_userfilter():
                 "outputs/{}/{}/wzz.root".format(ntuple_version, tag),
                 "outputs/{}/{}/zzz.root".format(ntuple_version, tag),
                 ]
+        if args.one_signal:
+            bkgfiles = [
+                    "outputs/{}/{}/zz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/ttz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/twz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/wz.root".format(ntuple_version, tag),
+                    # "outputs/{}/{}/rare.root".format(ntuple_version, tag),
+                    # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
+                    # "outputs/{}/{}/other.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/sig.root".format(ntuple_version, tag),
+                    ]
     # bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Other"]
     bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other"]
     if args.stack_signal:
         bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other", "WWZ", "WZZ", "ZZZ"]
+        if args.one_signal:
+            bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other", "VVV"]
     # bkgnames = ["t#bar{t}Z", "ZZ", "WZ", "tWZ", "Other"]
     # bkgnames = ["t#bar{t}Z", "ZZ", "WZ", "tWZ", "Other", "Z/Z#gamma/t#bar{t}", "Higgs"]
     sigfiles = [
@@ -81,8 +96,6 @@ def main_analysis_make_plot_userfilter():
             "outputs/{}/{}/zzz.root".format(ntuple_version, tag),
             # "outputs/{}/{}/sig.root".format(ntuple_version, tag),
             ]
-    if args.stack_signal:
-        sigfiles = []
     onesigfiles = [
             # "outputs/{}/{}/zh_wwz.root".format(ntuple_version, tag),
             # "outputs/{}/{}/wwz.root".format(ntuple_version, tag),
@@ -108,6 +121,9 @@ def main_analysis_make_plot_userfilter():
             "outputs/{}/{}/wz.root".format(ntuple_version, tag),
             ]
     bkgnamesddfake = ["Other", "DY", "t#bar{t}", "WZ"]
+    if args.stack_signal:
+        sigfiles = []
+        onesigfiles = []
 
     # sigfiles = sigfiles_detail
     sig_labels = ["WWZ", "WZZ", "ZZZ", "VVV"]
