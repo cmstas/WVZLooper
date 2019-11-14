@@ -268,6 +268,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.addCutToLastActiveCut("ARCut4LepBVeto", [&](){ return this->Cut4LepBVeto(); }, [&](){ return this->BTagSF(); } );
         cutflow.getCut("ARCut4LepBVeto");
         cutflow.addCutToLastActiveCut("ChannelAREMu", [&](){ return this->IsChannelEMu(true); }, UNITY );
+        cutflow.addCutToLastActiveCut("ChannelAREMuMTMax", [&](){ return (this->VarMTNom0() > this->VarMTFakeable() ? this->VarMTNom0() : this->VarMTFakeable()) > 50.; }, UNITY );
         cutflow.addCutToLastActiveCut("ChannelAREMuHighMT", [&](){ return this->CutHighMTAR(true); }, UNITY );
         cutflow.getCut("ARCut4LepBVeto");
         cutflow.addCutToLastActiveCut("ChannelAROffZ", [&](){ return this->IsChannelOffZ(true); }, UNITY );
@@ -474,12 +475,19 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         histograms.addHistogram("lepZPt1"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_ZCand_idx2); });
         histograms.addHistogram("lepNPt0"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Nom_idx1); });
         histograms.addHistogram("lepNPt1"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Nom_idx2); });
-        histograms.addHistogram("lepZIsoLep0"    , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 > 0 ? (wvz.lep_relIso03EAwLep().at(lep_ZCand_idx1)) : 999; });
-        histograms.addHistogram("lepZIsoLep1"    , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 > 0 ? (wvz.lep_relIso03EAwLep().at(lep_ZCand_idx2)) : 999; });
-        histograms.addHistogram("lepZIsoLepMax"  , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 > 0 ? std::max(wvz.lep_relIso03EAwLep().at(lep_ZCand_idx1), wvz.lep_relIso03EAwLep().at(lep_ZCand_idx2)) : 999; });
-        histograms.addHistogram("lepNIsoLep0"    , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 > 0 ? (wvz.lep_relIso03EAwLep().at(lep_Nom_idx1)) : 999; });
-        histograms.addHistogram("lepNIsoLep1"    , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 > 0 ? (wvz.lep_relIso03EAwLep().at(lep_Nom_idx2)) : 999; });
-        histograms.addHistogram("lepNIsoEl"      , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 > 0 ? (abs(wvz.lep_id().at(lep_Nom_idx1)) == 11 ? wvz.lep_relIso03EAwLep().at(lep_Nom_idx1) : wvz.lep_relIso03EAwLep().at(lep_Nom_idx2)) : 999; });
+        histograms.addHistogram("lepFPt0"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Fakeable_idx); });
+        histograms.addHistogram("lepFEta0"       , 180 , 0       , 200    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_eta()[lep_Fakeable_idx] : -999; });
+        histograms.addHistogram("lepZIsoEALep0"  , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? (wvz.lep_relIso03EA().at(lep_ZCand_idx1)) : 999; });
+        histograms.addHistogram("lepZIsoEALep1"  , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? (wvz.lep_relIso03EA().at(lep_ZCand_idx2)) : 999; });
+        histograms.addHistogram("lepZIsoEALepMax", 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? std::max(wvz.lep_relIso03EA().at(lep_ZCand_idx1), wvz.lep_relIso03EA().at(lep_ZCand_idx2)) : 999; });
+        histograms.addHistogram("lepNIsoEALep0"  , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx1 >= 0 ? (wvz.lep_relIso03EA().at(lep_Nom_idx1)) : 999; });
+        histograms.addHistogram("lepFIsoEALep0"  , 180 , 0       , 0.4    , [&](){ return lep_Fakeable_idx >= 0 ? (wvz.lep_relIso03EA().at(lep_Fakeable_idx)) : 999; });
+        histograms.addHistogram("lepZIsoLep0"    , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? (wvz.lep_relIso03EAwLep().at(lep_ZCand_idx1)) : 999; });
+        histograms.addHistogram("lepZIsoLep1"    , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? (wvz.lep_relIso03EAwLep().at(lep_ZCand_idx2)) : 999; });
+        histograms.addHistogram("lepZIsoLepMax"  , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? std::max(wvz.lep_relIso03EAwLep().at(lep_ZCand_idx1), wvz.lep_relIso03EAwLep().at(lep_ZCand_idx2)) : 999; });
+        histograms.addHistogram("lepNIsoLep0"    , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 >= 0 ? (wvz.lep_relIso03EAwLep().at(lep_Nom_idx1)) : 999; });
+        histograms.addHistogram("lepNIsoLep1"    , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 >= 0 ? (wvz.lep_relIso03EAwLep().at(lep_Nom_idx2)) : 999; });
+        histograms.addHistogram("lepNIsoEl"      , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 >= 0 ? (abs(wvz.lep_id().at(lep_Nom_idx1)) == 11 ? wvz.lep_relIso03EAwLep().at(lep_Nom_idx1) : wvz.lep_relIso03EAwLep().at(lep_Nom_idx2)) : 999; });
         histograms.addHistogram("lepZ2Pt0"       , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Z2Cand_idx1); });
         histograms.addHistogram("lepZ2Pt1"       , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Z2Cand_idx2); });
         histograms.addHistogram("lepZEta0"       , 180 , -5      , 5      , [&](){ return lep_ZCand_idx1 >= 0 ? wvz.lep_eta()[lep_ZCand_idx1] : -999; });
@@ -529,9 +537,11 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         histograms.addHistogram("MTSum"          , 180 , 0       , 400    , [&](){ return this->VarMTNom0() + this->VarMTNom1(); });
         histograms.addHistogram("LargeMTSum"     , 180 , 0       , 600    , [&](){ return this->VarMTNom0() + this->VarMTNom1(); });
         histograms.addHistogram("MT2"            , 180 , 0       , 180    , [&](){ return this->VarMT2(); });
+        histograms.addHistogram("MT2AR"          , 180 , 0       , 180    , [&](){ return this->VarARMT2(); });
         histograms.addHistogram("MTFakeable"     , 180 , 0       , 150    , [&](){ return this->VarMTFakeable(); });
         histograms.addHistogram("MTNomMax"       , 180 , 0       , 180    , [&](){ return this->VarMTMax(); });
         histograms.addHistogram("MTNomMin"       , 180 , 0       , 180    , [&](){ return this->VarMTMin(); });
+        histograms.addHistogram("MTNFMax"        , 180 , 0       , 150    , [&](){ return (this->VarMTNom0() > this->VarMTFakeable() ? this->VarMTNom0() : this->VarMTFakeable()); });
         // histograms.addHistogram("WindowMllNom"   , 180 , 0       , 50     , [&](){ return fabs(this->VarMll(lep_Nom_idx1, lep_Nom_idx2)-91.1876); });
         histograms.addHistogram("Yield"          , 1   , 0       , 1      , [&](){ return 0; });
         histograms.addHistogram("lepFrelIso03EA" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EA()[lep_Fakeable_idx] : -999; });
@@ -918,7 +928,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     //==========================
 
     // // Book Cutflow
-    // cutflow.bookCutflows();
+    cutflow.bookCutflows();
     if (doEventList)
         cutflow.bookEventLists();
 
@@ -963,6 +973,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             cutflow.bookHistogramsForCut(histograms_Z_peak, "Cut4LepLeptonPt");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAREMu");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAROffZ");
+            cutflow.bookHistogramsForCutAndBelow(histograms, "WZCRPresel");
         }
     }
     else if (ntupleVersion.Contains("Trilep"))
@@ -999,21 +1010,20 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         // If new file in chain set some things may need to be set
         if (looper->isNewFileInChain())
         {
-            useMVAID = looper->getCurrentFileName().Contains("WVZMVA")
+            useMVAID = (looper->getCurrentFileName().Contains("WVZMVA") or looper->getCurrentFileName().Contains("TrilepMVA"))
                 and (looper->getCurrentFileName().Contains("v0.1.15")
                         or looper->getCurrentFileName().Contains("v0.1.20")
                         or looper->getCurrentFileName().Contains("v0.1.21")
+                        or looper->getCurrentFileName().Contains("v0.1.22")
+                        or looper->getCurrentFileName().Contains("v0.1.23")
                         );
-            doNotApplyMETSmear = looper->getCurrentFileName().Contains("WVZMVA")
-                and (looper->getCurrentFileName().Contains("v0.1.15")
-                        or looper->getCurrentFileName().Contains("v0.1.20")
-                        or looper->getCurrentFileName().Contains("v0.1.21")
-                        );
+            doNotApplyMETSmear = useMVAID;
             // theoryweight.setFile(looper->getCurrentFileName());
             if (ntupleVersion.Contains("WVZ") and doSkim)
             {
                 createNewBranches();
             }
+            std::cout <<  " useMVAID: " << useMVAID <<  std::endl;
         }
 
         if (doEventList)
@@ -1969,7 +1979,7 @@ bool Analysis::passFakeableElectronID(int idx)
     // if (not (passVetoElectronID(idx))) return false;
     if (!( wvz.lep_p4().at(idx).pt() > 10.         )) return false;
     if (!( fabs(wvz.lep_p4().at(idx).eta()) < 2.5  )) return false;
-    if (!( wvz.lep_isCutBasedNoIsoVetoPOG().at(idx)    )) return false;
+    if (!( wvz.lep_isMVAwpLooseNoIsoPOG().at(idx)    )) return false;
     if (not (fabs(lep_sip3d->at(idx)) < 4       )) return false;
     return true;
 }
@@ -2469,6 +2479,10 @@ float Analysis::LeptonScaleFactor(int vare, int varm)
     else if (nVetoLeptons == 5)
     {
         return LeptonScaleFactor5Lep(vare, varm);
+    }
+    else
+    {
+        return 1.;
     }
 }
 
@@ -3117,9 +3131,43 @@ bool Analysis::CutEMuSig(int var)
 //______________________________________________________________________________________________
 bool Analysis::CutHighMTAR(int var)
 {
-    if (not (VarMTNom0(var) > 40.)) return false;
-    if (not (VarMTFakeable(var) > 20.)) return false;
-    return true;
+    if (nVetoLeptons == 4)
+    {
+        if (VarMll() < 100.)
+        {
+            if (VarARMT2(var) > 25.)
+                return true;
+            else
+                return false;
+        }
+        else
+        {
+            return true;
+        }
+        // if (VarMll() < 50.)
+        // {
+        //     if (VarMT2(var) > 30.)
+        //         return true;
+        //     else
+        //         return false;
+        // }
+        // else if (VarMll() < 100.)
+        // {
+        //     if (VarMTNom0(var) + VarMTNom1(var) > 100.)
+        //         return true;
+        //     else
+        //         return false;
+        // }
+        // else
+        // {
+        //     return true;
+        // }
+    }
+    else if (nVetoLeptons == 5)
+    {
+        if (not (VarMT5th(var) > 50.)) return false;
+        return true;
+    }
 }
 
 //______________________________________________________________________________________________
@@ -4221,6 +4269,30 @@ float Analysis::VarMT2(int var)
     if(lep_Nom_idx2 < 0) return false;
     lepton1.SetPtEtaPhiE((*lep_pt).at(lep_Nom_idx1),(*lep_eta).at(lep_Nom_idx1),(*lep_phi).at(lep_Nom_idx1),(*lep_energy).at(lep_Nom_idx1));
     lepton2.SetPtEtaPhiE((*lep_pt).at(lep_Nom_idx2),(*lep_eta).at(lep_Nom_idx2),(*lep_phi).at(lep_Nom_idx2),(*lep_energy).at(lep_Nom_idx2));
+    misspart.SetPtEtaPhiM(VarMET(var),TMath::Pi()/2,VarMETPhi(var),0);
+    rest_WW = lepton1 + lepton2 + misspart;
+    TVector3 beta_from_miss_reverse(rest_WW.BoostVector());
+    TVector3 beta_from_miss(-beta_from_miss_reverse.X(),-beta_from_miss_reverse.Y(),-beta_from_miss_reverse.Z());
+
+    lepton1.Boost(beta_from_miss);
+    lepton2.Boost(beta_from_miss);
+    misspart.Boost(beta_from_miss);
+    double MT2_0mass = asymm_mt2_lester_bisect::get_mT2(0,lepton1.Px(),lepton1.Py(),0,lepton2.Px(),lepton2.Py(),misspart.Px(), misspart.Py(),0,0,0);
+
+    return MT2_0mass;
+}
+
+//______________________________________________________________________________________________
+float Analysis::VarARMT2(int var)
+{
+    TLorentzVector lepton1;
+    TLorentzVector lepton2;
+    TLorentzVector misspart;
+    TLorentzVector rest_WW;
+    if(lep_Nom_idx1 < 0) return false;
+    if(lep_Fakeable_idx < 0) return false;
+    lepton1.SetPtEtaPhiE((*lep_pt).at(lep_Nom_idx1),(*lep_eta).at(lep_Nom_idx1),(*lep_phi).at(lep_Nom_idx1),(*lep_energy).at(lep_Nom_idx1));
+    lepton2.SetPtEtaPhiE((*lep_pt).at(lep_Fakeable_idx),(*lep_eta).at(lep_Fakeable_idx),(*lep_phi).at(lep_Fakeable_idx),(*lep_energy).at(lep_Fakeable_idx));
     misspart.SetPtEtaPhiM(VarMET(var),TMath::Pi()/2,VarMETPhi(var),0);
     rest_WW = lepton1 + lepton2 + misspart;
     TVector3 beta_from_miss_reverse(rest_WW.BoostVector());

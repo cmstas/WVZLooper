@@ -6,9 +6,10 @@ import pyrootutil as pr
 
 def compare_fake(lepflav, variable):
 
-    tag = "test"
+    tag = "nominal_nosmear_20191110"
 
-    sample_dir = "outputs/Trilep2016_v0.1.11_Trilep2017_v0.1.11_Trilep2018_v0.1.11/y2016_{}_y2017_{}_y2018_{}/".format(tag, tag, tag)
+    # sample_dir = "outputs/Trilep2016_v0.1.11_Trilep2017_v0.1.11_Trilep2018_v0.1.11/y2016_{}_y2017_{}_y2018_{}/".format(tag, tag, tag)
+    sample_dir = "outputs/TrilepMVA2016_v0.1.23_TrilepMVA2017_v0.1.23_TrilepMVA2018_v0.1.23/y2016_{}_y2017_{}_y2018_{}/".format(tag, tag, tag)
 
     all_process_fnames = [ sample_dir + "ttbar.root", sample_dir + "dy.root" ]
     histogram_name = "ThreeLeptonFakeValidationEvents{}__{}".format(lepflav, variable)

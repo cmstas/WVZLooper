@@ -17,7 +17,8 @@ Ntuple_Type = "WVZMVA"
 Ntuple_Version = "v0.1.21"
 Baseline_Version = "syst_nosmear_20191106"
 
-syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
+# syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
+syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "PDF", "Qsq", "AlphaS"]
 syst_list = ["Nominal", "JES", "JER", "Pileup", "MET", "METPileup"]
 syst_list = syst_list_all
 
@@ -304,11 +305,11 @@ def get_eff_ratios(process, region, variable, valopt="ratio"):
         rtn_val[syst] = var
         # print syst, varup, vardn, nominal
 
-    # Not entirely a correct treatment... but a work around
-    pufracerr = rtn_val["Pileup"].err / rtn_val["Pileup"].val
-    metpufracerr = rtn_val["METPileup"].err / rtn_val["METPileup"].val
-    rtn_val["Pileup"] = E(rtn_val["Pileup"].val, rtn_val["Pileup"].val * math.sqrt(pufracerr**2 + metpufracerr**2))
-    del rtn_val["METPileup"]
+    # # Not entirely a correct treatment... but a work around
+    # pufracerr = rtn_val["Pileup"].err / rtn_val["Pileup"].val
+    # metpufracerr = rtn_val["METPileup"].err / rtn_val["METPileup"].val
+    # rtn_val["Pileup"] = E(rtn_val["Pileup"].val, rtn_val["Pileup"].val * math.sqrt(pufracerr**2 + metpufracerr**2))
+    # del rtn_val["METPileup"]
 
 
     # for key in syst_list:
@@ -344,11 +345,11 @@ def get_alpha(process, numerator_region, denominator_region, valopt="eff"):
         rtn_val[syst] = var
         # print syst, varup, vardn, nominal
 
-    # Not entirely a correct treatment... but a work around
-    pufracerr = rtn_val["Pileup"].err / rtn_val["Pileup"].val
-    metpufracerr = rtn_val["METPileup"].err / rtn_val["METPileup"].val
-    rtn_val["Pileup"] = E(rtn_val["Pileup"].val, rtn_val["Pileup"].val * math.sqrt(pufracerr**2 + metpufracerr**2))
-    del rtn_val["METPileup"]
+    # # Not entirely a correct treatment... but a work around
+    # pufracerr = rtn_val["Pileup"].err / rtn_val["Pileup"].val
+    # metpufracerr = rtn_val["METPileup"].err / rtn_val["METPileup"].val
+    # rtn_val["Pileup"] = E(rtn_val["Pileup"].val, rtn_val["Pileup"].val * math.sqrt(pufracerr**2 + metpufracerr**2))
+    # del rtn_val["METPileup"]
 
     # for key in syst_list_all:
     #     if key == "METPileup": continue

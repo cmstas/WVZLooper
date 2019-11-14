@@ -400,6 +400,7 @@ public:
     float VarPtZeta(int=0);
     float VarPtZetaVis(int=0);
     float VarMinDRJetsToLep(int);
+    float VarARMT2(int=0);
     float VarMT2(int=0);
     float VarZZBDT(int=0);
     float VarTTZBDT(int=0);
