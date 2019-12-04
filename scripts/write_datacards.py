@@ -90,14 +90,14 @@ def write_datacards(ntuple_version, tag):
 
     if args.wwz_only:
         if args.nonh_vh_split:
-            procs = ["data_obs", "sig", "zhwwz", "nonhwzz", "whwzz", "nonhzzz", "zhzzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
+            procs = ["data_obs", "sig", "zhwwz", "nonhwzz", "whwzz", "nonhzzz", "zhzzz", "zz", "ttz", "wz", "twz", "higgs", "other"]
             mcprocs = procs[1:]
             bkgprocs = procs[2:]
             fnames =    [ fname_data , fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz , fname_zz  , fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
             nonzzbkg =  [              fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz ,             fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
             nonttzbkg = [              fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz , fname_zz  ,             fname_twz , fname_wz  , fname_higgs , fname_othernoh]
         else:
-            procs = ["data_obs", "sig", "wzz", "zzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
+            procs = ["data_obs", "sig", "wzz", "zzz", "zz", "ttz", "wz", "higgs", "twz", "other"]
             mcprocs = procs[1:]
             bkgprocs = procs[2:]
             fnames =    [ fname_data , fname_wwz , fname_wzz , fname_zzz , fname_zz  , fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
@@ -287,7 +287,7 @@ def write_datacards(ntuple_version, tag):
     # # Flat additional systematics
     # thissyst = {}
     # for proc in mcprocs:
-    #     if proc == "zz": thissyst["emu{}_".format(year) + proc] = "1.05"
+    #t     if proc == "zz": thissyst["emu{}_".format(year) + proc] = "1.05"
     #     else: thissyst["emu{}_".format(year) + proc] = 0
     # systs.append( ("FlatSystMTexpZZ{}".format(year), "lnN", [], thissyst) )
 
@@ -297,6 +297,13 @@ def write_datacards(ntuple_version, tag):
         if proc == "wz": thissyst["emu{}_".format(year) + proc] = "1.6" # Fake Syst
         else: thissyst["emu{}_".format(year) + proc] = 0
     systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
+
+    # Flat additional systematics
+    thissyst = {}
+    for proc in mcprocs:
+        if proc == "twz": thissyst["emu{}_".format(year) + proc] = "1.47" # TWZ Syst
+        else: thissyst["emu{}_".format(year) + proc] = 0
+    systs.append( ("FlatSystTWZ{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}
@@ -490,6 +497,13 @@ def write_datacards(ntuple_version, tag):
         if proc == "wz": thissyst["offz{}_".format(year) + proc] = "1.6" # Fake Syst
         else: thissyst["offz{}_".format(year) + proc] = 0
     systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
+
+    # Flat additional systematics
+    thissyst = {}
+    for proc in mcprocs:
+        if proc == "twz": thissyst["offz{}_".format(year) + proc] = "1.47" # TWZ Syst
+        else: thissyst["offz{}_".format(year) + proc] = 0
+    systs.append( ("FlatSystTWZ{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}

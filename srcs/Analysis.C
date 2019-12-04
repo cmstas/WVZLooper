@@ -53,8 +53,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     loadScaleFactors();
 
     // Load fast forest and bdt model
-    emu_zz_features = {"looper_MllN", "pt_4l", "looper_ZPt", "looper_mt2", "looper_lep3Pt", "looper_lep4Pt", "looper_pt_zeta", "looper_pt_zeta_vis", "met_pt", "looper_lep3MT", "looper_lep4MT", "looper_lep3dZ", "looper_lep4dZ"};
-    emu_ttz_features = {"looper_MllN", "pt_4l", "looper_ZPt", "looper_mt2", "looper_lep3Pt", "looper_lep4Pt", "looper_minDRJetToLep3", "looper_minDRJetToLep4", "looper_jet1Pt"};
+    emu_zz_features = {"looper_MllN", "looper_ZPt", "looper_mt2", "looper_lep3Pt", "looper_lep4Pt", "looper_vecsum_pt_4l", "looper_scalarsum_pt_4l", "looper_pt_zeta", "looper_pt_zeta_vis", "met_pt", "looper_lep3MT", "looper_lep4MT", "looper_m_4l"};
+    emu_ttz_features = {"looper_MllN", "looper_ZPt", "looper_mt2", "looper_lep3Pt", "looper_lep4Pt", "looper_vecsum_pt_4l", "looper_scalarsum_pt_4l", "looper_minDRJetToLep3", "looper_minDRJetToLep4", "looper_jet1Pt"};
     fast_forest_emu_zz = new FastForest("bdtmodel/emu_zz_bdt.txt", emu_zz_features);
     fast_forest_emu_ttz = new FastForest("bdtmodel/emu_ttz_bdt.txt", emu_ttz_features);
 
@@ -92,6 +92,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.getCut("Cut4LepBVeto");
         cutflow.addCutToLastActiveCut("ChannelEMu"              , [&](){ return this->IsChannelEMu();            } , UNITY );
         cutflow.addCutToLastActiveCut("ChannelEMuHighMT"        , [&](){ return this->CutEMuSig();               } , UNITY );
+        cutflow.getCut("ChannelEMu");
+        cutflow.addCutToLastActiveCut("ChannelEMuBDT"           , [&](){ return this->CutEMuBDT();               } , [&]() { return this->CutEMuBDTWgt(); } );
 
         // Low Mll
         cutflow.getCut("ChannelEMu");
@@ -607,6 +609,58 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                         return -999;
                     }
                 });
+
+        histograms.addHistogram("emuBDT", 5, 0, 5, [&]()
+                {
+                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                    float emuZZBDT = this->VarZZBDT();
+                    if (emuZZBDT < -0.9076937735080719) return 0;
+                    float emuTTZBDT = this->VarTTZBDT();
+                    if (emuTTZBDT < 0.0148177370429039) return 1;
+                    if (emuZZBDT < 0.7326840460300446) return 2;
+                    if (emuTTZBDT < 3.523359537124634) return 3;
+                    return 4;
+                });
+
+        histograms.addHistogram("emuBDT_JESUp", 5, 0, 5, [&]()
+                {
+                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                    float emuZZBDT = this->VarZZBDT(1);
+                    if (emuZZBDT < -0.9076937735080719) return 0;
+                    float emuTTZBDT = this->VarTTZBDT(1);
+                    if (emuTTZBDT < 0.0148177370429039) return 1;
+                    if (emuZZBDT < 0.7326840460300446) return 2;
+                    if (emuTTZBDT < 3.523359537124634) return 3;
+                    return 4;
+                });
+
+        histograms.addHistogram("emuBDT_JESDown", 5, 0, 5, [&]()
+                {
+                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                    float emuZZBDT = this->VarZZBDT(-1);
+                    if (emuZZBDT < -0.9076937735080719) return 0;
+                    float emuTTZBDT = this->VarTTZBDT(-1);
+                    if (emuTTZBDT < 0.0148177370429039) return 1;
+                    if (emuZZBDT < 0.7326840460300446) return 2;
+                    if (emuTTZBDT < 3.523359537124634) return 3;
+                    return 4;
+                });
+
     }
     else if (ntupleVersion.Contains("Trilep"))
     {
@@ -988,6 +1042,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.bookHistogramsForCutAndBelow(histograms, "ThreeLeptonsTTZ");
     }
 
+    cutflow.filterCuts({"FiveLeptonsMT5th"});
+
     // Looper class to facilitate various things
     TChain* ch = new TChain("t");
     ch->Add(fTTree->GetCurrentFile()->GetName());
@@ -1050,10 +1106,12 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
 
         if (ntupleVersion.Contains("WVZ"))
         {
-            if (cutflow.getCut("ChannelEMu").pass or cutflow.getCut("ChannelOffZ").pass or cutflow.getCut("ChannelOnZ").pass or cutflow.getCut("ChannelBTagEMu").pass)
+            if (doSkim)
             {
-                if (doSkim)
+                if (cutflow.getCut("ChannelEMu").pass or cutflow.getCut("ChannelOffZ").pass or cutflow.getCut("ChannelOnZ").pass or cutflow.getCut("ChannelBTagEMu").pass)
+                {
                     fillSkimTree({cutflow.getCut("ChannelEMu").pass, cutflow.getCut("ChannelOffZ").pass, cutflow.getCut("ChannelOnZ").pass, cutflow.getCut("ChannelBTagEMu").pass});
+                }
             }
         }
 
@@ -3129,6 +3187,62 @@ bool Analysis::CutEMuSig(int var)
 }
 
 //______________________________________________________________________________________________
+bool Analysis::CutEMuBDT()
+{
+    if (looper->getCurrentFileName().Contains("zz_4l_powheg_") or
+        looper->getCurrentFileName().Contains("zz_2l2q_powheg_") or
+        looper->getCurrentFileName().Contains("zz_2l2v_powheg_") or
+        looper->getCurrentFileName().Contains("ggzz_")
+       )
+    {
+        return wvz.evt() % 3 == 0;
+    }
+    if (looper->getCurrentFileName().Contains("wwz_amcatnlo_") or
+        looper->getCurrentFileName().Contains("zh_ww_4l_powheg_") or
+        looper->getCurrentFileName().Contains("ggzh_ww_4l_powheg_") or
+        looper->getCurrentFileName().Contains("wwz_4l2v_amcatnlo_")
+       )
+    {
+        return wvz.evt() % 3 == 0;
+    }
+    if (looper->getCurrentFileName().Contains("ttz_ll_mll1_amcatnlo_") or
+        looper->getCurrentFileName().Contains("ttz_llvv_mll10_amcatnlo_")
+       )
+    {
+        return wvz.evt() % 3 == 0;
+    }
+    return 1;
+}
+
+//______________________________________________________________________________________________
+float Analysis::CutEMuBDTWgt()
+{
+    if (looper->getCurrentFileName().Contains("zz_4l_powheg_") or
+        looper->getCurrentFileName().Contains("zz_2l2q_powheg_") or
+        looper->getCurrentFileName().Contains("zz_2l2v_powheg_") or
+        looper->getCurrentFileName().Contains("ggzz_")
+       )
+    {
+        return 3;
+    }
+    if (looper->getCurrentFileName().Contains("wwz_amcatnlo_") or
+        looper->getCurrentFileName().Contains("zh_ww_4l_powheg_") or
+        looper->getCurrentFileName().Contains("ggzh_ww_4l_powheg_") or
+        looper->getCurrentFileName().Contains("wwz_4l2v_amcatnlo_")
+       )
+    {
+        return 3;
+    }
+    if (looper->getCurrentFileName().Contains("ttz_ll_mll1_amcatnlo_") or
+        looper->getCurrentFileName().Contains("ttz_llvv_mll10_amcatnlo_")
+       )
+    {
+        return 3;
+    }
+    return 1;
+}
+
+//______________________________________________________________________________________________
 bool Analysis::CutHighMTAR(int var)
 {
     if (nVetoLeptons == 4)
@@ -3744,11 +3858,11 @@ float Analysis::VarMETNoSmearing(int var)
 {
 
     if      (var == 0) return wvz.met_orig_pt();
-    else if (var == 1) return wvz.met_orig_pt();
+    else if (var == 1) return wvz.met_orig_up_pt();
     else if (var == 2) return wvz.met_orig_pt();
     else if (var == 3) return wvz.met_orig_pt();
     else if (var == 4) return wvz.met_orig_pt();
-    else if (var ==-1) return wvz.met_orig_pt();
+    else if (var ==-1) return wvz.met_orig_dn_pt();
     else if (var ==-2) return wvz.met_orig_pt();
     else if (var ==-3) return wvz.met_orig_pt();
     else if (var ==-4) return wvz.met_orig_pt();
@@ -3769,8 +3883,8 @@ float Analysis::VarMETSmearing(int var)
         else if (var == 2) return wvz.met_pt();
         else if (var == 3) return wvz.met_pt();
         else if (var == 4) return wvz.met_pt();
-        else if (var ==-1) return wvz.met_pt();
-        else if (var ==-2) return wvz.met_dn_pt();
+        else if (var ==-1) return wvz.met_dn_pt();
+        else if (var ==-2) return wvz.met_pt();
         else if (var ==-3) return wvz.met_pt();
         else if (var ==-4) return wvz.met_pt();
         RooUtil::error(TString::Format("Unrecognized variation value var = %d", var).Data(), "VarMETSmearing");
@@ -3787,8 +3901,8 @@ float Analysis::VarMETSmearing(int var)
             else if (var == 2) return wvz.met_pt();
             else if (var == 3) return wvz.met_pt();
             else if (var == 4) return wvz.met_pt();
-            else if (var ==-1) return wvz.met_pt();
-            else if (var ==-2) return wvz.met_dn_pt();
+            else if (var ==-1) return wvz.met_dn_pt();
+            else if (var ==-2) return wvz.met_pt();
             else if (var ==-3) return wvz.met_pt();
             else if (var ==-4) return wvz.met_pt();
             RooUtil::error(TString::Format("Unrecognized variation value var = %d", var).Data(), "VarMETSmearing");
@@ -3822,11 +3936,11 @@ float Analysis::VarMETPhi(int var)
 float Analysis::VarMETPhiNoSmearing(int var)
 {
     if      (var == 0) return wvz.met_phi();
-    else if (var == 1) return wvz.met_phi();
+    else if (var == 1) return wvz.met_dn_phi();
     else if (var == 2) return wvz.met_phi();
     else if (var == 3) return wvz.met_phi();
     else if (var == 4) return wvz.met_phi();
-    else if (var ==-1) return wvz.met_phi();
+    else if (var ==-1) return wvz.met_dn_phi();
     else if (var ==-2) return wvz.met_phi();
     else if (var ==-3) return wvz.met_phi();
     else if (var ==-4) return wvz.met_phi();
@@ -3845,8 +3959,8 @@ float Analysis::VarMETPhiSmearing(int var)
         else if (var == 2) return wvz.met_phi();
         else if (var == 3) return wvz.met_phi();
         else if (var == 4) return wvz.met_phi();
-        else if (var ==-1) return wvz.met_phi();
-        else if (var ==-2) return wvz.met_dn_phi();
+        else if (var ==-1) return wvz.met_dn_phi();
+        else if (var ==-2) return wvz.met_phi();
         else if (var ==-3) return wvz.met_phi();
         else if (var ==-4) return wvz.met_phi();
         RooUtil::error(TString::Format("Unrecognized variation value var = %d", var).Data(), "VarMETPhiSmearing");
@@ -3861,8 +3975,8 @@ float Analysis::VarMETPhiSmearing(int var)
             else if (var == 2) return wvz.met_phi();
             else if (var == 3) return wvz.met_phi();
             else if (var == 4) return wvz.met_phi();
-            else if (var ==-1) return wvz.met_phi();
-            else if (var ==-2) return wvz.met_dn_phi();
+            else if (var ==-1) return wvz.met_dn_phi();
+            else if (var ==-2) return wvz.met_phi();
             else if (var ==-3) return wvz.met_phi();
             else if (var ==-4) return wvz.met_phi();
             RooUtil::error(TString::Format("Unrecognized variation value var = %d", var).Data(), "VarMETPhiSmearing");
@@ -4312,18 +4426,18 @@ float Analysis::VarZZBDT(int var)
     // BDT variables
     std::vector<float> emu_zz_input = {
         this->VarMll(lep_Nom_idx1, lep_Nom_idx2), //"looper_MllN",
-        this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2), //"pt_4l",
         this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2), //"looper_ZPt",
         this->VarMT2(var), //"looper_mt2",
         this->VarLepPt(lep_Nom_idx1), //"looper_lep3Pt",
         this->VarLepPt(lep_Nom_idx2), //"looper_lep4Pt",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(), //"looper_vecsum_pt_4l"
+        this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2), //"looper_scalarsum_pt_4l"
         this->VarPtZeta(var), //"looper_pt_zeta",
         this->VarPtZetaVis(var), //"looper_pt_zeta_vis",
         this->VarMET(var), //"met_pt",
         this->VarMTNom0(var), //"looper_lep3MT",
         this->VarMTNom1(var), //"looper_lep4MT",
-        wvz.lep_dz().at(lep_Nom_idx1), //"looper_lep3dZ",
-        wvz.lep_dz().at(lep_Nom_idx2), //"looper_lep4dZ"
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).mass() // "looper_m_4l"
         };
 
     // Evaluate the bdt score
@@ -4336,15 +4450,17 @@ float Analysis::VarTTZBDT(int var)
 
     std::vector<float> emu_ttz_input = {
         this->VarMll(lep_Nom_idx1, lep_Nom_idx2), //"looper_MllN",
-        this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2), //"pt_4l",
         this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2), //"looper_ZPt",
         this->VarMT2(var), //"looper_mt2",
         this->VarLepPt(lep_Nom_idx1), //"looper_lep3Pt",
         this->VarLepPt(lep_Nom_idx2), //"looper_lep4Pt",
-        this->VarMinDRJetsToLep(lep_Nom_idx1), //"looper_minDRJetToLep3",
-        this->VarMinDRJetsToLep(lep_Nom_idx2), //"looper_minDRJetToLep4",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(), //"looper_vecsum_pt_4l"
+        this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2), //"looper_scalarsum_pt_4l"
+        (lep_Nom_idx1 < 0 ? -999 : this->VarMinDRJetsToLep(lep_Nom_idx1)), //"looper_minDRJetToLep3",
+        (lep_Nom_idx2 < 0 ? -999 : this->VarMinDRJetsToLep(lep_Nom_idx2)), //"looper_minDRJetToLep4",
         (wvz.jets_p4().size() > 0 ? wvz.jets_p4()[0].pt() : -999), //"looper_jet1Pt",
         };
+    emu_ttz_features = {"looper_MllN", "looper_ZPt", "looper_mt2", "looper_lep3Pt", "looper_lep4Pt", "looper_vecsum_pt_4l", "looper_scalarsum_pt_4l", "looper_minDRJetToLep3", "looper_minDRJetToLep4", "looper_jet1Pt"};
 
     // Evaluate the bdt score
     return (*fast_forest_emu_ttz)(emu_ttz_input.data());

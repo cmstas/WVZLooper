@@ -334,6 +334,8 @@ public:
     bool Cut4LepBVeto(int=0);
     bool Cut4LepBTag(int=0);
     bool CutEMuSig(int=0);
+    bool CutEMuBDT();
+    float CutEMuBDTWgt();
     bool CutHighMT(int=0);
     bool CutHighMET(int=0);
     bool CutMedMET(int=0);
