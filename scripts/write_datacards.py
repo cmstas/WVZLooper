@@ -250,7 +250,7 @@ def write_datacards(ntuple_version, tag):
     for systcateg in systcategs:
         thissyst = {}
         for proc in mcprocs:
-            if proc not in ["zz", "ttz"]:
+            if proc not in ["zz", "ttz", "wz", "twz"]:
                 thissyst["emu{}_".format(year) + proc] = [hists_db[proc][systcateg+"Up"], hists_db[proc][systcateg+"Down"]]
             else:
                 thissyst["emu{}_".format(year) + proc] = 0
@@ -294,7 +294,7 @@ def write_datacards(ntuple_version, tag):
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        if proc == "wz": thissyst["emu{}_".format(year) + proc] = "1.6" # Fake Syst
+        if proc == "wz": thissyst["emu{}_".format(year) + proc] = "1.3" # Fake Syst
         else: thissyst["emu{}_".format(year) + proc] = 0
     systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
 
@@ -450,7 +450,7 @@ def write_datacards(ntuple_version, tag):
     for systcateg in systcategs:
         thissyst = {}
         for proc in mcprocs:
-            if proc not in ["zz", "ttz"]:
+            if proc not in ["zz", "ttz", "wz", "twz"]:
                 thissyst["offz{}_".format(year) + proc] = [hists_db[proc][systcateg+"Up"], hists_db[proc][systcateg+"Down"]]
             else:
                 thissyst["offz{}_".format(year) + proc] = 0
@@ -494,7 +494,7 @@ def write_datacards(ntuple_version, tag):
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        if proc == "wz": thissyst["offz{}_".format(year) + proc] = "1.6" # Fake Syst
+        if proc == "wz": thissyst["offz{}_".format(year) + proc] = "1.3" # Fake Syst
         else: thissyst["offz{}_".format(year) + proc] = 0
     systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
 
