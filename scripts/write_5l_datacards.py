@@ -1,5 +1,6 @@
 #!/bin/env python
 
+from __future__ import absolute_import
 import ROOT as r
 
 import pyrootutil as pr
@@ -9,6 +10,7 @@ import sys
 import os
 from errors import E
 import datacard_writer as dw
+from six.moves import zip
 
 parser = argparse.ArgumentParser(description="Plotter for the WVZ analysis")
 parser.add_argument('-b' , '--baseline_tag'    , dest='baseline_tag'    , help='baseline tag (e.g. test, test1. test2, etc.)' , required=True)

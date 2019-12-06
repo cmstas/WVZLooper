@@ -1,5 +1,6 @@
 #!/bin/env python
 
+from __future__ import absolute_import
 import plottery_wrapper as p
 import sys
 import pyrootutil as pr

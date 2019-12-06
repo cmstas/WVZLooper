@@ -1,15 +1,17 @@
 #!/bin/env python
 
+from __future__ import absolute_import
+from __future__ import print_function
 import ROOT as r
 import sys
 
 try:
     version = sys.argv[1]
 except:
-    print "Usage:"
-    print ""
-    print "   {} VERSION".format(sys.argv[0])
-    print ""
+    print("Usage:")
+    print("")
+    print("   {} VERSION".format(sys.argv[0]))
+    print("")
     sys.exit(-1)
 
 f = r.TFile("/nfs-7/userdata/phchang/babies/{}/vh_nonbb_amcatnlo_1.root".format(version))
