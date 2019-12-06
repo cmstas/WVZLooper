@@ -40,6 +40,8 @@
 // MET MC Correction
 #include "METCorrectionHandler.h"
 
+#include "fastforest.h"
+
 using namespace std;
 
 //class: the main class for functions;
@@ -133,6 +135,7 @@ public:
     bool doFakeEst;
     bool doSyst;
     bool doSkim;
+    bool newbranchesadded;
     bool useMVAID;
     bool doNotApplyMETSmear;
     std::vector<LV> leptons;
@@ -240,6 +243,14 @@ public:
     TFile* BDTinputFile;
     RooUtil::TTreeX* tx;
 
+    // FastForest
+    FastForest* fast_forest_emu_zz;
+    FastForest* fast_forest_emu_ttz;
+    FastForest* fast_forest_offz_zz;
+    FastForest* fast_forest_offz_ttz;
+    std::vector<std::string> emu_zz_features;
+    std::vector<std::string> emu_ttz_features;
+
 //*******functions********//
     Analysis(const char* ifileName, const char* RootName);
     virtual ~Analysis();
@@ -254,7 +265,7 @@ public:
 
     void setDoSkim(bool=true);
     void createNewBranches();
-    void fillSkimTree();
+    void fillSkimTree(std::vector<int>);
 
     void loadScaleFactors();
 
@@ -318,14 +329,20 @@ public:
 
     bool Cut4LepLeptonPt(bool=false);
     bool CutZZ4LepLeptonPt();
-    bool CutHLT();
+    bool CutHLT(std::vector<int> idxs=std::vector<int>());
     bool Cut4LepLowMll(bool=false);
     bool Cut4LepBVeto(int=0);
     bool Cut4LepBTag(int=0);
+    bool CutEMuSig(int=0);
+    bool CutEMuBDT();
+    float CutEMuBDTWgt();
     bool CutHighMT(int=0);
     bool CutHighMET(int=0);
+    bool CutMedMET(int=0);
     bool CutHighMTAR(int=0);
     bool CutLowPtZeta(int=0);
+    bool CutHighPt4l();
+    bool CutMedPt4l();
 
     bool IsChannelEMu(bool=false);
     bool IsChannelOnZ(bool=false);
@@ -346,6 +363,8 @@ public:
     float VarMjj();
     float VarMjjMinDR();
     float VarMET(int=0);
+    float VarMETNoSmearing(int=0);
+    float VarMETSmearing(int=0);
     float VarNvtx();
     float VarMll2ndZ();
     float VarMT(int,int=0);
@@ -366,6 +385,7 @@ public:
     float VarNbmed();
     float VarMll2l();
     float VarNSFOS();
+    LV VarLepP4(int);
     float VarLepPt(int);
     float VarLepEta(int idx);
     float VarLepPhi(int idx);
@@ -375,12 +395,17 @@ public:
     float VarHTLep(int, int, int, int);
     float VarHTLep5();
     float VarMETPhi(int=0);
+    float VarMETPhiNoSmearing(int=0);
+    float VarMETPhiSmearing(int=0);
     float VarTauTauDisc(int=0);
     float VarPtZetaDiff(int=0);
     float VarPtZeta(int=0);
     float VarPtZetaVis(int=0);
     float VarMinDRJetsToLep(int);
+    float VarARMT2(int=0);
     float VarMT2(int=0);
+    float VarZZBDT(int=0);
+    float VarTTZBDT(int=0);
 
     LeptonVectors GetLeptonVectors();
 
