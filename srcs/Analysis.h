@@ -290,6 +290,7 @@ public:
     float LeptonScaleFactor(int=0, int=0);
     float LeptonScaleFactorZZ4l();
     float LeptonScaleFactor5Lep(int=0, int=0);
+    float LeptonScaleFactor6Lep(int=0, int=0);
     float LeptonScaleFactorv1();
     float IndividualLeptonScaleFactor(int, bool, int=0, int=0);
     float FakeFactor();
@@ -318,6 +319,7 @@ public:
     bool Is4LeptonFakeValidationEvents();
     bool Is3LeptonFakeValidationEvents();
     bool Is5LeptonEvent();
+    bool Is6LeptonEvent();
     bool IsTwoOSLeptonEvent();
     bool FindZCandLeptons();
     bool FindTwoOSNominalLeptons();
@@ -343,6 +345,7 @@ public:
     bool CutLowPtZeta(int=0);
     bool CutHighPt4l();
     bool CutMedPt4l();
+    bool CutHighSumLepPt();
 
     bool IsChannelEMu(bool=false);
     bool IsChannelOnZ(bool=false);
