@@ -252,6 +252,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.getCut("Weight");
         cutflow.addCutToLastActiveCut("FiveLeptons"             , [&](){ return this->Is5LeptonEvent();          } , [&](){ return this->LeptonScaleFactor(); } );
         cutflow.addCutToLastActiveCut("FiveLeptonsRelIso5th"    , [&](){ return this->Is5thNominal();            } , UNITY );
+        cutflow.addCutToLastActiveCut("FiveLeptonsBVeto"        , [&](){ return wvz.nb() == 0;                   } , [&](){ return this->BTagSF(); } );
         cutflow.addCutToLastActiveCut("FiveLeptonsMT5th"        , [&](){ return this->CutHighMT();               } , UNITY );
         // cutflow.getCut("FiveLeptons");
         // cutflow.addCutToLastActiveCut("FiveLeptonsEl"           , [&](){ return abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11;} , UNITY );
@@ -751,8 +752,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         // i.e. *MT*, *MET*, and *Cut4LepB* are the pattern used to search the cut names in the cutflow object to declare a systematic varations
         // e.g. ChannelBTagEMuHighMT contains "MT" and therefore a JES variations will be declared for these cuts
         // Then later below with "setCutSyst" function the variational cut defn will be defined
-        cutflow.addCutSyst("JESUp"         , {"PtZeta", "MT" , "MET" , "Cut4LepB"});
-        cutflow.addCutSyst("JESDown"       , {"PtZeta", "MT" , "MET" , "Cut4LepB"});
+        cutflow.addCutSyst("JESUp"         , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto"});
+        cutflow.addCutSyst("JESDown"       , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto"});
         cutflow.addCutSyst("JERUp"         , {"PtZeta", "MT" , "MET"});
         cutflow.addCutSyst("JERDown"       , {"PtZeta", "MT" , "MET"});
         cutflow.addCutSyst("METUp"         , {"PtZeta", "MT" , "MET"});
@@ -948,12 +949,14 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.setCutSyst("ChannelOffZMedMET"         , "METPileupDown" , [&]() { return     this->CutMedMET (-4); } , UNITY );
 
         // 3. Cut4LepB cuts (the btag and bveto)
-        cutflow.setCutSyst("Cut4LepBVeto"  , "JESUp"  , [&]() { return this->Cut4LepBVeto(1); }  , [&]() { return this->BTagSF(); } );
-        cutflow.setCutSyst("Cut4LepBTag"   , "JESUp"  , [&]() { return this->Cut4LepBTag(1); }   , [&]() { return this->BTagSF(); } );
-        cutflow.setCutSyst("ARCut4LepBVeto", "JESUp"  , [&]() { return this->Cut4LepBVeto(1); }  , [&]() { return this->BTagSF(); } );
-        cutflow.setCutSyst("Cut4LepBVeto"  , "JESDown" , [&]() { return this->Cut4LepBVeto(-1); }, [&]() { return this->BTagSF(); } );
-        cutflow.setCutSyst("Cut4LepBTag"   , "JESDown" , [&]() { return this->Cut4LepBTag(-1); } , [&]() { return this->BTagSF(); } );
-        cutflow.setCutSyst("ARCut4LepBVeto", "JESDown" , [&]() { return this->Cut4LepBVeto(-1); }, [&]() { return this->BTagSF(); } );
+        cutflow.setCutSyst("Cut4LepBVeto"    , "JESUp"   , [&]() { return this->Cut4LepBVeto(1); } , [&]() { return this->BTagSF(); } );
+        cutflow.setCutSyst("Cut4LepBTag"     , "JESUp"   , [&]() { return this->Cut4LepBTag(1); }  , [&]() { return this->BTagSF(); } );
+        cutflow.setCutSyst("ARCut4LepBVeto"  , "JESUp"   , [&]() { return this->Cut4LepBVeto(1); } , [&]() { return this->BTagSF(); } );
+        cutflow.setCutSyst("FiveLeptonsBVeto", "JESUp"   , [&]() { return wvz.nb_up() == 0;}       , [&]() { return this->BTagSF(); } );
+        cutflow.setCutSyst("Cut4LepBVeto"    , "JESDown" , [&]() { return this->Cut4LepBVeto(-1); }, [&]() { return this->BTagSF(); } );
+        cutflow.setCutSyst("Cut4LepBTag"     , "JESDown" , [&]() { return this->Cut4LepBTag(-1); } , [&]() { return this->BTagSF(); } );
+        cutflow.setCutSyst("ARCut4LepBVeto"  , "JESDown" , [&]() { return this->Cut4LepBVeto(-1); }, [&]() { return this->BTagSF(); } );
+        cutflow.setCutSyst("FiveLeptonsBVeto", "JESDown" , [&]() { return wvz.nb_dn() == 0;}       , [&]() { return this->BTagSF(); } );
 
         // // 4. PtZeta
         // cutflow.setCutSyst("ChannelEMuLowPtZeta", "JESUp" , [&]() { return this->CutLowPtZeta(1); } , UNITY);
@@ -987,7 +990,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     //==========================
 
     // // Book Cutflow
-    cutflow.bookCutflows();
+    // cutflow.bookCutflows();
     if (doEventList)
         cutflow.bookEventLists();
 
@@ -1003,6 +1006,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelBTagOnZ");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelBTagOffZ");
             cutflow.bookHistogramsForCutAndBelow(histograms, "FiveLeptons");
+            cutflow.bookHistogramsForCutAndBelow(histograms, "SixLeptons");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAREMu");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAROffZ");
             cutflow.bookHistogramsForCutAndBelow(histograms, "CutHLTZZ4l");
@@ -1049,7 +1053,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.bookHistogramsForCutAndBelow(histograms, "ThreeLeptonsTTZ");
     }
 
-    // cutflow.filterCuts({"FiveLeptonsMT5th", "SixLeptonsSumPtCut"});
+    cutflow.filterCuts({"FiveLeptonsMT5th", "SixLeptonsSumPtCut"});
+    cutflow.printCuts();
 
     // Looper class to facilitate various things
     TChain* ch = new TChain("t");
@@ -1739,16 +1744,16 @@ void Analysis::select5LepLeptons()
     lep_5Lep_Z2_idx2 = -999;
     lep_5Lep_W_idx = -999;
 
-    double chi1_sq, chi2_sq, mT;
+    // double chi1_sq, chi2_sq, mT;
     int z_lep1;
     int z_lep2;
     int z_lep3;
     int z_lep4;
     int w_lep;
     z_lep1=z_lep2=z_lep3=z_lep4=w_lep=-999;
-    chi1_sq=chi2_sq=0.0;
+    // chi1_sq=chi2_sq=0.0;
     double Mz = 91.1876;
-    double Mw = 80.379;
+    // double Mw = 80.379;
     double pair1massDiff, pair2massDiff;
     pair1massDiff=pair2massDiff=0.0;
     double compare1 = 15;
@@ -1798,7 +1803,7 @@ void Analysis::select5LepLeptons()
                                         {
                                             if(i!=m and j!=m and k!=m and l!=m)//make sure not checking same lepton
                                             {
-                                                mT = sqrt(2*met_pt*wvz.lep_p4()[lep_veto_idxs.at(m)].pt()*(1.0 - cos(wvz.lep_p4()[lep_veto_idxs.at(m)].phi() - met_phi)));
+                                                // mT = sqrt(2*met_pt*wvz.lep_p4()[lep_veto_idxs.at(m)].pt()*(1.0 - cos(wvz.lep_p4()[lep_veto_idxs.at(m)].phi() - met_phi)));
                                                 w_lep=m;
                                                 //if(mT > 50.0) w_lep=m;
                                                 //if(fabs(mT-Mw)<=20) w_lep=m;
@@ -3164,19 +3169,13 @@ bool Analysis::CutHighMT(int var)
     }
     else if (nVetoLeptons == 5)
     {
-        if (not (wvz.nb() == 0)) return false;  //lumped into this cut because "[&](){ return wvz.nb() == 0; }, UNITY );" at the level of addCutToLastActiveCut failed for some reason  
-        if((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11))
+        if ((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11))
         {
-          if(not (VarMT5th(var) > 50.)) return false;
+            if (not(VarMT5th(var) > 50.)) return false;
         }
-        else if((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 13)) return true;
-        return true;
+        else if ((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 13)) return true;
     }
-    /*else if (nVetoLeptons == 5)
-    {
-        if (not (VarMT5th(var) > 50.)) return false;
-        return true;
-    }*/
+    return true;
 }
 
 //______________________________________________________________________________________________
@@ -3195,30 +3194,13 @@ bool Analysis::CutEMuSig(int var)
         {
             return true;
         }
-        // if (VarMll() < 50.)
-        // {
-        //     if (VarMT2(var) > 30.)
-        //         return true;
-        //     else
-        //         return false;
-        // }
-        // else if (VarMll() < 100.)
-        // {
-        //     if (VarMTNom0(var) + VarMTNom1(var) > 100.)
-        //         return true;
-        //     else
-        //         return false;
-        // }
-        // else
-        // {
-        //     return true;
-        // }
     }
     else if (nVetoLeptons == 5)
     {
         if (not (VarMT5th(var) > 50.)) return false;
         return true;
     }
+    return true;
 }
 
 //______________________________________________________________________________________________
@@ -3314,7 +3296,6 @@ bool Analysis::CutHighMTAR(int var)
     }
     else if (nVetoLeptons == 5)
     {
-        if (not (wvz.nb() == 0)) return false;  //lumped into this cut because "[&](){ return wvz.nb() == 0; }, UNITY );" at the level of addCutToLastActiveCut failed for some reason  
         if((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11))
         {
           if(not (VarMT5th(var) > 50.)) return false;
@@ -3322,22 +3303,18 @@ bool Analysis::CutHighMTAR(int var)
         else if((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 13)) return true;
         return true;
     }
-    /*else if (nVetoLeptons == 5)
-    {
-        if (not (VarMT5th(var) > 50.)) return false;
-        return true;
-    }*/
+    return true;
 }
 
 //______________________________________________________________________________________________
 bool Analysis::CutHighSumLepPt()
 {
-  double sumLepPt = 0.0;
-  for(unsigned int i=0; i<wvz.lep_pt().size(); i++)
-    sumLepPt +=  wvz.lep_pt().at(i);
+    double sumLepPt = 0.0;
+    for (unsigned int i = 0; i < wvz.lep_pt().size(); i++)
+        sumLepPt +=  wvz.lep_pt().at(i);
 
-  if(sumLepPt > 250) return true;
-  else return false;
+    if (sumLepPt > 250) return true;
+    else return false;
 
 }
 
@@ -3779,43 +3756,8 @@ bool Analysis::CutMedPt4l()
 bool Analysis::Is5thNominal()
 {
 
-    // std::vector<int> idxs;
-    // idxs.push_back(lep_ZCand_idx1);
-    // idxs.push_back(lep_ZCand_idx2);
-    // idxs.push_back(lep_2ndZCand_idx1);
-    // idxs.push_back(lep_2ndZCand_idx2);
-    // idxs.push_back(lep_WCand_idx1);
-
-    // int idx_w_max_reliso = -1;
-    // float max_iso = 0;
-
-    // for (auto& idx : idxs)
-    // {
-    //     float tmpiso = wvz.lep_relIso03EA()[idx];
-    //     if (max_iso < tmpiso)
-    //     {
-    //         max_iso = tmpiso;
-    //         idx_w_max_reliso = idx;
-    //     }
-    // }
-
-    // if (idx_w_max_reliso < 0)
-    //     return passNominalLeptonID(lep_WCand_idx1) and wvz.lep_p4()[lep_WCand_idx1].pt() > 20.;
-    // else
-    //     return passNominalLeptonID(idx_w_max_reliso) and wvz.lep_p4()[lep_WCand_idx1].pt() > 20.;
-
-    // return passNominalLeptonID(lep_WCand_idx1) and passNominalLeptonID(lep_2ndZCand_idx2) and wvz.lep_p4()[lep_WCand_idx1].pt() > 20.;
-
-    /*if (abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11)
-        return wvz.lep_relIso03EA()[lep_5Lep_W_idx] < 0.1;
-    else
-        return wvz.lep_relIso04DB()[lep_5Lep_W_idx] < 0.1;
-    */
     if (passNominalLeptonID(lep_5Lep_W_idx)) return true;
-    // if (lep_relIso03EA->at(lep_WCand_idx1) < 0.1)
-    //     return true;
-    // else
-    //     return false;
+    else return false;
 }
 
 //______________________________________________________________________________________________
