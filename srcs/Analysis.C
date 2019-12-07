@@ -3310,8 +3310,10 @@ bool Analysis::CutHighMTAR(int var)
 bool Analysis::CutHighSumLepPt()
 {
     double sumLepPt = 0.0;
-    for (unsigned int i = 0; i < wvz.lep_pt().size(); i++)
-        sumLepPt +=  wvz.lep_pt().at(i);
+    for (unsigned int i = 0; i < lep_veto_idxs.size(); ++i)
+    {
+        sumLepPt +=  wvz.lep_pt().at(lep_veto_idxs.at(i));
+    }
 
     if (sumLepPt > 250) return true;
     else return false;
@@ -3538,6 +3540,7 @@ bool Analysis::Is5LeptonEvent()
     return true;
 }
 
+//______________________________________________________________________________________________
 bool Analysis::Is6LeptonEvent()
 {
     if (not (nVetoLeptons >= 6)) return false;
