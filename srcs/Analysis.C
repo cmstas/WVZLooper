@@ -35,7 +35,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     newbranchesadded = false; // This is needed to check whether the branches were added to the skim tree
 
     // To whether or not run eventlist
-    bool doEventList = false;
+    bool doEventList = true;
 
     // Parsing year
     if (ntupleVersion.Contains("v0.0.5")) year = -1; // Meaning use this sets to scale it up to 137
@@ -55,8 +55,10 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     // Load fast forest and bdt model
     emu_zz_features = {"looper_MllN", "looper_ZPt", "looper_mt2", "looper_lep3Pt", "looper_lep4Pt", "looper_vecsum_pt_4l", "looper_scalarsum_pt_4l", "looper_pt_zeta", "looper_pt_zeta_vis", "met_pt", "looper_lep3MT", "looper_lep4MT", "looper_m_4l"};
     emu_ttz_features = {"looper_MllN", "looper_ZPt", "looper_mt2", "looper_lep3Pt", "looper_lep4Pt", "looper_vecsum_pt_4l", "looper_scalarsum_pt_4l", "looper_minDRJetToLep3", "looper_minDRJetToLep4", "looper_jet1Pt"};
+    offz_zz_features = emu_zz_features;
     fast_forest_emu_zz = new FastForest("bdtmodel/emu_zz_bdt.txt", emu_zz_features);
     fast_forest_emu_ttz = new FastForest("bdtmodel/emu_ttz_bdt.txt", emu_ttz_features);
+    fast_forest_offz_zz = new FastForest("bdtmodel/offz_zz_bdt.txt", offz_zz_features);
 
     // The RooUtil::Cutflow object facilitates various cutflow/histogramming
     RooUtil::Cutflow cutflow(output_file);
@@ -177,6 +179,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                     }
                 }
                 , UNITY );
+        cutflow.getCut("ChannelOffZ");
+        cutflow.addCutToLastActiveCut("ChannelOffZBDT"           , [&](){ return this->CutOffZBDT();              } , [&]() { return this->CutOffZBDTWgt(); } );
 
         // OffZ Low/High Mll
         cutflow.getCut("ChannelOffZ");
@@ -661,6 +665,33 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                     return 4;
                 });
 
+        histograms.addHistogram("offzBDT", 2, 0, 2, [&]()
+                {
+                    // 0 , -inf , 3.0
+                    // 1 , 3.0  , inf
+                    float offzZZBDT = this->VarOffZBDT();
+                    if (offzZZBDT > 3.0) return 1;
+                    else return 0;
+                });
+
+        histograms.addHistogram("offzBDT_JESUp", 2, 0, 2, [&]()
+                {
+                    // 0 , -inf , 3.0
+                    // 1 , 3.0  , inf
+                    float offzZZBDT = this->VarOffZBDT(1);
+                    if (offzZZBDT > 3.0) return 1;
+                    else return 0;
+                });
+
+        histograms.addHistogram("offzBDT_JESDown", 2, 0, 2, [&]()
+                {
+                    // 0 , -inf , 3.0
+                    // 1 , 3.0  , inf
+                    float offzZZBDT = this->VarOffZBDT(-1);
+                    if (offzZZBDT > 3.0) return 1;
+                    else return 0;
+                });
+
     }
     else if (ntupleVersion.Contains("Trilep"))
     {
@@ -1128,6 +1159,13 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             }
         // }
 
+//         if (cutflow.getCut("ChannelEMuBDT").pass)
+//         {
+//             float weight = this->EventWeight()*this->BTagSF()*this->LeptonScaleFactor();
+//             std::cout << std::endl;
+//             std::cout << "TEST 1:0:" << wvz.evt() << ":" << weight << ":" << this->VarZZBDT() << ":" << this->VarTTZBDT() << std::endl;
+//         }
+
     }
 
     // If there were zero events looped over the createNewBranches never gets called
@@ -1148,7 +1186,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     }
 
     if (doEventList)
-        cutflow.getCut("WZCRElPt").writeEventList("eventlist.txt");
+        cutflow.getCut("ChannelEMuBDT").writeEventList("eventlist.txt");
 
 
 }//end of whole function
@@ -3215,6 +3253,28 @@ bool Analysis::CutEMuBDT()
 }
 
 //______________________________________________________________________________________________
+bool Analysis::CutOffZBDT()
+{
+    if (looper->getCurrentFileName().Contains("zz_4l_powheg_") or
+        looper->getCurrentFileName().Contains("zz_2l2q_powheg_") or
+        looper->getCurrentFileName().Contains("zz_2l2v_powheg_") or
+        looper->getCurrentFileName().Contains("ggzz_")
+       )
+    {
+        return wvz.evt() % 3 == 0;
+    }
+    if (looper->getCurrentFileName().Contains("wwz_amcatnlo_") or
+        looper->getCurrentFileName().Contains("zh_ww_4l_powheg_") or
+        looper->getCurrentFileName().Contains("ggzh_ww_4l_powheg_") or
+        looper->getCurrentFileName().Contains("wwz_4l2v_amcatnlo_")
+       )
+    {
+        return wvz.evt() % 3 == 0;
+    }
+    return 1;
+}
+
+//______________________________________________________________________________________________
 float Analysis::CutEMuBDTWgt()
 {
     if (looper->getCurrentFileName().Contains("zz_4l_powheg_") or
@@ -3235,6 +3295,28 @@ float Analysis::CutEMuBDTWgt()
     }
     if (looper->getCurrentFileName().Contains("ttz_ll_mll1_amcatnlo_") or
         looper->getCurrentFileName().Contains("ttz_llvv_mll10_amcatnlo_")
+       )
+    {
+        return 3;
+    }
+    return 1;
+}
+
+//______________________________________________________________________________________________
+float Analysis::CutOffZBDTWgt()
+{
+    if (looper->getCurrentFileName().Contains("zz_4l_powheg_") or
+        looper->getCurrentFileName().Contains("zz_2l2q_powheg_") or
+        looper->getCurrentFileName().Contains("zz_2l2v_powheg_") or
+        looper->getCurrentFileName().Contains("ggzz_")
+       )
+    {
+        return 3;
+    }
+    if (looper->getCurrentFileName().Contains("wwz_amcatnlo_") or
+        looper->getCurrentFileName().Contains("zh_ww_4l_powheg_") or
+        looper->getCurrentFileName().Contains("ggzh_ww_4l_powheg_") or
+        looper->getCurrentFileName().Contains("wwz_4l2v_amcatnlo_")
        )
     {
         return 3;
@@ -4442,6 +4524,30 @@ float Analysis::VarZZBDT(int var)
 
     // Evaluate the bdt score
     return (*fast_forest_emu_zz)(emu_zz_input.data());
+}
+
+//______________________________________________________________________________________________
+float Analysis::VarOffZBDT(int var)
+{
+    // BDT variables
+    std::vector<float> offz_zz_input = {
+        this->VarMll(lep_Nom_idx1, lep_Nom_idx2), //"looper_MllN",
+        this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2), //"looper_ZPt",
+        this->VarMT2(var), //"looper_mt2",
+        this->VarLepPt(lep_Nom_idx1), //"looper_lep3Pt",
+        this->VarLepPt(lep_Nom_idx2), //"looper_lep4Pt",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(), //"looper_vecsum_pt_4l"
+        this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2), //"looper_scalarsum_pt_4l"
+        this->VarPtZeta(var), //"looper_pt_zeta",
+        this->VarPtZetaVis(var), //"looper_pt_zeta_vis",
+        this->VarMET(var), //"met_pt",
+        this->VarMTNom0(var), //"looper_lep3MT",
+        this->VarMTNom1(var), //"looper_lep4MT",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).mass() // "looper_m_4l"
+        };
+
+    // Evaluate the bdt score
+    return (*fast_forest_offz_zz)(offz_zz_input.data());
 }
 
 //______________________________________________________________________________________________
