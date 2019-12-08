@@ -247,8 +247,8 @@ public:
     FastForest* fast_forest_emu_zz;
     FastForest* fast_forest_emu_ttz;
     FastForest* fast_forest_offz_zz;
-    FastForest* fast_forest_offz_ttz;
     std::vector<std::string> emu_zz_features;
+    std::vector<std::string> offz_zz_features;
     std::vector<std::string> emu_ttz_features;
 
 //*******functions********//
@@ -338,6 +338,8 @@ public:
     bool CutEMuSig(int=0);
     bool CutEMuBDT();
     float CutEMuBDTWgt();
+    bool CutOffZBDT();
+    float CutOffZBDTWgt();
     bool CutHighMT(int=0);
     bool CutHighMET(int=0);
     bool CutMedMET(int=0);
@@ -409,6 +411,7 @@ public:
     float VarMT2(int=0);
     float VarZZBDT(int=0);
     float VarTTZBDT(int=0);
+    float VarOffZBDT(int=0);
 
     LeptonVectors GetLeptonVectors();
 
