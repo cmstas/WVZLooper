@@ -421,8 +421,8 @@ public:
     float VarMinDRJetsToLep(int);
     float VarARMT2(int=0);
     float VarMT2(int=0);
-    float computeAllBDTScores();
-    float resetAllBDTScores();
+    void computeAllBDTScores();
+    void resetAllBDTScores();
     float VarZZBDT(int=0);
     float VarTTZBDT(int=0);
     float VarOffZBDT(int=0);

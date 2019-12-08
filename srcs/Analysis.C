@@ -497,7 +497,10 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 }
                 });
 
-        histograms.addHistogram("emuBDT", 5, 0, 5, [&]()
+        histograms.addHistogram("emuBDTZZScore", 180, -10, 10, [&]() { computeAllBDTScores(); return emu_zz_bdt_score; });
+        histograms.addHistogram("emuBDTTTZScore", 180, -10, 10, [&]() { computeAllBDTScores(); return emu_ttz_bdt_score; });
+
+        histograms.addHistogram("emuBDT_Nominal", 5, 0, 5, [&]()
                 {
                 //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
                 // 0 , -inf                , -0.9076937735080719 , -inf               , inf
@@ -551,7 +554,9 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 return 4;
                 });
 
-        histograms.addHistogram("offzBDT", 2, 0, 2, [&]()
+        histograms.addHistogram("offzBDTScore", 180, -10, 10, [&]() { computeAllBDTScores(); return offz_zz_bdt_score; });
+
+        histograms.addHistogram("offzBDT_Nominal", 2, 0, 2, [&]()
                 {
                 // 0 , -inf , 3.0
                 // 1 , 3.0  , inf
@@ -1076,7 +1081,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             cutflow.bookHistogramsForCut(histograms, "ChannelBTagOffZHighMET");
             cutflow.bookHistogramsForCut(histograms, "FiveLeptonsMT5th");
             cutflow.bookHistogramsForCut(histograms, "SixLeptonsSumPtCut");
-            cutflow.bookHistogramsForCut(histograms_Z_peak, "Cut4LepLeptonPt");
+            // cutflow.bookHistogramsForCut(histograms_Z_peak, "Cut4LepLeptonPt");
             // cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAREMu");
             // cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAROffZ");
             // cutflow.bookHistogramsForCutAndBelow(histograms, "WZCRPresel");
@@ -4526,7 +4531,7 @@ float Analysis::VarARMT2(int var)
 }
 
 //______________________________________________________________________________________________
-float Analysis::computeAllBDTScores()
+void Analysis::computeAllBDTScores()
 {
     if (not bdt_score_computed)
     {
@@ -4544,7 +4549,7 @@ float Analysis::computeAllBDTScores()
 }
 
 //______________________________________________________________________________________________
-float Analysis::resetAllBDTScores()
+void Analysis::resetAllBDTScores()
 {
 
     emu_zz_bdt_score = -999;
