@@ -24,8 +24,10 @@ python rooutil/yield_for_keynote.py plots/$1/$2/yield/ChannelEMuHighMT__Yield.tx
 python rooutil/yield_for_keynote.py plots/$1/$2/yield/ChannelOnZ__Yield.txt > onz.txt
 python rooutil/yield_for_keynote.py plots/$1/$2/yield/ChannelBTagEMu__Yield.txt > btag.txt
 
+mkdir -p yield_summary
+
 ##head -n1 emu.txt > summary.txt
-tail -n2 emu.txt | head -n1 > summary_${1}_${2}.txt
-tail -n2 offz.txt | head -n1 >> summary_${1}_${2}.txt
-tail -n2 onz.txt | head -n1 >> summary_${1}_${2}.txt
-tail -n2 btag.txt | head -n1 >> summary_${1}_${2}.txt
+tail -n2 emu.txt | head -n1 > yield_summary/summary_${1}_${2}.txt
+tail -n2 offz.txt | head -n1 >> yield_summary/summary_${1}_${2}.txt
+tail -n2 onz.txt | head -n1 >> yield_summary/summary_${1}_${2}.txt
+tail -n2 btag.txt | head -n1 >> yield_summary/summary_${1}_${2}.txt
