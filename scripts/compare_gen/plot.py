@@ -1,5 +1,6 @@
 #!/bin/env python
 
+from __future__ import absolute_import
 import plottery_wrapper as p
 
 p.dump_plot(fnames=["4l2v.root"], data_fname="incl.root",

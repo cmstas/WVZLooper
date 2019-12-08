@@ -1,6 +1,20 @@
 #!/bin/env python
 
+
+from __future__ import absolute_import
+from __future__ import print_function
+import ROOT as r
+
+import pyrootutil as pr
+import plottery_wrapper as p
 import argparse
+import sys
+import os
+from errors import E
+import datacard_writer as dw
+from six.moves import range
+from six.moves import zip
+
 
 parser = argparse.ArgumentParser(description="Plotter for the WVZ analysis")
 parser.add_argument('-b' , '--baseline_tag'    , dest='baseline_tag'    , help='baseline tag (e.g. test, test1. test2, etc.)' , required=True)
@@ -143,8 +157,8 @@ def write_datacards(ntuple_version, tag):
     expected_nevt_ttz = bcr_data_h.GetBinContent(1)
 
     if not args.print_yields:
-        print year, "ttz_sf", "{:.2f} +/- {:.2f}".format(ttz_sf, ttz_sferr), expected_nevt_ttz
-        print year, "zz_sf", "{:.2f} +/- {:.2f}".format(zz_sf, zz_sferr), expected_nevt_zz
+        print(year, "ttz_sf", "{:.2f} +/- {:.2f}".format(ttz_sf, ttz_sferr), expected_nevt_ttz)
+        print(year, "zz_sf", "{:.2f} +/- {:.2f}".format(zz_sf, zz_sferr), expected_nevt_zz)
 
     ###############################
     # EMu channel data card writing
@@ -205,13 +219,13 @@ def write_datacards(ntuple_version, tag):
                 h.Scale(ttz_sf)
                 after_scale = h.Integral()
                 if syst == "Nominal":
-                    print year, "ttz", before_scale, after_scale
+                    print(year, "ttz", before_scale, after_scale)
             if proc == "zz":
                 before_scale = h.Integral()
                 h.Scale(zz_sf)
                 after_scale = h.Integral()
                 if syst == "Nominal":
-                    print year, "zz", before_scale, after_scale
+                    print(year, "zz", before_scale, after_scale)
             # if proc == "wz": h.Scale(2)
 
             hists_db[proc][syst] = h
@@ -220,7 +234,7 @@ def write_datacards(ntuple_version, tag):
 
     # ZZ CR systematic line
     onz_cr_hist = r.TH1F("onz_cr", "", nbins, 0, nbins)
-    for i in xrange(1, nbins+1):
+    for i in range(1, nbins+1):
         onz_cr_hist.SetBinContent(i, expected_nevt_zz)
     alpha = hists_db["zz"]["Nominal"].Clone("alpha")
     alpha.Divide(onz_cr_hist)
@@ -234,7 +248,7 @@ def write_datacards(ntuple_version, tag):
 
     # ttZ CR systematic line
     btag_cr_hist = r.TH1F("btag_cr", "", nbins, 0, nbins)
-    for i in xrange(1, nbins+1):
+    for i in range(1, nbins+1):
         btag_cr_hist.SetBinContent(i, expected_nevt_ttz)
     alpha = hists_db["ttz"]["Nominal"].Clone("alpha")
     alpha.Divide(btag_cr_hist)
@@ -405,13 +419,13 @@ def write_datacards(ntuple_version, tag):
                 h.Scale(ttz_sf)
                 after_scale = h.Integral()
                 if syst == "Nominal":
-                    print year, "ttz", before_scale, after_scale
+                    print(year, "ttz", before_scale, after_scale)
             if proc == "zz":
                 before_scale = h.Integral()
                 h.Scale(zz_sf)
                 after_scale = h.Integral()
                 if syst == "Nominal":
-                    print year, "zz", before_scale, after_scale
+                    print(year, "zz", before_scale, after_scale)
             # if proc == "wz": h.Scale(2)
 
             hists_db[proc][syst] = h
@@ -420,7 +434,7 @@ def write_datacards(ntuple_version, tag):
 
     # ZZ CR systematic line
     onz_cr_hist = r.TH1F("onz_cr", "", nbins, 0, nbins)
-    for i in xrange(1, nbins+1):
+    for i in range(1, nbins+1):
         onz_cr_hist.SetBinContent(i, expected_nevt_zz)
     alpha = hists_db["zz"]["Nominal"].Clone("alpha")
     alpha.Divide(onz_cr_hist)
@@ -434,7 +448,7 @@ def write_datacards(ntuple_version, tag):
 
     # ttZ CR systematic line
     btag_cr_hist = r.TH1F("btag_cr", "", nbins, 0, nbins)
-    for i in xrange(1, nbins+1):
+    for i in range(1, nbins+1):
         btag_cr_hist.SetBinContent(i, expected_nevt_ttz)
     alpha = hists_db["ttz"]["Nominal"].Clone("alpha")
     alpha.Divide(btag_cr_hist)
@@ -586,7 +600,7 @@ def write_datacards(ntuple_version, tag):
         for index, item in enumerate(finalyields):
             for procfullname, rate in zip(item[0], item[1]):
                 procname = procfullname.split("_")[1]
-                print index, procname, rate
+                print(index, procname, rate)
                 histsdict[procname].SetBinContent(index+1, rate.val)
                 histsdict[procname].SetBinError(index+1, rate.err)
         if args.nonh_vh_split:

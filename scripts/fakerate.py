@@ -6,6 +6,8 @@
 #
 ###########################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 from plottery import plottery as ply
 import plottery_wrapper as p
 import ROOT as r
@@ -14,15 +16,17 @@ import sys
 import read_table as rt
 from errors import E
 from array import array
+from six.moves import range
+from six.moves import zip
 
 #____________________________________________________________________________________
 # Help function of this plotter script
 def usage():
-    print "Usage:"
-    print ""
-    print "   $ {} ntuple_version tag".format(sys.argv[0])
-    print ""
-    print ""
+    print("Usage:")
+    print("")
+    print("   $ {} ntuple_version tag".format(sys.argv[0]))
+    print("")
+    print("")
     sys.exit(-1)
 
 #____________________________________________________________________________________
@@ -65,7 +69,7 @@ def main_fake_rate_measurement(prefix, output_name, etaregion="", procname="ttba
     fr_data.pop(0) # first one is underflow bin
     fr_data.pop(0) # second one is underflow bin
     fr_data.pop(-1) # last one is overflow bin
-    print fr_data
+    print(fr_data)
 
     # Denominator: Fake directly from ttbar MC
     yields_ttbar = rt.read_table(basedir + prefix + "Fake__lepFakeCand2PtFineVarBin"+etaregion+".txt")
@@ -82,7 +86,7 @@ def main_fake_rate_measurement(prefix, output_name, etaregion="", procname="ttba
             fr_mc.append(fr)
         else:
             fr_mc.append(E(0, 0))
-    print fr_mc
+    print(fr_mc)
     fr_mc.pop(0) # first one is underflow bin
     fr_mc.pop(0) # second one is underflow bin
     fr_mc.pop(-1) # last one is overflow bin
@@ -201,7 +205,7 @@ def save_fake_rate(fr_mc_fwd, fr_data_fwd, fr_mc_cen, fr_data_cen, output_name):
     fr_data = r.TH2F(output_name+"_data", "", len(ptbounds)-1, array('d',ptbounds), len(etabounds)-1, array('d',etabounds))
     fr_mc = r.TH2F(output_name+"_mc", "", len(ptbounds)-1, array('d',ptbounds), len(etabounds)-1, array('d',etabounds))
 
-    for i in xrange(1, len(ptbounds)):
+    for i in range(1, len(ptbounds)):
         fr_data_fwd_val = fr_data_fwd.GetBinContent(i)
         fr_data_cen_val = fr_data_cen.GetBinContent(i)
         fr_data_fwd_err = fr_data_fwd.GetBinError(i)
@@ -211,7 +215,7 @@ def save_fake_rate(fr_mc_fwd, fr_data_fwd, fr_mc_cen, fr_data_cen, output_name):
         fr_data.SetBinContent(i, 2, fr_data_fwd_val)
         fr_data.SetBinError(i, 2, fr_data_fwd_err)
 
-    for i in xrange(1, len(ptbounds)):
+    for i in range(1, len(ptbounds)):
         fr_mc_fwd_val = fr_mc_fwd.GetBinContent(i)
         fr_mc_cen_val = fr_mc_cen.GetBinContent(i)
         fr_mc_fwd_err = fr_mc_fwd.GetBinError(i)

@@ -6,6 +6,8 @@
 #
 ###########################################
 
+from __future__ import absolute_import
+from __future__ import print_function
 import plottery_wrapper as p
 import ROOT as r
 import glob
@@ -14,11 +16,11 @@ import sys
 #____________________________________________________________________________________
 # Help function of this plotter script
 def usage():
-    print "Usage:"
-    print ""
-    print "   $ {} ntuple_version tag".format(sys.argv[0])
-    print ""
-    print ""
+    print("Usage:")
+    print("")
+    print("   $ {} ntuple_version tag".format(sys.argv[0]))
+    print("")
+    print("")
     sys.exit(-1)
 
 #____________________________________________________________________________________

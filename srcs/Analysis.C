@@ -266,6 +266,11 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         // cutflow.addCutToLastActiveCut("FiveLeptonsMuRelIso5th"  , [&](){ return this->Is5thNominal();            } , UNITY );
         // cutflow.addCutToLastActiveCut("FiveLeptonsMuMT5th"      , [&](){ return this->Is5thNominal();            } , UNITY );
 
+        //Common six lepton selections
+        cutflow.getCut("Weight");
+        cutflow.addCutToLastActiveCut("SixLeptons"                     , [&](){ return this->Is6LeptonEvent();          } , [&](){ return this->LeptonScaleFactor(); } );
+        cutflow.addCutToLastActiveCut("SixLeptonsSumPtCut"             , [&](){ return this->CutHighSumLepPt();         } , UNITY );
+
         cutflow.getCut("Weight");
         cutflow.addCutToLastActiveCut("ARFindZCandLeptons"            , [&](){ return this->FindZCandLeptons();        } , UNITY );
         cutflow.addCutToLastActiveCut("ARFindOSOneNomOneNotNomLeptons", [&](){ return this->FindOSOneNomOneNotNomLeptons(); }, UNITY );
@@ -760,16 +765,16 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 {
                 if (wvz.isData()) return 1.f;
                 if (year == 2016) return getTruePUw2016(wvz.nTrueInt()) != 0 ? getTruePUwUp2016(wvz.nTrueInt()) / getTruePUw2016(wvz.nTrueInt()) : 0;
-                else if (year == 2017) return getTruePUw2016(wvz.nTrueInt()) != 0 ? getTruePUwUp2017(wvz.nTrueInt()) / getTruePUw2017(wvz.nTrueInt()) : 0;
-                else if (year == 2018) return getTruePUw2016(wvz.nTrueInt()) != 0 ? getTruePUwUp2018(wvz.nTrueInt()) / getTruePUw2018(wvz.nTrueInt()) : 0;
+                else if (year == 2017) return getTruePUw2017(wvz.nTrueInt()) != 0 ? getTruePUwUp2017(wvz.nTrueInt()) / getTruePUw2017(wvz.nTrueInt()) : 0;
+                else if (year == 2018) return getTruePUw2018(wvz.nTrueInt()) != 0 ? getTruePUwUp2018(wvz.nTrueInt()) / getTruePUw2018(wvz.nTrueInt()) : 0;
                 return 0.f;
                 } );
         cutflow.addWgtSyst("PileupDown"  , [&]()
                 {
                 if (wvz.isData()) return 1.f;
                 if (year == 2016) return getTruePUw2016(wvz.nTrueInt()) != 0 ? getTruePUwDn2016(wvz.nTrueInt()) / getTruePUw2016(wvz.nTrueInt()) : 0;
-                else if (year == 2017) return getTruePUw2016(wvz.nTrueInt()) != 0 ? getTruePUwDn2017(wvz.nTrueInt()) / getTruePUw2017(wvz.nTrueInt()) : 0;
-                else if (year == 2018) return getTruePUw2016(wvz.nTrueInt()) != 0 ? getTruePUwDn2018(wvz.nTrueInt()) / getTruePUw2018(wvz.nTrueInt()) : 0;
+                else if (year == 2017) return getTruePUw2017(wvz.nTrueInt()) != 0 ? getTruePUwDn2017(wvz.nTrueInt()) / getTruePUw2017(wvz.nTrueInt()) : 0;
+                else if (year == 2018) return getTruePUw2018(wvz.nTrueInt()) != 0 ? getTruePUwDn2018(wvz.nTrueInt()) / getTruePUw2018(wvz.nTrueInt()) : 0;
                 return 0.f;
                 } );
 
@@ -1055,6 +1060,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             cutflow.bookHistogramsForCut(histograms, "ChannelBTagOffZ");
             cutflow.bookHistogramsForCut(histograms, "ChannelBTagOffZHighMET");
             cutflow.bookHistogramsForCut(histograms, "FiveLeptonsMT5th");
+            cutflow.bookHistogramsForCut(histograms, "SixLeptons");
+            cutflow.bookHistogramsForCut(histograms, "SixLeptonsSumPtCut");
             cutflow.bookHistogramsForCut(histograms_Z_peak, "Cut4LepLeptonPt");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAREMu");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAROffZ");
@@ -1073,7 +1080,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.bookHistogramsForCutAndBelow(histograms, "ThreeLeptonsTTZ");
     }
 
-    // cutflow.filterCuts({"FiveLeptonsMT5th"});
+    cutflow.filterCuts({"FiveLeptonsMT5th", "SixLeptonsSumPtCut"});
 
     // Looper class to facilitate various things
     TChain* ch = new TChain("t");
@@ -2576,6 +2583,10 @@ float Analysis::LeptonScaleFactor(int vare, int varm)
     {
         return LeptonScaleFactor5Lep(vare, varm);
     }
+    else if (nVetoLeptons >= 6)
+    {
+        return LeptonScaleFactor6Lep(vare, varm);
+    }
     else
     {
         return 1.;
@@ -2608,6 +2619,20 @@ float Analysis::LeptonScaleFactor5Lep(int vare, int varm)
     scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx1, false, vare, varm);
     scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx2, false, vare, varm);
     scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_W_idx, false, vare, varm);
+    return scalefactor;
+}
+
+//______________________________________________________________________________________________
+float Analysis::LeptonScaleFactor6Lep(int vare, int varm)
+{
+    if (wvz.isData())
+        return 1.;
+    // Based on lep_Veto indices
+    float scalefactor = 1;
+    for(unsigned int i=0; i<wvz.lep_pt().size(); i++)
+    {
+      scalefactor *= IndividualLeptonScaleFactor(i, false, vare, varm);
+    }
     return scalefactor;
 }
 
@@ -3177,9 +3202,19 @@ bool Analysis::CutHighMT(int var)
     }
     else if (nVetoLeptons == 5)
     {
-        if (not (VarMT5th(var) > 50.)) return false;
+        if (not (wvz.nb() == 0)) return false;  //lumped into this cut because "[&](){ return wvz.nb() == 0; }, UNITY );" at the level of addCutToLastActiveCut failed for some reason  
+        if((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11))
+        {
+          if(not (VarMT5th(var) > 50.)) return false;
+        }
+        else if((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 13)) return true;
         return true;
     }
+    /*else if (nVetoLeptons == 5)
+    {
+        if (not (VarMT5th(var) > 50.)) return false;
+        return true;
+    }*/
 }
 
 //______________________________________________________________________________________________
@@ -3361,9 +3396,31 @@ bool Analysis::CutHighMTAR(int var)
     }
     else if (nVetoLeptons == 5)
     {
-        if (not (VarMT5th(var) > 50.)) return false;
+        if (not (wvz.nb() == 0)) return false;  //lumped into this cut because "[&](){ return wvz.nb() == 0; }, UNITY );" at the level of addCutToLastActiveCut failed for some reason  
+        if((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11))
+        {
+          if(not (VarMT5th(var) > 50.)) return false;
+        }
+        else if((abs(wvz.lep_id()[lep_5Lep_W_idx]) == 13)) return true;
         return true;
     }
+    /*else if (nVetoLeptons == 5)
+    {
+        if (not (VarMT5th(var) > 50.)) return false;
+        return true;
+    }*/
+}
+
+//______________________________________________________________________________________________
+bool Analysis::CutHighSumLepPt()
+{
+  double sumLepPt = 0.0;
+  for(unsigned int i=0; i<wvz.lep_pt().size(); i++)
+    sumLepPt +=  wvz.lep_pt().at(i);
+
+  if(sumLepPt > 250) return true;
+  else return false;
+
 }
 
 //______________________________________________________________________________________________
@@ -3583,6 +3640,13 @@ bool Analysis::Is5LeptonEvent()
     if (not (wvz.lep_pt()[lep_5Lep_Z1_idx2] > 10)) return false;
     if (not (wvz.lep_pt()[lep_5Lep_Z2_idx1] > 25)) return false;
     if (not (wvz.lep_pt()[lep_5Lep_Z2_idx2] > 10)) return false;
+    return true;
+}
+
+bool Analysis::Is6LeptonEvent()
+{
+    if (not (nVetoLeptons >= 6)) return false;
+    if (not (CutHLT())) return false;
     return true;
 }
 
@@ -3824,11 +3888,12 @@ bool Analysis::Is5thNominal()
 
     // return passNominalLeptonID(lep_WCand_idx1) and passNominalLeptonID(lep_2ndZCand_idx2) and wvz.lep_p4()[lep_WCand_idx1].pt() > 20.;
 
-    if (abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11)
+    /*if (abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11)
         return wvz.lep_relIso03EA()[lep_5Lep_W_idx] < 0.1;
     else
         return wvz.lep_relIso04DB()[lep_5Lep_W_idx] < 0.1;
-
+    */
+    if (passNominalLeptonID(lep_5Lep_W_idx)) return true;
     // if (lep_relIso03EA->at(lep_WCand_idx1) < 0.1)
     //     return true;
     // else
