@@ -251,6 +251,18 @@ public:
     std::vector<std::string> offz_zz_features;
     std::vector<std::string> emu_ttz_features;
 
+    float emu_zz_bdt_score;
+    float offz_zz_bdt_score;
+    float emu_ttz_bdt_score;
+    float emu_zz_bdt_score_up;
+    float offz_zz_bdt_score_up;
+    float emu_ttz_bdt_score_up;
+    float emu_zz_bdt_score_dn;
+    float offz_zz_bdt_score_dn;
+    float emu_ttz_bdt_score_dn;
+
+    bool bdt_score_computed;
+
 //*******functions********//
     Analysis(const char* ifileName, const char* RootName);
     virtual ~Analysis();
@@ -409,6 +421,8 @@ public:
     float VarMinDRJetsToLep(int);
     float VarARMT2(int=0);
     float VarMT2(int=0);
+    float computeAllBDTScores();
+    float resetAllBDTScores();
     float VarZZBDT(int=0);
     float VarTTZBDT(int=0);
     float VarOffZBDT(int=0);

@@ -74,4 +74,4 @@ for i in $(ls -r /nfs-7/userdata/phchang/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVER
 done
 
 mkdir -p outputs/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/${TAG}
-sh rooutil/xargs.sh -n 6 .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}_${FILTERCUTS}.txt
+sh rooutil/xargs.sh -n 9 .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}_${FILTERCUTS}.txt

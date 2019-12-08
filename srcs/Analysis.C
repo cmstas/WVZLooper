@@ -35,7 +35,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     newbranchesadded = false; // This is needed to check whether the branches were added to the skim tree
 
     // To whether or not run eventlist
-    bool doEventList = true;
+    bool doEventList = false;
 
     // Parsing year
     if (ntupleVersion.Contains("v0.0.5")) year = -1; // Meaning use this sets to scale it up to 137
@@ -449,6 +449,139 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
 
     if (not ntupleVersion.Contains("Trilep"))
     {
+        histograms.addHistogram("Yield"          , 1   , 0       , 1      , [&](){ return 0; });
+        histograms.addHistogram("emuSR"          , 4, 0, 4, [&]()
+                {
+                if (this->VarMll() > 100.)
+                {
+                return 3;
+                }
+                else if (this->VarMT2() > 25.)
+                {
+                if (this->VarMll() > 60.)
+                return 2;
+                else if (this->VarMll() > 40.)
+                return 1;
+                else
+                return 0;
+                }
+                else
+                {
+                return -999;
+                }
+                });
+        histograms.addHistogram("eemmSR"         , 3, 0, 3, [&]()
+                {
+                if (this->VarMET() > 120.)
+                {
+                return 0;
+                }
+                else if (this->VarMET() > 70.)
+                {
+                if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 70.)
+                {
+                return 1;
+                }
+                else if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 40.)
+                {
+                return 2;
+                }
+                else
+                {
+                return -999;
+                }
+                }
+                else
+                {
+                    return -999;
+                }
+                });
+
+        histograms.addHistogram("emuBDT", 5, 0, 5, [&]()
+                {
+                //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                computeAllBDTScores();
+                float emuZZBDT = emu_zz_bdt_score;
+                if (emuZZBDT < -0.9076937735080719) return 0;
+                float emuTTZBDT = emu_ttz_bdt_score;
+                if (emuTTZBDT < 0.0148177370429039) return 1;
+                if (emuZZBDT < 0.7326840460300446) return 2;
+                if (emuTTZBDT < 3.523359537124634) return 3;
+                return 4;
+                });
+
+        histograms.addHistogram("emuBDT_JESUp", 5, 0, 5, [&]()
+                {
+                //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                computeAllBDTScores();
+                float emuZZBDT = emu_zz_bdt_score_up;
+                if (emuZZBDT < -0.9076937735080719) return 0;
+                float emuTTZBDT = emu_ttz_bdt_score_up;
+                if (emuTTZBDT < 0.0148177370429039) return 1;
+                if (emuZZBDT < 0.7326840460300446) return 2;
+                if (emuTTZBDT < 3.523359537124634) return 3;
+                return 4;
+                });
+
+        histograms.addHistogram("emuBDT_JESDown", 5, 0, 5, [&]()
+                {
+                //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                computeAllBDTScores();
+                float emuZZBDT = emu_zz_bdt_score_up;
+                if (emuZZBDT < -0.9076937735080719) return 0;
+                float emuTTZBDT = emu_ttz_bdt_score_up;
+                if (emuTTZBDT < 0.0148177370429039) return 1;
+                if (emuZZBDT < 0.7326840460300446) return 2;
+                if (emuTTZBDT < 3.523359537124634) return 3;
+                return 4;
+                });
+
+        histograms.addHistogram("offzBDT", 2, 0, 2, [&]()
+                {
+                // 0 , -inf , 3.0
+                // 1 , 3.0  , inf
+                computeAllBDTScores();
+                float offzZZBDT = offz_zz_bdt_score;
+                if (offzZZBDT > 3.0) return 1;
+                else return 0;
+                });
+
+        histograms.addHistogram("offzBDT_JESUp", 2, 0, 2, [&]()
+                {
+                // 0 , -inf , 3.0
+                // 1 , 3.0  , inf
+                computeAllBDTScores();
+                float offzZZBDT = offz_zz_bdt_score_up;
+                if (offzZZBDT > 3.0) return 1;
+                else return 0;
+                });
+
+        histograms.addHistogram("offzBDT_JESDown", 2, 0, 2, [&]()
+                {
+                // 0 , -inf , 3.0
+                // 1 , 3.0  , inf
+                computeAllBDTScores();
+                float offzZZBDT = offz_zz_bdt_score_dn;
+                if (offzZZBDT > 3.0) return 1;
+                else return 0;
+                });
+
+
         if (not doSyst)
         {
             histograms.addHistogram("Mll"            , 180 , 0       , 300    , [&](){ return this->VarMll(); });
@@ -557,7 +690,6 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             histograms.addHistogram("MTNomMin"       , 180 , 0       , 180    , [&](){ return this->VarMTMin(); });
             histograms.addHistogram("MTNFMax"        , 180 , 0       , 150    , [&](){ return (this->VarMTNom0() > this->VarMTFakeable() ? this->VarMTNom0() : this->VarMTFakeable()); });
             // histograms.addHistogram("WindowMllNom"   , 180 , 0       , 50     , [&](){ return fabs(this->VarMll(lep_Nom_idx1, lep_Nom_idx2)-91.1876); });
-            histograms.addHistogram("Yield"          , 1   , 0       , 1      , [&](){ return 0; });
             histograms.addHistogram("lepFrelIso03EA" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EA()[lep_Fakeable_idx] : -999; });
             histograms.addHistogram("lepFrelIso04DB" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso04DB()[lep_Fakeable_idx] : -999; });
             // histograms.addHistogram("jetPt0"         , 180 , 0.      , 200    , [&](){ return wvz.jets_p4().size() > 0 ? wvz.jets_p4()[0].pt() : -999; });
@@ -575,310 +707,6 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             histograms.addHistogram("pt_zeta"        , 180 , -200    , 200       , [&](){ return this->VarPtZetaDiff(); });
             histograms.addHistogram("pt_zeta_vis"    , 180 , -200    , 550       , [&](){ return this->VarPtZetaVis(); });
             histograms.addHistogram("pt_zeta_sum"    , 180 , -200    , 550       , [&](){ return this->VarPtZeta(); });
-            histograms.addHistogram("emuSR"          , 4, 0, 4, [&]()
-                    {
-                    if (this->VarMll() > 100.)
-                    {
-                    return 3;
-                    }
-                    else if (this->VarMT2() > 25.)
-                    {
-                    if (this->VarMll() > 60.)
-                    return 2;
-                    else if (this->VarMll() > 40.)
-                    return 1;
-                    else
-                    return 0;
-                    }
-                    else
-                    {
-                    return -999;
-                    }
-                    });
-            histograms.addHistogram("eemmSR"         , 3, 0, 3, [&]()
-                    {
-                    if (this->VarMET() > 120.)
-                    {
-                    return 0;
-                    }
-                    else if (this->VarMET() > 70.)
-                    {
-                    if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 70.)
-                    {
-                    return 1;
-                    }
-                    else if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 40.)
-                    {
-                    return 2;
-                    }
-                    else
-                    {
-                    return -999;
-                    }
-                    }
-                    else
-                    {
-                        return -999;
-                    }
-                    });
-
-            histograms.addHistogram("emuBDT", 5, 0, 5, [&]()
-                    {
-                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                    float emuZZBDT = this->VarZZBDT();
-                    if (emuZZBDT < -0.9076937735080719) return 0;
-                    float emuTTZBDT = this->VarTTZBDT();
-                    if (emuTTZBDT < 0.0148177370429039) return 1;
-                    if (emuZZBDT < 0.7326840460300446) return 2;
-                    if (emuTTZBDT < 3.523359537124634) return 3;
-                    return 4;
-                    });
-
-            histograms.addHistogram("emuBDT_JESUp", 5, 0, 5, [&]()
-                    {
-                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                    float emuZZBDT = this->VarZZBDT(1);
-                    if (emuZZBDT < -0.9076937735080719) return 0;
-                    float emuTTZBDT = this->VarTTZBDT(1);
-                    if (emuTTZBDT < 0.0148177370429039) return 1;
-                    if (emuZZBDT < 0.7326840460300446) return 2;
-                    if (emuTTZBDT < 3.523359537124634) return 3;
-                    return 4;
-                    });
-
-            histograms.addHistogram("emuBDT_JESDown", 5, 0, 5, [&]()
-                    {
-                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                    float emuZZBDT = this->VarZZBDT(-1);
-                    if (emuZZBDT < -0.9076937735080719) return 0;
-                    float emuTTZBDT = this->VarTTZBDT(-1);
-                    if (emuTTZBDT < 0.0148177370429039) return 1;
-                    if (emuZZBDT < 0.7326840460300446) return 2;
-                    if (emuTTZBDT < 3.523359537124634) return 3;
-                    return 4;
-                    });
-
-        }
-        else
-        {
-            histograms.addHistogram("Mll"            , 180 , 0       , 300    , [&](){ return this->VarMll(); });
-            histograms.addHistogram("MET"            , 180 , 0       , 300    , [&](){ return this->VarMET(); });
-            histograms.addHistogram("Pt4l"           , 180 , 0       , 300    , [&](){ return (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(); });
-            histograms.addHistogram("METmod"         , 180 , 0       , 300    , [&](){ return this->VarMET() + (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() / 2.; });
-            histograms.addHistogram("OrigMET"        , 180 , 0       , 300    , [&](){ return useMVAID ? wvz.met_orig_pt() : wvz.met_pt(); });
-            histograms.addHistogram("ID5thraw"       , 180 , -15     , 15     , [&](){ return wvz.lep_id()[lep_5Lep_W_idx]; });
-            histograms.addHistogram("ID5th"          , 2   , 0       , 2      , [&](){ return abs(wvz.lep_id()[lep_5Lep_W_idx]) == 11 ? 0 : 1; });
-            histograms.addHistogram("IsoMed5th"      , 2   , 0       , 2      , [&](){ return wvz.lep_isCutBasedIsoMediumPOG()[lep_5Lep_W_idx]; });
-            histograms.addHistogram("IsoTight5th"    , 2   , 0       , 2      , [&](){ return wvz.lep_isCutBasedIsoTightPOG()[lep_5Lep_W_idx]; });
-            histograms.addHistogram("MT5th"          , 180 , 0       , 300    , [&](){ return this->VarMT5th(); });
-            histograms.addHistogram("RelIso5th"      , 180 , 0       , 0.4    , [&](){ return this->VarRelIso5th(); });
-            histograms.addHistogram("Njet"           , 6   , 0       , 6      , [&](){ return this->VarNjet(); });
-            histograms.addHistogram("Mjj"            , 180 , 0       , 300    , [&](){ return this->VarMjj(); });
-            histograms.addHistogram("MjjMinDR"       , 180 , 0       , 300    , [&](){ return this->VarMjjMinDR(); });
-            histograms.addHistogram("Nbjet"          , 6   , 0       , 6      , [&](){ return this->VarNb(); });
-            histograms.addHistogram("Nbjetmed"       , 6   , 0       , 6      , [&](){ return this->VarNbmed(); });
-            histograms.addHistogram("lepZPt0"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_ZCand_idx1); });
-            histograms.addHistogram("lepZPt1"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_ZCand_idx2); });
-            histograms.addHistogram("lepNPt0"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Nom_idx1); });
-            histograms.addHistogram("lepNPt1"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Nom_idx2); });
-            histograms.addHistogram("lepFPt0"        , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Fakeable_idx); });
-            histograms.addHistogram("lepFEta0"       , 180 , 0       , 200    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_eta()[lep_Fakeable_idx] : -999; });
-            histograms.addHistogram("lepZIsoEALep0"  , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? (wvz.lep_relIso03EA().at(lep_ZCand_idx1)) : 999; });
-            histograms.addHistogram("lepZIsoEALep1"  , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? (wvz.lep_relIso03EA().at(lep_ZCand_idx2)) : 999; });
-            histograms.addHistogram("lepZIsoEALepMax", 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? std::max(wvz.lep_relIso03EA().at(lep_ZCand_idx1), wvz.lep_relIso03EA().at(lep_ZCand_idx2)) : 999; });
-            histograms.addHistogram("lepNIsoEALep0"  , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx1 >= 0 ? (wvz.lep_relIso03EA().at(lep_Nom_idx1)) : 999; });
-            histograms.addHistogram("lepFIsoEALep0"  , 180 , 0       , 0.4    , [&](){ return lep_Fakeable_idx >= 0 ? (wvz.lep_relIso03EA().at(lep_Fakeable_idx)) : 999; });
-            histograms.addHistogram("lepZIsoLep0"    , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? (wvz.lep_relIso03EAwLep().at(lep_ZCand_idx1)) : 999; });
-            histograms.addHistogram("lepZIsoLep1"    , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? (wvz.lep_relIso03EAwLep().at(lep_ZCand_idx2)) : 999; });
-            histograms.addHistogram("lepZIsoLepMax"  , 180 , 0       , 0.4    , [&](){ return lep_ZCand_idx2 >= 0 ? std::max(wvz.lep_relIso03EAwLep().at(lep_ZCand_idx1), wvz.lep_relIso03EAwLep().at(lep_ZCand_idx2)) : 999; });
-            histograms.addHistogram("lepNIsoLep0"    , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 >= 0 ? (wvz.lep_relIso03EAwLep().at(lep_Nom_idx1)) : 999; });
-            histograms.addHistogram("lepNIsoLep1"    , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 >= 0 ? (wvz.lep_relIso03EAwLep().at(lep_Nom_idx2)) : 999; });
-            histograms.addHistogram("lepNIsoEl"      , 180 , 0       , 0.4    , [&](){ return lep_Nom_idx2 >= 0 ? (abs(wvz.lep_id().at(lep_Nom_idx1)) == 11 ? wvz.lep_relIso03EAwLep().at(lep_Nom_idx1) : wvz.lep_relIso03EAwLep().at(lep_Nom_idx2)) : 999; });
-            histograms.addHistogram("lepZ2Pt0"       , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Z2Cand_idx1); });
-            histograms.addHistogram("lepZ2Pt1"       , 180 , 0       , 200    , [&](){ return this->VarLepPt(lep_Z2Cand_idx2); });
-            histograms.addHistogram("lepZEta0"       , 180 , -5      , 5      , [&](){ return lep_ZCand_idx1 >= 0 ? wvz.lep_eta()[lep_ZCand_idx1] : -999; });
-            histograms.addHistogram("lepZEta1"       , 180 , -5      , 5      , [&](){ return lep_ZCand_idx2 >= 0 ? wvz.lep_eta()[lep_ZCand_idx2] : -999; });
-            histograms.addHistogram("lepNEta0"       , 180 , -5      , 5      , [&](){ return lep_Nom_idx1 >= 0 ? wvz.lep_eta()[lep_Nom_idx1] : -999; });
-            histograms.addHistogram("lepNEta1"       , 180 , -5      , 5      , [&](){ return lep_Nom_idx2 >= 0 ? wvz.lep_eta()[lep_Nom_idx2] : -999; });
-            histograms.addHistogram("lepZ2Eta0"      , 180 , -5      , 5      , [&](){ return lep_Z2Cand_idx1 >= 0 ? wvz.lep_eta()[lep_Z2Cand_idx1] : -999; });
-            histograms.addHistogram("lepZ2Eta1"      , 180 , -5      , 5      , [&](){ return lep_Z2Cand_idx2 >= 0 ? wvz.lep_eta()[lep_Z2Cand_idx2] : -999; });
-            histograms.addHistogram("lepNip3d0"      , 180 , 0       , 0.1    , [&](){ return lep_Nom_idx1 >= 0 ? fabs(wvz.lep_ip3d()[lep_Nom_idx1]) : -999; });
-            histograms.addHistogram("lepNip3d1"      , 180 , 0       , 0.1    , [&](){ return lep_Nom_idx2 >= 0 ? fabs(wvz.lep_ip3d()[lep_Nom_idx2]) : -999; });
-            histograms.addHistogram("lepNdxy0"       , 180 , 0       , 0.1    , [&](){ return lep_Nom_idx1 >= 0 ? fabs(wvz.lep_dxy()[lep_Nom_idx1]) : -999; });
-            histograms.addHistogram("lepNdxy1"       , 180 , 0       , 0.1    , [&](){ return lep_Nom_idx2 >= 0 ? fabs(wvz.lep_dxy()[lep_Nom_idx2]) : -999; });
-            histograms.addHistogram("lepNdz0"        , 180 , 0       , 0.1    , [&](){ return lep_Nom_idx1 >= 0 ? fabs(wvz.lep_dz()[lep_Nom_idx1]) : -999; });
-            histograms.addHistogram("lepNdz1"        , 180 , 0       , 0.1    , [&](){ return lep_Nom_idx2 >= 0 ? fabs(wvz.lep_dz()[lep_Nom_idx2]) : -999; });
-            histograms.addHistogram("MllZCand"       , 180 , 0       , 200    , [&](){ return this->VarMll(lep_ZCand_idx1, lep_ZCand_idx2); });
-            histograms.addHistogram("MllNom"         , 180 , 0       , 250    , [&](){ return this->VarMll(lep_Nom_idx1, lep_Nom_idx2); });
-            histograms.addHistogram("MllZ2Cand"      , 180 , 0       , 200    , [&](){ return this->VarMll(lep_Z2Cand_idx1, lep_Z2Cand_idx2); });
-            histograms.addHistogram("MZZ4l"          , 180 , 0       , 450    , [&](){ return this->VarM4l(lep_Z2Cand_idx1, lep_Z2Cand_idx2, lep_ZCand_idx1, lep_ZCand_idx2); });
-            histograms.addHistogram("MZZ4lZoom"      , 180 , 115     , 135    , [&](){ return this->VarM4l(lep_Z2Cand_idx1, lep_Z2Cand_idx2, lep_ZCand_idx1, lep_ZCand_idx2); });
-            histograms.addHistogram("PtllZCand"      , 180 , 0       , 200    , [&](){ return this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2); });
-            histograms.addHistogram("PtllNom"        , 180 , 0       , 200    , [&](){ return this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2); });
-            histograms.addHistogram("HTHad"          , 180 , 0       , 200    , [&](){ return wvz.ht(); });
-            histograms.addHistogram("HTLep"          , 180 , 0       , 200    , [&](){ return this->VarHTLep(lep_Nom_idx1, lep_Nom_idx2, lep_ZCand_idx1, lep_ZCand_idx2); });
-            histograms.addHistogram("HTLep5"         , 180 , 0       , 500    , [&](){ return this->VarHTLep5(); });
-            histograms.addHistogram("lepNTauLep"     , 5   , 0       , 5      , [&](){ return lep_Veto_idx4 >= 0 ? (abs(wvz.lep_mc_motherid().at(lep_Veto_idx1))==15)+(abs(wvz.lep_mc_motherid().at(lep_Veto_idx2))==15)+(abs(wvz.lep_mc_motherid().at(lep_Veto_idx3))==15)+(abs(wvz.lep_mc_motherid().at(lep_Veto_idx4))==15) : -999; });
-            histograms.addHistogram("nlepNotNom"     , 5   , 0       , 5      , [&](){ return lep_notnom_idxs.size(); });
-            histograms.addHistogram("MTNom0"         , 180 , 0       , 180    , [&](){ return this->VarMTNom0(); });
-            histograms.addHistogram("MTNom1"         , 180 , 0       , 150    , [&](){ return this->VarMTNom1(); });
-            histograms.addHistogram("LargeMTNom0"    , 180 , 0       , 300    , [&](){ return this->VarMTNom0(); });
-            histograms.addHistogram("LargeMTNom1"    , 180 , 0       , 300    , [&](){ return this->VarMTNom1(); });
-            histograms.addHistogram("MTSum"          , 180 , 0       , 400    , [&](){ return this->VarMTNom0() + this->VarMTNom1(); });
-            histograms.addHistogram("LargeMTSum"     , 180 , 0       , 600    , [&](){ return this->VarMTNom0() + this->VarMTNom1(); });
-            histograms.addHistogram("MT2"            , 180 , 0       , 180    , [&](){ return this->VarMT2(); });
-            histograms.addHistogram("MT2AR"          , 180 , 0       , 180    , [&](){ return this->VarARMT2(); });
-            histograms.addHistogram("MTFakeable"     , 180 , 0       , 150    , [&](){ return this->VarMTFakeable(); });
-            histograms.addHistogram("MTNomMax"       , 180 , 0       , 180    , [&](){ return this->VarMTMax(); });
-            histograms.addHistogram("MTNomMin"       , 180 , 0       , 180    , [&](){ return this->VarMTMin(); });
-            histograms.addHistogram("MTNFMax"        , 180 , 0       , 150    , [&](){ return (this->VarMTNom0() > this->VarMTFakeable() ? this->VarMTNom0() : this->VarMTFakeable()); });
-            histograms.addHistogram("Yield"          , 1   , 0       , 1      , [&](){ return 0; });
-            histograms.addHistogram("lepFrelIso03EA" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EA()[lep_Fakeable_idx] : -999; });
-            histograms.addHistogram("lepFrelIso04DB" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso04DB()[lep_Fakeable_idx] : -999; });
-            histograms.addHistogram("pt_zeta"        , 180 , -200    , 200       , [&](){ return this->VarPtZetaDiff(); });
-            histograms.addHistogram("pt_zeta_vis"    , 180 , -200    , 550       , [&](){ return this->VarPtZetaVis(); });
-            histograms.addHistogram("pt_zeta_sum"    , 180 , -200    , 550       , [&](){ return this->VarPtZeta(); });
-            histograms.addHistogram("emuSR"          , 4, 0, 4, [&]()
-                    {
-                    if (this->VarMll() > 100.)
-                    {
-                    return 3;
-                    }
-                    else if (this->VarMT2() > 25.)
-                    {
-                    if (this->VarMll() > 60.)
-                    return 2;
-                    else if (this->VarMll() > 40.)
-                    return 1;
-                    else
-                    return 0;
-                    }
-                    else
-                    {
-                    return -999;
-                    }
-                    });
-            histograms.addHistogram("eemmSR"         , 3, 0, 3, [&]()
-                    {
-                    if (this->VarMET() > 120.)
-                    {
-                    return 0;
-                    }
-                    else if (this->VarMET() > 70.)
-                    {
-                    if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 70.)
-                    {
-                    return 1;
-                    }
-                    else if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 40.)
-                    {
-                    return 2;
-                    }
-                    else
-                    {
-                    return -999;
-                    }
-                    }
-                    else
-                    {
-                        return -999;
-                    }
-                    });
-
-            histograms.addHistogram("emuBDT", 5, 0, 5, [&]()
-                    {
-                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                    float emuZZBDT = this->VarZZBDT();
-                    if (emuZZBDT < -0.9076937735080719) return 0;
-                    float emuTTZBDT = this->VarTTZBDT();
-                    if (emuTTZBDT < 0.0148177370429039) return 1;
-                    if (emuZZBDT < 0.7326840460300446) return 2;
-                    if (emuTTZBDT < 3.523359537124634) return 3;
-                    return 4;
-                    });
-
-            histograms.addHistogram("emuBDT_JESUp", 5, 0, 5, [&]()
-                    {
-                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                    float emuZZBDT = this->VarZZBDT(1);
-                    if (emuZZBDT < -0.9076937735080719) return 0;
-                    float emuTTZBDT = this->VarTTZBDT(1);
-                    if (emuTTZBDT < 0.0148177370429039) return 1;
-                    if (emuZZBDT < 0.7326840460300446) return 2;
-                    if (emuTTZBDT < 3.523359537124634) return 3;
-                    return 4;
-                    });
-
-            histograms.addHistogram("emuBDT_JESDown", 5, 0, 5, [&]()
-                    {
-                    //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                    // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                    // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                    // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                    // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                    // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                    float emuZZBDT = this->VarZZBDT(-1);
-                    if (emuZZBDT < -0.9076937735080719) return 0;
-                    float emuTTZBDT = this->VarTTZBDT(-1);
-                    if (emuTTZBDT < 0.0148177370429039) return 1;
-                    if (emuZZBDT < 0.7326840460300446) return 2;
-                    if (emuTTZBDT < 3.523359537124634) return 3;
-                    return 4;
-                    });
-
-            histograms.addHistogram("offzBDT", 2, 0, 2, [&]()
-                    {
-                    // 0 , -inf , 3.0
-                    // 1 , 3.0  , inf
-                    float offzZZBDT = this->VarOffZBDT();
-                    if (offzZZBDT > 3.0) return 1;
-                    else return 0;
-                    });
-
-            histograms.addHistogram("offzBDT_JESUp", 2, 0, 2, [&]()
-                    {
-                    // 0 , -inf , 3.0
-                    // 1 , 3.0  , inf
-                    float offzZZBDT = this->VarOffZBDT(1);
-                    if (offzZZBDT > 3.0) return 1;
-                    else return 0;
-                    });
-
-            histograms.addHistogram("offzBDT_JESDown", 2, 0, 2, [&]()
-                    {
-                    // 0 , -inf , 3.0
-                    // 1 , 3.0  , inf
-                    float offzZZBDT = this->VarOffZBDT(-1);
-                    if (offzZZBDT > 3.0) return 1;
-                    else return 0;
-                    });
-
-
         }
     }
     else if (ntupleVersion.Contains("Trilep"))
@@ -1232,7 +1060,9 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             cutflow.bookHistogramsForCut(histograms, "ChannelOffZHighMET");
             cutflow.bookHistogramsForCut(histograms, "ChannelOffZSR");
             cutflow.bookHistogramsForCut(histograms, "ChannelEMu");
+            cutflow.bookHistogramsForCut(histograms, "ChannelEMuBDT");
             cutflow.bookHistogramsForCut(histograms, "ChannelOffZ");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOffZBDT");
             cutflow.bookHistogramsForCut(histograms, "ChannelHZZ4l");
             cutflow.bookHistogramsForCut(histograms, "ChannelOnZ");
             cutflow.bookHistogramsForCut(histograms, "ChannelOnZSR");
@@ -1326,6 +1156,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         selectWZCRLeptons();
         /* probably not necessary anymore */ sortLeptonIndex();
         selectFakeStudyLeptons();
+        resetAllBDTScores();
         if (not doNotApplyMETSmear) correctMET();
         cutflow.fill();
 
@@ -4692,6 +4523,41 @@ float Analysis::VarARMT2(int var)
     double MT2_0mass = asymm_mt2_lester_bisect::get_mT2(0,lepton1.Px(),lepton1.Py(),0,lepton2.Px(),lepton2.Py(),misspart.Px(), misspart.Py(),0,0,0);
 
     return MT2_0mass;
+}
+
+//______________________________________________________________________________________________
+float Analysis::computeAllBDTScores()
+{
+    if (not bdt_score_computed)
+    {
+        emu_zz_bdt_score = VarZZBDT();
+        offz_zz_bdt_score = VarOffZBDT();
+        emu_ttz_bdt_score = VarTTZBDT();
+        emu_zz_bdt_score_up = VarZZBDT(1);
+        offz_zz_bdt_score_up = VarOffZBDT(1);
+        emu_ttz_bdt_score_up = VarTTZBDT(1);
+        emu_zz_bdt_score_dn = VarZZBDT(-1);
+        offz_zz_bdt_score_dn = VarOffZBDT(-1);
+        emu_ttz_bdt_score_dn = VarTTZBDT(-1);
+        bdt_score_computed = true;
+    }
+}
+
+//______________________________________________________________________________________________
+float Analysis::resetAllBDTScores()
+{
+
+    emu_zz_bdt_score = -999;
+    offz_zz_bdt_score = -999;
+    emu_ttz_bdt_score = -999;
+    emu_zz_bdt_score_up = -999;
+    offz_zz_bdt_score_up = -999;
+    emu_ttz_bdt_score_up = -999;
+    emu_zz_bdt_score_dn = -999;
+    offz_zz_bdt_score_dn = -999;
+    emu_ttz_bdt_score_dn = -999;
+    bdt_score_computed = false;
+
 }
 
 //______________________________________________________________________________________________
