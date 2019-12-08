@@ -106,6 +106,7 @@ int main(int argc, char** argv)
         //
         bool dosyst = false;
         bool doskim = false;
+        TString filtercuts = "";
         if (argc>=5)
         {
             std::string extraopt = argv[4];
@@ -113,8 +114,15 @@ int main(int argc, char** argv)
                 dosyst = true;
             else if (TString(extraopt).EqualTo("SKIM"))
                 doskim = true;
+            else
+                filtercuts = argv[4];
         }
-        Run.Loop(argv[2], argv[3], dosyst, doskim);
+        if (argc>=6)
+        {
+            filtercuts = argv[5];
+        }
+
+        Run.Loop(argv[2], argv[3], dosyst, doskim, filtercuts);
 
         // Done
         Run.End(count);

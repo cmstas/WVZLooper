@@ -12,30 +12,31 @@ usage()
   echo "      sh $(basename $0) OPTIONSTRINGS ..."
   echo
   echo "Options with arguments:"
-  echo "  -h    Help                   (Display this message)"
-  echo "  -b    Baseline tag of github (e.g. -b baseline_0612)"
-  echo "  -t    Ntuple type            (e.g. -t WVZMVA, WVZ, or Trilep etc.)"
-  echo "  -v    Ntuple version         (e.g. -v 0.0.9, 0.1.0, or etc.)"
-  echo "  -1    Force looper stage     (e.g. -1)"
-  echo "  -2    Force hadder stage     (e.g. -2)"
-  echo "  -d    plot output directory  (e.g. -d cr)"
-  echo "  -p    plot filter pattern    (e.g. -p _cutflow)"
-  echo "  -n    nbins                  (e.g. -n)"
-  echo "  -u    unblind                (e.g. -u)"
-  echo "  -y    yaxis-log              (e.g. -y)"
-  echo "  -s    do systematics         (e.g. -s)"
-  echo "  -k    do skim tree           (e.g. -k)"
-  echo "  -x    xaxis_label            (e.g. -x \"MET [GeV]\")"
-  echo "  -r    yaxis_range            (e.g. -r \"[0., 100.]\")"
-  echo "  -a    run all year           (e.g. -a)"
-  echo "  -c    one combined signal    (e.g. -c)"
-  echo "  -i    stack signal           (e.g. -i)"
+  echo "  -h    Help                     (Display this message)"
+  echo "  -b    Baseline tag of github   (e.g. -b baseline_0612)"
+  echo "  -t    Ntuple type              (e.g. -t WVZMVA, WVZ, or Trilep etc.)"
+  echo "  -v    Ntuple version           (e.g. -v 0.0.9, 0.1.0, or etc.)"
+  echo "  -1    Force looper stage       (e.g. -1)"
+  echo "  -2    Force hadder stage       (e.g. -2)"
+  echo "  -f    filter cuts (comma sep.) (e.g. -f FiveLeptonsMT5th,SixLeptonsSumPtCut,ChannelEMuBDT)"
+  echo "  -d    plot output directory    (e.g. -d cr)"
+  echo "  -p    plot filter pattern      (e.g. -p _cutflow)"
+  echo "  -n    nbins                    (e.g. -n)"
+  echo "  -u    unblind                  (e.g. -u)"
+  echo "  -y    yaxis-log                (e.g. -y)"
+  echo "  -s    do systematics           (e.g. -s)"
+  echo "  -k    do skim tree             (e.g. -k)"
+  echo "  -x    xaxis_label              (e.g. -x \"MET [GeV]\")"
+  echo "  -r    yaxis_range              (e.g. -r \"[0., 100.]\")"
+  echo "  -a    run all year             (e.g. -a)"
+  echo "  -c    one combined signal      (e.g. -c)"
+  echo "  -i    stack signal             (e.g. -i)"
   echo
   exit
 }
 
 # Command-line opts
-while getopts ":b:t:v:d:p:n:r:x:12uyskacih" OPTION; do
+while getopts ":b:t:v:d:p:n:r:f:x:12uyskacih" OPTION; do
   case $OPTION in
     b) BASELINE=${OPTARG};;
     t) NTUPLETYPE=${OPTARG};;
@@ -47,6 +48,7 @@ while getopts ":b:t:v:d:p:n:r:x:12uyskacih" OPTION; do
     n) NBINS=" -n "${OPTARG};;
     x) XAXISLABEL=${OPTARG};;
     r) YAXISRANGE=${OPTARG};;
+    f) FILTERCUTS=" -f ${OPTARG}";;
     u) UNBLIND=" -u";;
     y) YAXISLOG=" -y";;
     s) DOSYST=" -s";;
@@ -65,7 +67,7 @@ if [ -z ${NTUPLEVERSION}  ]; then usage; fi
 if [ -z ${FORCELOOPER}  ]; then FORCELOOPER=false; fi
 if [ -z ${FORCEHADDER}  ]; then FORCEHADDER=false; fi
 if [ -z ${DIRNAME}  ]; then DIRNAME="yield"; fi
-if [ -z ${PATTERN}  ]; then PATTERN="ChannelEMuHighMT__Yield,ChannelOffZHighMET__Yield,ChannelOnZ__Yield,ChannelBTagEMu__Yield,FiveLeptonsMT5th__Yield,ChannelEMu__Yield,ChannelOffZ__Yield,ChannelOffZSR__Yield"; fi
+if [ -z ${PATTERN}  ]; then PATTERN="ChannelEMuHighMT__Yield,ChannelOffZHighMET__Yield,ChannelOnZ__Yield,ChannelBTagEMu__Yield,FiveLeptonsMT5th__Yield,ChannelEMu__Yield,ChannelOffZ__Yield,ChannelOffZSR__Yield,SixLeptonsSumPtCut__Yield"; fi
 if [ -z "${NBINS}" ]; then NBINS=""; fi
 if [ -z ${UNBLIND}  ]; then UNBLIND=""; fi
 if [ -z ${YAXISLOG}  ]; then YAXISLOG=""; fi
@@ -88,6 +90,7 @@ echo "NTUPLEVERSION  : ${NTUPLEVERSION}"
 echo "NTUPLETYPE     : ${NTUPLETYPE}"
 echo "FORCELOOPER    : ${FORCELOOPER}"
 echo "FORCEHADDER    : ${FORCEHADDER}"
+echo "FILTERCUTS     : ${FILTERCUTS}"
 echo "DIRNAME        : ${DIRNAME}"
 echo "PATTERN        : ${PATTERN}"
 echo "NBINS          : ${NBINS}"
@@ -117,15 +120,15 @@ if [ ! -d /nfs-7/userdata/phchang/babies/${NTUPLETYPE}2018_${NTUPLEVERSION}/ ]; 
 #
 if ${FORCELOOPER} || [ ! -d outputs/${NTUPLETYPE}2016_${NTUPLEVERSION}/y2016_${BASELINE} ]; then
     echo "Running the looper..."
-    sh ./run.sh ${DOSYST} ${DOSKIM} -y 2016 -t ${NTUPLETYPE} -v ${NTUPLEVERSION} -T y2016_${BASELINE} &
+    sh ./run.sh ${DOSYST} ${DOSKIM} ${FILTERCUTS} -y 2016 -t ${NTUPLETYPE} -v ${NTUPLEVERSION} -T y2016_${BASELINE} &
 fi
 if ${FORCELOOPER} || [ ! -d outputs/${NTUPLETYPE}2017_${NTUPLEVERSION}/y2017_${BASELINE} ]; then
     echo "Running the looper..."
-    sh ./run.sh ${DOSYST} ${DOSKIM} -y 2017 -t ${NTUPLETYPE} -v ${NTUPLEVERSION} -T y2017_${BASELINE} &
+    sh ./run.sh ${DOSYST} ${DOSKIM} ${FILTERCUTS} -y 2017 -t ${NTUPLETYPE} -v ${NTUPLEVERSION} -T y2017_${BASELINE} &
 fi
 if ${FORCELOOPER} || [ ! -d outputs/${NTUPLETYPE}2018_${NTUPLEVERSION}/y2018_${BASELINE} ]; then
     echo "Running the looper..."
-    sh ./run.sh ${DOSYST} ${DOSKIM} -y 2018 -t ${NTUPLETYPE} -v ${NTUPLEVERSION} -T y2018_${BASELINE} &
+    sh ./run.sh ${DOSYST} ${DOSKIM} ${FILTERCUTS} -y 2018 -t ${NTUPLETYPE} -v ${NTUPLEVERSION} -T y2018_${BASELINE} &
 fi
 wait
 

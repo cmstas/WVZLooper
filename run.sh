@@ -10,23 +10,25 @@ usage()
   echo "      sh $(basename $0) OPTIONSTRINGS ..."
   echo
   echo "Options with arguments:"
-  echo "  -h    Help                   (Display this message)"
-  echo "  -y    year                   (e.g. -y 2016)"
-  echo "  -t    Ntuple type            (e.g. -t WVZMVA, WVZ, or Trilep etc.)"
-  echo "  -v    Ntuple version         (e.g. -v 0.0.9, 0.1.0, or etc.)"
-  echo "  -T    tag                    (e.g. -T test1)"
-  echo "  -s    do syst                (e.g. -s)"
+  echo "  -h    Help                     (Display this message)"
+  echo "  -y    year                     (e.g. -y 2016)"
+  echo "  -t    Ntuple type              (e.g. -t WVZMVA, WVZ, or Trilep etc.)"
+  echo "  -v    Ntuple version           (e.g. -v 0.0.9, 0.1.0, or etc.)"
+  echo "  -T    tag                      (e.g. -T test1)"
+  echo "  -f    filter cuts (comma sep.) (e.g. -f FiveLeptonsMT5th,SixLeptonsSumPtCut,ChannelEMuBDT)"
+  echo "  -s    do syst                  (e.g. -s)"
   echo
   exit
 }
 
 # Command-line opts
-while getopts ":y:t:v:T:skh" OPTION; do
+while getopts ":y:t:v:T:f:skh" OPTION; do
   case $OPTION in
     y) YEAR=${OPTARG};;
     t) NTUPLETYPE=${OPTARG};;
     v) NTUPLEVERSION=${OPTARG};;
     T) TAG=${OPTARG};;
+    f) FILTERCUTS=${OPTARG};;
     s) SYST=SYST;;
     k) SKIM=SKIM;;
     h) usage;;
@@ -52,6 +54,7 @@ echo "YEAR           : ${YEAR}"
 echo "NTUPLEVERSION  : ${NTUPLEVERSION}"
 echo "NTUPLETYPE     : ${NTUPLETYPE}"
 echo "TAG            : ${TAG}"
+echo "FILTERCUTS     : ${FILTERCUTS}"
 echo "SYST           : ${SYST}"
 echo "SKIM           : ${SKIM}"
 echo "================================================"
@@ -61,14 +64,14 @@ if [ ! -d /nfs-7/userdata/phchang/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/ 
 
 echo " Will only show progress for ZZ to 4L sample. since that is the bottle neck processing"
 
-rm -f .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}.txt
+rm -f .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}_${FILTERCUTS}.txt
 for i in $(ls -r /nfs-7/userdata/phchang/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/); do
     if [[ $i == *"zz_4l_powheg"* ]]; then
-        echo ./Analysis.exe ${i} ${NTUPLETYPE}${YEAR}_${NTUPLEVERSION} ${TAG} ${SYST} ${SKIM}" | tee outputs/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/${TAG}/${SYST}${SKIM}${i}.log"  >> .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}.txt
+        echo ./Analysis.exe ${i} ${NTUPLETYPE}${YEAR}_${NTUPLEVERSION} ${TAG} ${SYST} ${SKIM} ${FILTERCUTS}" | tee outputs/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/${TAG}/${SYST}${SKIM}${i}.log"  >> .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}_${FILTERCUTS}.txt
     else
-        echo ./Analysis.exe ${i} ${NTUPLETYPE}${YEAR}_${NTUPLEVERSION} ${TAG} ${SYST} ${SKIM}" > outputs/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/${TAG}/${SYST}${SKIM}${i}.log 2>&1"  >> .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}.txt
+        echo ./Analysis.exe ${i} ${NTUPLETYPE}${YEAR}_${NTUPLEVERSION} ${TAG} ${SYST} ${SKIM} ${FILTERCUTS}" > outputs/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/${TAG}/${SYST}${SKIM}${i}.log 2>&1"  >> .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}_${FILTERCUTS}.txt
     fi
 done
 
 mkdir -p outputs/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/${TAG}
-sh rooutil/xargs.sh -n 6 .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}.txt
+sh rooutil/xargs.sh -n 6 .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}_${FILTERCUTS}.txt

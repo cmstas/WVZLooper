@@ -255,7 +255,7 @@ public:
     Analysis(const char* ifileName, const char* RootName);
     virtual ~Analysis();
     virtual void  Initial(const char* RootName, int RootNumber);
-    virtual void  Loop(const char* NtupleVersion, const char* TagName, bool dosyst, bool doskim);
+    virtual void  Loop(const char* NtupleVersion, const char* TagName, bool dosyst, bool doskim, TString filtercuts="");
     virtual void  End(int RootNumber);
     virtual void  Finish(int RootNumber);
     virtual void  Output();
