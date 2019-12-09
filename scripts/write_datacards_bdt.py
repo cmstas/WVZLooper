@@ -23,6 +23,7 @@ parser.add_argument('-v' , '--ntuple_version'  , dest='ntuple_version'  , help='
 parser.add_argument('-y' , '--print_yields'    , dest='print_yields'    , help='to print wysiwyg yields'                      , action='store_true', default=False)
 parser.add_argument('-d' , '--print_detail'    , dest='print_detail'    , help='to print wysiwyg uncertainty detail'          , action='store_true', default=False)
 parser.add_argument('-w' , '--wwz_only'        , dest='wwz_only'        , help='to write wwz only signal datacards'           , action='store_true', default=False)
+parser.add_argument('-1' , '--onebin'          , dest='onebin'          , help='to write wwz only signal datacards'           , action='store_true', default=False)
 parser.add_argument('-s' , '--nonh_vh_split'   , dest='nonh_vh_split'   , help='to write wwz only signal datacards'           , action='store_true', default=False)
 
 args = parser.parse_args()
@@ -66,10 +67,10 @@ def write_datacards(ntuple_version, tag):
     prefix = "{}/{}".format(ntuple_version, tag)
 
     # number of emu bdt bins
-    n_emu_bdt_bins = 5
+    n_emu_bdt_bins = 5 if not args.onebin else 1
 
     # number of eemm bdt bins
-    n_offz_bdt_bins = 2
+    n_offz_bdt_bins = 2 if not args.onebin else 1
 
     #===========================================================================
     # Retrieve files with histograms from the histogram output root files
@@ -178,9 +179,14 @@ def write_datacards(ntuple_version, tag):
     zz_sferrs = []
     expected_nevt_zzs = []
     for i in xrange(n_emu_bdt_bins):
-        zzcr_zz_h = pr.get_summed_histogram([fname_zz], "ChannelOnZBDT{}__Yield".format(i)) # get histogram from zz
-        zzcr_data_h = pr.get_summed_histogram([fname_data], "ChannelOnZBDT{}__Yield".format(i)) # get histogram from data
-        zzcr_nonzz_h = pr.get_summed_histogram(nonzzbkg, "ChannelOnZBDT{}__Yield".format(i)) # get histogram for non zz
+        if n_emu_bdt_bins == 1:
+            zzcr_zz_h = pr.get_summed_histogram([fname_zz], "ChannelOnZ__Yield") # get histogram from zz
+            zzcr_data_h = pr.get_summed_histogram([fname_data], "ChannelOnZ__Yield") # get histogram from data
+            zzcr_nonzz_h = pr.get_summed_histogram(nonzzbkg, "ChannelOnZ__Yield") # get histogram for non zz
+        else:
+            zzcr_zz_h = pr.get_summed_histogram([fname_zz], "ChannelOnZBDT{}__Yield".format(i)) # get histogram from zz
+            zzcr_data_h = pr.get_summed_histogram([fname_data], "ChannelOnZBDT{}__Yield".format(i)) # get histogram from data
+            zzcr_nonzz_h = pr.get_summed_histogram(nonzzbkg, "ChannelOnZBDT{}__Yield".format(i)) # get histogram for non zz
         zz_sf = pr.get_sf(zzcr_zz_h, zzcr_data_h, zzcr_nonzz_h).GetBinContent(1) # get the scalefactor
         zz_sferr = pr.get_sf(zzcr_zz_h, zzcr_data_h, zzcr_nonzz_h).GetBinError(1) # get the error on scalefactor
         expected_nevt_zz = zzcr_data_h.GetBinContent(1) # get the total number of data events
@@ -231,7 +237,9 @@ def write_datacards(ntuple_version, tag):
             # Read 5 bins in the bdt and make a single histogram
             h = r.TH1F("emu{}_{}".format(year, proc), "emu{}_{}".format(year, proc), n_emu_bdt_bins, 0, n_emu_bdt_bins)
             for i in xrange(n_emu_bdt_bins):
-                htemp = tfile.Get("ChannelEMuBDT{}{}__Yield".format(i, systhacked))
+                bn = i
+                if n_emu_bdt_bins == 1: bn = ""
+                htemp = tfile.Get("ChannelEMuBDT{}{}__Yield".format(bn, systhacked))
                 h.SetBinContent(i + 1, htemp.GetBinContent(1))
                 h.SetBinError(i + 1, htemp.GetBinError(1))
 
@@ -361,6 +369,7 @@ def write_datacards(ntuple_version, tag):
         if args.print_yields:
             vals = d.print_yields(detail=args.print_detail)
             if vals:
+                if n_emu_bdt_bins == 1: i = "One"
                 if args.nonh_vh_split:
                     print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}".format(year, i))
                     finalyields.append(vals)
@@ -397,7 +406,10 @@ def write_datacards(ntuple_version, tag):
             # Read 2 bins in the bdt and make a single histogram
             h = r.TH1F("offz{}_{}".format(year, proc), "offz{}_{}".format(year, proc), n_offz_bdt_bins, 0, n_offz_bdt_bins)
             for i in xrange(n_offz_bdt_bins):
-                htemp = tfile.Get("ChannelOffZBDT{}{}__Yield".format(binname[i], systhacked))
+                bn = binname[i]
+                if n_offz_bdt_bins == 1:
+                    bn = ""
+                htemp = tfile.Get("ChannelOffZBDT{}{}__Yield".format(bn, systhacked))
                 h.SetBinContent(i + 1, htemp.GetBinContent(1))
                 h.SetBinError(i + 1, htemp.GetBinError(1))
 
@@ -525,6 +537,7 @@ def write_datacards(ntuple_version, tag):
         if args.print_yields:
             vals = d.print_yields(detail=args.print_detail)
             if vals:
+                if n_offz_bdt_bins == 1: i = "One"
                 if args.nonh_vh_split:
                     print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}".format(year, i))
                     finalyields.append(vals)
@@ -780,7 +793,7 @@ def write_datacards(ntuple_version, tag):
         p.plot_hist(bgs=bkghists,
                 sigs=sighists,
                 options={
-                "output_name": "fitplot/fit{}.pdf".format(year),
+                "output_name": "fitplot/bdtfit{}.pdf".format(year),
                 "print_yield":True,
                 "signal_scale": 1,
                 "legend_scalex":1.8,
@@ -788,7 +801,7 @@ def write_datacards(ntuple_version, tag):
                 "legend_ncolumns": 3,
                 "legend_smart": True,
                 "yaxis_log":False,
-                "ymax_scale": 1.2,
+                "ymax_scale": 0.3,
                 "lumi_value":lumi,
                 # "no_overflow": True,
                 "remove_underflow": True,
