@@ -37,6 +37,11 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     // To whether or not run eventlist
     bool doEventList = false;
 
+    const float b1 = -0.908;
+    const float b2 =  0.015;
+    const float b3 =  0.733;
+    const float b4 =  3.523;
+
     // Parsing year
     if (ntupleVersion.Contains("v0.0.5")) year = -1; // Meaning use this sets to scale it up to 137
     else if (ntupleVersion.Contains("2016")) year = 2016;
@@ -510,11 +515,11 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
                 computeAllBDTScores();
                 float emuZZBDT = emu_zz_bdt_score;
-                if (emuZZBDT < -0.9076937735080719) return 0;
+                if (emuZZBDT < b1) return 0;
                 float emuTTZBDT = emu_ttz_bdt_score;
-                if (emuTTZBDT < 0.0148177370429039) return 1;
-                if (emuZZBDT < 0.7326840460300446) return 2;
-                if (emuTTZBDT < 3.523359537124634) return 3;
+                if (emuTTZBDT < b2) return 2;
+                if (emuZZBDT < b3) return 1;
+                if (emuTTZBDT < b4) return 3;
                 return 4;
                 });
 
@@ -528,11 +533,11 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
                 computeAllBDTScores();
                 float emuZZBDT = emu_zz_bdt_score_up;
-                if (emuZZBDT < -0.9076937735080719) return 0;
+                if (emuZZBDT < b1) return 0;
                 float emuTTZBDT = emu_ttz_bdt_score_up;
-                if (emuTTZBDT < 0.0148177370429039) return 1;
-                if (emuZZBDT < 0.7326840460300446) return 2;
-                if (emuTTZBDT < 3.523359537124634) return 3;
+                if (emuTTZBDT < b2) return 2;
+                if (emuZZBDT < b3) return 1;
+                if (emuTTZBDT < b4) return 3;
                 return 4;
                 });
 
@@ -546,11 +551,11 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
                 computeAllBDTScores();
                 float emuZZBDT = emu_zz_bdt_score_up;
-                if (emuZZBDT < -0.9076937735080719) return 0;
+                if (emuZZBDT < b1) return 0;
                 float emuTTZBDT = emu_ttz_bdt_score_up;
-                if (emuTTZBDT < 0.0148177370429039) return 1;
-                if (emuZZBDT < 0.7326840460300446) return 2;
-                if (emuTTZBDT < 3.523359537124634) return 3;
+                if (emuTTZBDT < b2) return 2;
+                if (emuZZBDT < b3) return 1;
+                if (emuTTZBDT < b4) return 3;
                 return 4;
                 });
 
