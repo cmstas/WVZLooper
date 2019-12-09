@@ -2509,14 +2509,11 @@ float Analysis::EventWeight()
                 and looper->getCurrentFileName().Contains("ggzh_ww_4l_powheg"))
             fixXsec = 2.9735355337; // BR of Z->ll / Z->ll/vv (calculated from ggzh_ww_4l_powheg sample itself (is this the correct thing to do? maybe?)
         if (year == 2016)
-            // return fixXsec * evt_scale1fb * 35.9 * getTruePUw2016(wvz.nTrueInt());
-            return fixXsec * evt_scale1fb * 35.9;
+            return fixXsec * evt_scale1fb * 35.9 * getTruePUw2016(wvz.nTrueInt());
         else if (year == 2017)
-            // return fixXsec * evt_scale1fb * 41.3 * getTruePUw2017(wvz.nTrueInt());
-            return fixXsec * evt_scale1fb * 41.3;
+            return fixXsec * evt_scale1fb * 41.3 * getTruePUw2017(wvz.nTrueInt());
         else if (year == 2018)
-            // return fixXsec * evt_scale1fb * 59.74 * getTruePUw2018(wvz.nTrueInt());
-            return fixXsec * evt_scale1fb * 59.74;
+            return fixXsec * evt_scale1fb * 59.74 * getTruePUw2018(wvz.nTrueInt());
         else
             return fixXsec * evt_scale1fb * 137;
 

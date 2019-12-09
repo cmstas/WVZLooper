@@ -14,16 +14,18 @@ usage()
   echo "  -b    Baseline tag of github (e.g. -b baseline_0612)"
   echo "  -t    Ntuple type            (e.g. -t WVZMVA, WVZ, or Trilep etc.)"
   echo "  -v    Ntuple version         (e.g. -v v0.0.9, v0.1.0, or etc.)"
+  echo "  -B    bdt"
   echo
   exit
 }
 
 # Command-line opts
-while getopts ":b:t:v:h" OPTION; do
+while getopts ":b:t:v:Bh" OPTION; do
   case $OPTION in
     b) BASELINE=${OPTARG};;
     t) NTUPLETYPE=${OPTARG};;
     v) NTUPLEVERSION=${OPTARG};;
+    B) DOBDT=" -b";;
     h) usage;;
     :) usage;;
   esac
@@ -47,9 +49,9 @@ echo "NTUPLEVERSION  : ${NTUPLEVERSION}"
 echo "NTUPLETYPE     : ${NTUPLETYPE}"
 echo "================================================"
 
-sh $DIR/combinecard.sh -s ${NTUPLETYPE}2016_${NTUPLEVERSION} -t y2016_${BASELINE}
-sh $DIR/combinecard.sh -s ${NTUPLETYPE}2017_${NTUPLEVERSION} -t y2017_${BASELINE}
-sh $DIR/combinecard.sh -s ${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2018_${BASELINE}
+sh $DIR/combinecard.sh -s ${NTUPLETYPE}2016_${NTUPLEVERSION} -t y2016_${BASELINE} ${DOBDT}
+sh $DIR/combinecard.sh -s ${NTUPLETYPE}2017_${NTUPLEVERSION} -t y2017_${BASELINE} ${DOBDT}
+sh $DIR/combinecard.sh -s ${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2018_${BASELINE} ${DOBDT}
 
 combineCards.py \
     y2016=stats/${NTUPLETYPE}2016_${NTUPLEVERSION}/y2016_${BASELINE}/stat.txt \
