@@ -101,6 +101,16 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.addCutToLastActiveCut("ChannelEMuHighMT"        , [&](){ return this->CutEMuSig();               } , UNITY );
         cutflow.getCut("ChannelEMu");
         cutflow.addCutToLastActiveCut("ChannelEMuBDT"           , [&](){ return this->CutEMuBDT();               } , [&]() { return this->CutEMuBDTWgt(); } );
+        cutflow.getCut("ChannelEMuBDT");
+        cutflow.addCutToLastActiveCut("ChannelEMuBDT0"          , [&](){ return emuBDTBin() == 0;                } , UNITY );
+        cutflow.getCut("ChannelEMuBDT");
+        cutflow.addCutToLastActiveCut("ChannelEMuBDT1"          , [&](){ return emuBDTBin() == 1;                } , UNITY );
+        cutflow.getCut("ChannelEMuBDT");
+        cutflow.addCutToLastActiveCut("ChannelEMuBDT2"          , [&](){ return emuBDTBin() == 2;                } , UNITY );
+        cutflow.getCut("ChannelEMuBDT");
+        cutflow.addCutToLastActiveCut("ChannelEMuBDT3"          , [&](){ return emuBDTBin() == 3;                } , UNITY );
+        cutflow.getCut("ChannelEMuBDT");
+        cutflow.addCutToLastActiveCut("ChannelEMuBDT4"          , [&](){ return emuBDTBin() == 4;                } , UNITY );
 
         // Low Mll
         cutflow.getCut("ChannelEMu");
@@ -140,6 +150,16 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                     }
                 }
                 , UNITY );
+        cutflow.getCut("ChannelOnZ");
+        cutflow.addCutToLastActiveCut("ChannelOnZBDT0"          , [&](){ return emuBDTBin() == 0;                } , UNITY );
+        cutflow.getCut("ChannelOnZ");
+        cutflow.addCutToLastActiveCut("ChannelOnZBDT1"          , [&](){ return emuBDTBin() == 1;                } , UNITY );
+        cutflow.getCut("ChannelOnZ");
+        cutflow.addCutToLastActiveCut("ChannelOnZBDT2"          , [&](){ return emuBDTBin() == 2;                } , UNITY );
+        cutflow.getCut("ChannelOnZ");
+        cutflow.addCutToLastActiveCut("ChannelOnZBDT3"          , [&](){ return emuBDTBin() == 3;                } , UNITY );
+        cutflow.getCut("ChannelOnZ");
+        cutflow.addCutToLastActiveCut("ChannelOnZBDT4"          , [&](){ return emuBDTBin() == 4;                } , UNITY );
 
         // OffZ channel
         cutflow.getCut("Cut4LepBVeto");
@@ -185,7 +205,13 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 }
                 , UNITY );
         cutflow.getCut("ChannelOffZ");
-        cutflow.addCutToLastActiveCut("ChannelOffZBDT"           , [&](){ return this->CutOffZBDT();              } , [&]() { return this->CutOffZBDTWgt(); } );
+        cutflow.addCutToLastActiveCut("ChannelOffZBDT"           , [&](){ return this->CutOffZBDT() and this->VarOffZBDT() > 0; } , [&]() { return this->CutOffZBDTWgt(); } );
+        cutflow.getCut("ChannelOffZ");
+        cutflow.addCutToLastActiveCut("ChannelOffZBDTCR"         , [&](){ return this->CutOffZBDT() and this->VarOffZBDT() < 0; } , [&]() { return this->CutOffZBDTWgt(); } );
+        cutflow.getCut("ChannelOffZBDT");
+        cutflow.addCutToLastActiveCut("ChannelOffZBDTA"          , [&](){ return offzBDTBin() == 0; } , UNITY );
+        cutflow.getCut("ChannelOffZBDT");
+        cutflow.addCutToLastActiveCut("ChannelOffZBDTB"          , [&](){ return offzBDTBin() == 1; } , UNITY );
 
         // OffZ Low/High Mll
         cutflow.getCut("ChannelOffZ");
@@ -803,8 +829,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         // i.e. *MT*, *MET*, and *Cut4LepB* are the pattern used to search the cut names in the cutflow object to declare a systematic varations
         // e.g. ChannelBTagEMuHighMT contains "MT" and therefore a JES variations will be declared for these cuts
         // Then later below with "setCutSyst" function the variational cut defn will be defined
-        cutflow.addCutSyst("JESUp"         , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto"});
-        cutflow.addCutSyst("JESDown"       , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto"});
+        cutflow.addCutSyst("JESUp"         , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB"});
+        cutflow.addCutSyst("JESDown"       , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB"});
         cutflow.addCutSyst("JERUp"         , {"PtZeta", "MT" , "MET"});
         cutflow.addCutSyst("JERDown"       , {"PtZeta", "MT" , "MET"});
         cutflow.addCutSyst("METUp"         , {"PtZeta", "MT" , "MET"});
@@ -1009,6 +1035,32 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.setCutSyst("ARCut4LepBVeto"  , "JESDown" , [&]() { return this->Cut4LepBVeto(-1); }, [&]() { return this->BTagSF(); } );
         cutflow.setCutSyst("FiveLeptonsBVeto", "JESDown" , [&]() { return wvz.nb_dn() == 0;}       , [&]() { return this->BTagSF(); } );
 
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "JESUp" , [&]() { return emuBDTBin(1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "JESUp" , [&]() { return emuBDTBin(1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "JESUp" , [&]() { return emuBDTBin(1) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "JESUp" , [&]() { return emuBDTBin(1) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "JESUp" , [&]() { return emuBDTBin(1) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "JESUp" , [&]() { return emuBDTBin(1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "JESUp" , [&]() { return emuBDTBin(1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "JESUp" , [&]() { return emuBDTBin(1) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "JESUp" , [&]() { return emuBDTBin(1) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "JESUp" , [&]() { return emuBDTBin(1) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "JESUp" , [&]() { return offzBDTBin(1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "JESUp" , [&]() { return offzBDTBin(1) == 1; } , UNITY );
+
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "JESDown" , [&]() { return emuBDTBin(-1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "JESDown" , [&]() { return emuBDTBin(-1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "JESDown" , [&]() { return emuBDTBin(-1) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "JESDown" , [&]() { return emuBDTBin(-1) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "JESDown" , [&]() { return emuBDTBin(-1) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "JESDown" , [&]() { return emuBDTBin(-1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "JESDown" , [&]() { return emuBDTBin(-1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "JESDown" , [&]() { return emuBDTBin(-1) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "JESDown" , [&]() { return emuBDTBin(-1) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "JESDown" , [&]() { return emuBDTBin(-1) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "JESDown" , [&]() { return offzBDTBin(-1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "JESDown" , [&]() { return offzBDTBin(-1) == 1; } , UNITY );
+
         // // 4. PtZeta
         // cutflow.setCutSyst("ChannelEMuLowPtZeta", "JESUp" , [&]() { return this->CutLowPtZeta(1); } , UNITY);
         // cutflow.setCutSyst("ChannelEMuLowPtZeta", "JESDown" , [&]() { return this->CutLowPtZeta(-1); } , UNITY);
@@ -1071,10 +1123,23 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             cutflow.bookHistogramsForCut(histograms, "ChannelOffZSR");
             cutflow.bookHistogramsForCut(histograms, "ChannelEMu");
             cutflow.bookHistogramsForCut(histograms, "ChannelEMuBDT");
+            cutflow.bookHistogramsForCut(histograms, "ChannelEMuBDT0");
+            cutflow.bookHistogramsForCut(histograms, "ChannelEMuBDT1");
+            cutflow.bookHistogramsForCut(histograms, "ChannelEMuBDT2");
+            cutflow.bookHistogramsForCut(histograms, "ChannelEMuBDT3");
+            cutflow.bookHistogramsForCut(histograms, "ChannelEMuBDT4");
             cutflow.bookHistogramsForCut(histograms, "ChannelOffZ");
             cutflow.bookHistogramsForCut(histograms, "ChannelOffZBDT");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOffZBDTA");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOffZBDTB");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOffZBDTCR");
             cutflow.bookHistogramsForCut(histograms, "ChannelHZZ4l");
             cutflow.bookHistogramsForCut(histograms, "ChannelOnZ");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOnZBDT0");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOnZBDT1");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOnZBDT2");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOnZBDT3");
+            cutflow.bookHistogramsForCut(histograms, "ChannelOnZBDT4");
             cutflow.bookHistogramsForCut(histograms, "ChannelOnZSR");
             cutflow.bookHistogramsForCut(histograms, "ChannelOnZHighMT");
             cutflow.bookHistogramsForCut(histograms, "ChannelOnZHighMET");
@@ -4638,6 +4703,78 @@ float Analysis::VarTTZBDT(int var)
 
     // Evaluate the bdt score
     return (*fast_forest_emu_ttz)(emu_ttz_input.data());
+}
+
+//______________________________________________________________________________________________
+int Analysis::emuBDTBin(int var)
+{
+    computeAllBDTScores();
+    const float b1 = -0.908;
+    const float b2 =  0.015;
+    const float b3 =  0.733;
+    const float b4 =  3.523;
+    if (var == 0)
+    {
+        float emuZZBDT = emu_zz_bdt_score;
+        if (emuZZBDT < b1) return 0;
+        float emuTTZBDT = emu_ttz_bdt_score;
+        if (emuTTZBDT < b2) return 2;
+        if (emuZZBDT < b3) return 1;
+        if (emuTTZBDT < b4) return 3;
+        return 4;
+    }
+    else if (var == 1)
+    {
+        float emuZZBDT = emu_zz_bdt_score_up;
+        if (emuZZBDT < b1) return 0;
+        float emuTTZBDT = emu_ttz_bdt_score_up;
+        if (emuTTZBDT < b2) return 2;
+        if (emuZZBDT < b3) return 1;
+        if (emuTTZBDT < b4) return 3;
+        return 4;
+    }
+    else if (var == -1)
+    {
+        float emuZZBDT = emu_zz_bdt_score_dn;
+        if (emuZZBDT < b1) return 0;
+        float emuTTZBDT = emu_ttz_bdt_score_dn;
+        if (emuTTZBDT < b2) return 2;
+        if (emuZZBDT < b3) return 1;
+        if (emuTTZBDT < b4) return 3;
+        return 4;
+    }
+    else
+    {
+        return -999;
+    }
+}
+
+//______________________________________________________________________________________________
+int Analysis::offzBDTBin(int var)
+{
+    computeAllBDTScores();
+    if (var == 0)
+    {
+        float offzZZBDT = offz_zz_bdt_score;
+        if (offzZZBDT > 3.0) return 1;
+        else return 0;
+    }
+    else if (var == 1)
+    {
+        float offzZZBDT = offz_zz_bdt_score_up;
+        if (offzZZBDT > 3.0) return 1;
+        else return 0;
+    }
+    else if (var == -1)
+    {
+        float offzZZBDT = offz_zz_bdt_score_dn;
+        if (offzZZBDT > 3.0) return 1;
+        else return 0;
+    }
+    else
+    {
+        return -999;
+    }
 }
 
 //______________________________________________________________________________________________

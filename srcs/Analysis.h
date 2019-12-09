@@ -423,6 +423,8 @@ public:
     float VarMT2(int=0);
     void computeAllBDTScores();
     void resetAllBDTScores();
+    int emuBDTBin(int=0);
+    int offzBDTBin(int=0);
     float VarZZBDT(int=0);
     float VarTTZBDT(int=0);
     float VarOffZBDT(int=0);

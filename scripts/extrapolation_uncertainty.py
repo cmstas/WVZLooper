@@ -18,7 +18,7 @@ from six.moves import zip
 # Baseline_Version = "syst"
 Ntuple_Type = "WVZMVA"
 Ntuple_Version = "v0.1.21"
-Baseline_Version = "syst_nosmear_20191106"
+Baseline_Version = "20191208_v5"
 
 # syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
 syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "PDF", "Qsq", "AlphaS"]
@@ -546,29 +546,56 @@ def main():
     # -- combined version where only one transfer factor is computed
 
     # MET/Mll combined extrapolation
-    print "TF OnZ -> OffZ SR"
+    print("TF OnZ -> OffZ SR")
     hists = get_alpha_hists("zz", "ChannelOffZSR", "ChannelOnZ")
     p.print_yield_table_from_list(hists, "exp/zz_eemm_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
     p.print_yield_tex_table_from_list(hists, "exp/zz_eemm_tf.tex", prec=4, caption="eemm zz transfer factor", noerror=True)
 
     # flavor/Mll/MT combined extrapolation
-    print "TF OnZ -> EMu SR"
+    print("TF OnZ -> EMu SR")
     hists = get_alpha_hists("zz", "ChannelEMuHighMT", "ChannelOnZ")
     p.print_yield_table_from_list(hists, "exp/zz_emu_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
     p.print_yield_tex_table_from_list(hists, "exp/zz_emu_tf.tex", prec=4, caption="emu zz transfer factor", noerror=True)
 
     # flavor/nbjet/MET combined extrapolation
-    print "TF BTag -> OffZ SR"
+    print("TF BTag -> OffZ SR")
     hists = get_alpha_hists("ttz", "ChannelOffZSR", "ChannelBTagEMu")
     p.print_yield_table_from_list(hists, "exp/ttz_eemm_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
     p.print_yield_tex_table_from_list(hists, "exp/ttz_eemm_tf.tex", prec=4, caption="eemm ttz transfer factor", noerror=True)
 
     # nbjet/MT combined extrapolation
-    print "TF BTag -> EMu SR"
+    print("TF BTag -> EMu SR")
     hists = get_alpha_hists("ttz", "ChannelEMuHighMT", "ChannelBTagEMu")
     p.print_yield_table_from_list(hists, "exp/ttz_emu_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
     p.print_yield_tex_table_from_list(hists, "exp/ttz_emu_tf.tex", prec=4, caption="emu ttz transfer factor", noerror=True)
 
+def main_bdt():
+
+    for i in xrange(5):
+        print("TF OnZ -> EMu SR BDT bin {}".format(i))
+        hists = get_alpha_hists("zz", "ChannelEMuBDT{}".format(i), "ChannelOnZBDT{}".format(i))
+        p.print_yield_table_from_list(hists, "exp/zz_emu_tf_bdt{}.txt".format(i), prec=4, binrange=[1,2,3], noerror=True)
+        p.print_yield_tex_table_from_list(hists, "exp/zz_emu_tf_bdt{}.tex".format(i), prec=4, caption="emu zz transfer factor BDT{}".format(i), noerror=True)
+
+    for i in ["A", "B"]:
+        print("TF OnZ -> EEMM SR BDT bin {}".format(i))
+        hists = get_alpha_hists("zz", "ChannelOffZBDT{}".format(i), "ChannelOffZBDTCR")
+        p.print_yield_table_from_list(hists, "exp/zz_eemm_tf_bdt{}.txt".format(i), prec=4, binrange=[1,2,3], noerror=True)
+        p.print_yield_tex_table_from_list(hists, "exp/zz_eemm_tf_bdt{}.tex".format(i), prec=4, caption="eemm zz transfer factor BDT{}".format(i), noerror=True)
+
+    for i in xrange(5):
+        # flav BDT bin 0 combined extrapolation
+        print("TF BTag EMu -> EMu SR BDT bin {}".format(i))
+        hists = get_alpha_hists("ttz", "ChannelEMuBDT{}".format(i), "ChannelBTagEMu".format(i))
+        p.print_yield_table_from_list(hists, "exp/ttz_emu_tf_bdt{}.txt".format(i), prec=4, binrange=[1,2,3], noerror=True)
+        p.print_yield_tex_table_from_list(hists, "exp/ttz_emu_tf_bdt{}.tex".format(i), prec=4, caption="emu ttz transfer factor BDT{}".format(i), noerror=True)
+
+    for i in ["A", "B"]:
+        # flav BDT bin 0 combined extrapolation
+        print("TF BTag EMu -> EEMM SR BDT bin {}".format(i))
+        hists = get_alpha_hists("ttz", "ChannelOffZBDT{}".format(i), "ChannelBTagEMu".format(i))
+        p.print_yield_table_from_list(hists, "exp/ttz_eemm_tf_bdt{}.txt".format(i), prec=4, binrange=[1,2,3], noerror=True)
+        p.print_yield_tex_table_from_list(hists, "exp/ttz_eemm_tf_bdt{}.tex".format(i), prec=4, caption="eemm ttz transfer factor BDT{}".format(i), noerror=True)
 
 def main_add():
 
@@ -686,7 +713,8 @@ def main_zz_onz_cut_efficiency_check():
 
 if __name__ == "__main__":
 
-    main_zz_onz_cut_efficiency_check()
-    main_ttz_btag_cut_efficiency_check()
-    main()
+    # main_zz_onz_cut_efficiency_check()
+    # main_ttz_btag_cut_efficiency_check()
+    # main()
+    main_bdt()
 
