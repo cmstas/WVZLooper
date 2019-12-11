@@ -18,7 +18,7 @@ from six.moves import zip
 # Baseline_Version = "syst"
 Ntuple_Type = "WVZMVA"
 Ntuple_Version = "v0.1.21"
-Baseline_Version = "20191208_v5"
+Baseline_Version = "v1"
 
 # syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
 syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "PDF", "Qsq", "AlphaS"]
@@ -713,8 +713,8 @@ def main_zz_onz_cut_efficiency_check():
 
 if __name__ == "__main__":
 
-    # main_zz_onz_cut_efficiency_check()
-    # main_ttz_btag_cut_efficiency_check()
-    # main()
+    main_zz_onz_cut_efficiency_check()
+    main_ttz_btag_cut_efficiency_check()
+    main()
     main_bdt()
 

@@ -57,7 +57,10 @@ def write_datacards(ntuple_version, tag):
     # ntuple_version = args.sample_set_name
     # tag = args.tag
 
+    wwzonlysuffix = ""
+
     if args.wwz_only:
+        wwzonlysuffix = "wwzonly"
         if args.nonh_vh_split:
             fname_sig     = "outputs/{}/{}/nonh_wwz.root".format(ntuple_version, tag)
         else:
@@ -196,6 +199,8 @@ def write_datacards(ntuple_version, tag):
 
             if syst == "Nominal":
                 if nbins == 5:
+                    print(fitreg, fitvar)
+                    print(tfile)
                     h = rebin36(tfile.Get("Channel{}__{}".format(fitreg, fitvar)).Clone())
                 else:
                     h = tfile.Get("Channel{}__{}".format(fitreg, fitvar)).Clone()
@@ -348,15 +353,15 @@ def write_datacards(ntuple_version, tag):
         for i in xrange(1, nbins+1):
             d.set_bin(i)
             d.set_region_name("bin{}".format(i))
-            d.write("stats/{}/emu_datacard_bin{}.txt".format(prefix, i))
+            d.write("stats/{}/emu_datacard{}_bin{}.txt".format(prefix, "_"+wwzonlysuffix if wwzonlysuffix != "" else "", i))
             if args.print_yields:
                 vals = d.print_yields(detail=args.print_detail)
                 if vals:
                     if args.nonh_vh_split:
-                        print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}".format(year, i))
+                        print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}{}".format(wwzonlysuffix, year, i))
                         finalyields.append(vals)
                     else:
-                        print_yield_table(vals[0], vals[1], "textable/emu{}{}".format(year, i))
+                        print_yield_table(vals[0], vals[1], "textable/emu{}{}{}".format(wwzonlysuffix, year, i))
                         finalyields.append(vals)
     elif nbins == 1:
         d.set_bin(1)
@@ -366,9 +371,9 @@ def write_datacards(ntuple_version, tag):
             vals = d.print_yields(detail=args.print_detail)
             if vals:
                 if args.nonh_vh_split:
-                    print_yield_table(vals[0], vals[1], "textable/emuSplit{}".format(year))
+                    print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}".format(wwzonlysuffix, year))
                 else:
-                    print_yield_table(vals[0], vals[1], "textable/emu{}".format(year))
+                    print_yield_table(vals[0], vals[1], "textable/emu{}{}".format(wwzonlysuffix, year))
 
     # colors = [2005, 2001, 2003, 2007, 920, 2012, 2011, 2002]
     # p.plot_hist(data=None, bgs=bgs, sigs=[sig], options={"bkg_sort_method":"ascending", "yaxis_range":[0.,2.5]}, colors=colors, sig_labels=["sig"], legend_labels=bkgprocs)
@@ -547,15 +552,15 @@ def write_datacards(ntuple_version, tag):
         for i in xrange(1, nbins+1):
             d.set_bin(i)
             d.set_region_name("bin{}".format(i))
-            d.write("stats/{}/offz_datacard_bin{}.txt".format(prefix, i))
+            d.write("stats/{}/offz_datacard{}_bin{}.txt".format(prefix, "_"+wwzonlysuffix if wwzonlysuffix != "" else "", i))
             if args.print_yields:
                 vals = d.print_yields(detail=args.print_detail)
                 if vals:
                     if args.nonh_vh_split:
-                        print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}".format(year, i))
+                        print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}{}".format(wwzonlysuffix, year, i))
                         finalyields.append(vals)
                     else:
-                        print_yield_table(vals[0], vals[1], "textable/offz{}{}".format(year, i))
+                        print_yield_table(vals[0], vals[1], "textable/offz{}{}{}".format(wwzonlysuffix, year, i))
                         finalyields.append(vals)
     elif nbins == 1:
         d.set_bin(1)
@@ -565,12 +570,12 @@ def write_datacards(ntuple_version, tag):
             vals = d.print_yields(detail=args.print_detail)
             if vals:
                 if args.nonh_vh_split:
-                    print_yield_table(vals[0], vals[1], "textable/offzSplit{}".format(year))
+                    print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}".format(wwzonlysuffix, year))
                 else:
-                    print_yield_table(vals[0], vals[1], "textable/offz{}".format(year))
+                    print_yield_table(vals[0], vals[1], "textable/offz{}{}".format(wwzonlysuffix, year))
 
 
-    if len(finalyields) > 0:
+    if len(finalyields) > 5:
 
         procs = ["sig", "wzz", "zzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
         if args.nonh_vh_split:
@@ -618,7 +623,7 @@ def write_datacards(ntuple_version, tag):
         p.plot_hist(bgs=bkghists,
                 sigs=sighists,
                 options={
-                "output_name": "fitplot/fit{}.pdf".format(year),
+                "output_name": "fitplot/fit{}{}.pdf".format(wwzonlysuffix, year),
                 "print_yield":True,
                 "signal_scale": 1,
                 "legend_scalex":1.8,
@@ -705,7 +710,7 @@ def get_tf_uncertainty_from_txt_file(txtpath):
             continue
         result = line.split()[7]
 
-    print "from TF file ", txtpath, "got TF uncertainty of", float(result)
+    print("from TF file ", txtpath, "got TF uncertainty of", float(result))
 
     return str(1 + float(result) / 100.)
 

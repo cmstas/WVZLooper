@@ -28,6 +28,7 @@ def main_analysis_make_plot_userfilter():
     parser.add_argument('-x' , '--xaxis_label'     , dest='xaxis_label'     , help='xaxis title'         , default=""                                                                                                )
     parser.add_argument('-r' , '--yaxis_range'     , dest='yaxis_range'     , help='yaxis range'         , default=[]                                                                                                )
     parser.add_argument('-i' , '--stack_signal'    , dest='stack_signal'    , help='stack signal'        , default=False, action='store_true'                                                                        )
+    parser.add_argument('-S' , '--signal_scale'    , dest='signal_scale'    , help='signal scale'        , default=1                                                                                                 )
     
     args = parser.parse_args()
 
@@ -131,6 +132,10 @@ def main_analysis_make_plot_userfilter():
     sig_labels = ["WWZ", "WZZ", "ZZZ", "VVV"]
     # sig_labels = ["WWZ", "ZH#rightarrowWW", "WZZ", "WH#rightarrowZZ", "ZZZ", "ZH#rightarrowZZ"]
 
+    if float(args.signal_scale) != 1:
+        suffix = " [x{}]".format(args.signal_scale)
+        sig_labels = ["WWZ"+suffix, "WZZ"+suffix, "ZZZ"+suffix, "VVV"+suffix]
+
     colors = [2001, 2005, 2007, 2003, 2011, 920, 2012, 2011, 2002]
     if args.stack_signal:
         colors = [2001, 2005, 2007, 2003, 2011, 920, 2, 4, 1]
@@ -153,7 +158,7 @@ def main_analysis_make_plot_userfilter():
             extraoptions={
                 "print_yield":True,
                 "nbins":int(args.nbins),
-                "signal_scale": 1,
+                "signal_scale": float(args.signal_scale),
                 # "signal_scale": 20,
                 # "signal_scale": 10,
                 # "signal_scale": "auto",
@@ -168,7 +173,7 @@ def main_analysis_make_plot_userfilter():
                 # "no_overflow": True,
                 "remove_underflow": True,
                 "xaxis_ndivisions":505,
-                "ratio_range":[0.,2.],
+                "ratio_range":[0.,5.],
                 "xaxis_label":args.xaxis_label,
                 "ratio_xaxis_title":args.xaxis_label,
                 "yaxis_range":[float(x) for x in args.yaxis_range.split(",")] if isinstance(args.yaxis_range, six.string_types) and len(args.yaxis_range) > 0 else [],

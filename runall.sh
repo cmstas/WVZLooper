@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap "kill 0" EXIT
+# trap "kill 0" EXIT
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -25,6 +25,7 @@ usage()
   echo "  -u    unblind                  (e.g. -u)"
   echo "  -y    yaxis-log                (e.g. -y)"
   echo "  -s    do systematics           (e.g. -s)"
+  echo "  -S    signal scale             (e.g. -S)"
   echo "  -k    do skim tree             (e.g. -k)"
   echo "  -x    xaxis_label              (e.g. -x \"MET [GeV]\")"
   echo "  -r    yaxis_range              (e.g. -r \"[0., 100.]\")"
@@ -36,13 +37,14 @@ usage()
 }
 
 # Command-line opts
-while getopts ":b:t:v:d:p:n:r:f:x:12uyskacih" OPTION; do
+while getopts ":b:t:v:d:p:S:n:r:f:x:12uyskacih" OPTION; do
   case $OPTION in
     b) BASELINE=${OPTARG};;
     t) NTUPLETYPE=${OPTARG};;
     v) NTUPLEVERSION=${OPTARG};;
     d) DIRNAME=${OPTARG};;
     p) PATTERN=${OPTARG};;
+    S) SIGNALSCALE=" -S ${OPTARG}";;
     1) FORCELOOPER=true;;
     2) FORCEHADDER=true;;
     n) NBINS=" -n "${OPTARG};;
@@ -67,7 +69,7 @@ if [ -z ${NTUPLEVERSION}  ]; then usage; fi
 if [ -z ${FORCELOOPER}  ]; then FORCELOOPER=false; fi
 if [ -z ${FORCEHADDER}  ]; then FORCEHADDER=false; fi
 if [ -z ${DIRNAME}  ]; then DIRNAME="yield"; fi
-if [ -z ${PATTERN}  ]; then PATTERN="ChannelEMuHighMT__Yield,ChannelOffZHighMET__Yield,ChannelOnZ__Yield,ChannelBTagEMu__Yield,FiveLeptonsMT5th__Yield,ChannelEMu__Yield,ChannelOffZ__Yield,ChannelOffZSR__Yield,SixLeptonsSumPtCut__Yield"; fi
+if [ -z ${PATTERN}  ]; then PATTERN="ChannelEMuHighMT__Yield,ChannelOffZHighMET__Yield,ChannelOnZ__Yield,ChannelBTagEMu__Yield,FiveLeptonsMT5th__Yield,ChannelEMu__Yield,ChannelOffZ__Yield,ChannelOffZSR__Yield,SixLeptonsSumPtCut__Yield,ChannelEMuBDT__Yield,ChannelOffZBDT__Yield,ChannelEMuBDT__emuBDT_Nominal,ChannelOffZBDT__offzBDT_Nominal"; fi
 if [ -z "${NBINS}" ]; then NBINS=""; fi
 if [ -z ${UNBLIND}  ]; then UNBLIND=""; fi
 if [ -z ${YAXISLOG}  ]; then YAXISLOG=""; fi
@@ -91,6 +93,7 @@ echo "NTUPLETYPE     : ${NTUPLETYPE}"
 echo "FORCELOOPER    : ${FORCELOOPER}"
 echo "FORCEHADDER    : ${FORCEHADDER}"
 echo "FILTERCUTS     : ${FILTERCUTS}"
+echo "SIGNALSCALE    : ${SIGNALSCALE}"
 echo "DIRNAME        : ${DIRNAME}"
 echo "PATTERN        : ${PATTERN}"
 echo "NBINS          : ${NBINS}"
@@ -173,14 +176,14 @@ if [ -n ${DIRNAME} ] && [ -n ${PATTERN} ]; then
 
     if ${RUNALLYEAR}; then
         # Plotting the output histograms by each year
-        python ./scripts/plot.py ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION} -t y2016_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
-        python ./scripts/plot.py ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2017_${NTUPLEVERSION} -t y2017_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
-        python ./scripts/plot.py ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
+        python ./scripts/plot.py ${SIGNALSCALE} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION} -t y2016_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
+        python ./scripts/plot.py ${SIGNALSCALE} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2017_${NTUPLEVERSION} -t y2017_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
+        python ./scripts/plot.py ${SIGNALSCALE} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
     fi
 
     # Plotting the output histograms of all year
     echo python ./scripts/plot.py ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION}_${NTUPLETYPE}2017_${NTUPLEVERSION}_${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2016_${BASELINE}_y2017_${BASELINE}_y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # Basically the tags are just concatenated with "_"
-    python ./scripts/plot.py ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION}_${NTUPLETYPE}2017_${NTUPLEVERSION}_${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2016_${BASELINE}_y2017_${BASELINE}_y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # Basically the tags are just concatenated with "_"
+    python ./scripts/plot.py ${SIGNALSCALE} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION}_${NTUPLETYPE}2017_${NTUPLEVERSION}_${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2016_${BASELINE}_y2017_${BASELINE}_y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # Basically the tags are just concatenated with "_"
 
 fi
 

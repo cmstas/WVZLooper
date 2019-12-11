@@ -14,16 +14,18 @@ usage()
   echo "  -s    sample_set             (e.g. -s WVZ2016_v0.1.6)"
   echo "  -t    tag                    (e.g. -t y2016_test)"
   echo "  -b    do bdt"
+  echo "  -w    wwz only"
   echo
   exit
 }
 
 # Command-line opts
-while getopts ":s:t:bh" OPTION; do
+while getopts ":s:t:bwh" OPTION; do
   case $OPTION in
     s) SAMPLESET=${OPTARG};;
     t) TAG=${OPTARG};;
     b) DOBDT=true;;
+    w) WWZONLY="_wwzonly";;
     h) usage;;
     :) usage;;
   esac
@@ -45,50 +47,22 @@ echo "SAMPLESET      : ${SAMPLESET}"
 echo "TAG            : ${TAG}"
 echo "================================================"
 
-# combineCards.py \
-#     emu1=stats/${SAMPLESET}/${TAG}/emu_datacard_bin1.txt \
-#     emu2=stats/${SAMPLESET}/${TAG}/emu_datacard_bin2.txt \
-#     emu3=stats/${SAMPLESET}/${TAG}/emu_datacard_bin3.txt \
-#     emu4=stats/${SAMPLESET}/${TAG}/emu_datacard_bin4.txt \
-#     emu5=stats/${SAMPLESET}/${TAG}/emu_datacard_bin5.txt \
-#     offz=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
-
-# combineCards.py \
-#     emu1=stats/${SAMPLESET}/${TAG}/emu_datacard_bin1.txt \
-#     emu2=stats/${SAMPLESET}/${TAG}/emu_datacard_bin2.txt \
-#     emu3=stats/${SAMPLESET}/${TAG}/emu_datacard_bin3.txt \
-#     emu4=stats/${SAMPLESET}/${TAG}/emu_datacard_bin4.txt \
-#     emu5=stats/${SAMPLESET}/${TAG}/emu_datacard_bin5.txt \
-#     offzA=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt \
-#     offzB=stats/${SAMPLESET}/${TAG}/offz_datacard_bin2.txt \
-#     offzC=stats/${SAMPLESET}/${TAG}/offz_datacard_bin3.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
-
 if [ $DOBDT ]; then
 combineCards.py \
-    emu1=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard_bin1.txt \
-    emu2=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard_bin2.txt \
-    emu3=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard_bin3.txt \
-    emu4=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard_bin4.txt \
-    emu5=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard_bin4.txt \
-    offzA=stats/${SAMPLESET}/${TAG}/offz_bdt_datacard_bin1.txt \
-    offzB=stats/${SAMPLESET}/${TAG}/offz_bdt_datacard_bin2.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+    emu1=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin1.txt \
+    emu2=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin2.txt \
+    emu3=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin3.txt \
+    emu4=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin4.txt \
+    emu5=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin5.txt \
+    offzA=stats/${SAMPLESET}/${TAG}/offz_bdt_datacard${WWZONLY}_bin1.txt \
+    offzB=stats/${SAMPLESET}/${TAG}/offz_bdt_datacard${WWZONLY}_bin2.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
 else
 combineCards.py \
-    emu1=stats/${SAMPLESET}/${TAG}/emu_datacard_bin1.txt \
-    emu2=stats/${SAMPLESET}/${TAG}/emu_datacard_bin2.txt \
-    emu3=stats/${SAMPLESET}/${TAG}/emu_datacard_bin3.txt \
-    emu4=stats/${SAMPLESET}/${TAG}/emu_datacard_bin4.txt \
-    offzA=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt \
-    offzB=stats/${SAMPLESET}/${TAG}/offz_datacard_bin2.txt \
-    offzC=stats/${SAMPLESET}/${TAG}/offz_datacard_bin3.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+    emu1=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin1.txt \
+    emu2=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin2.txt \
+    emu3=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin3.txt \
+    emu4=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin4.txt \
+    offzA=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin1.txt \
+    offzB=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin2.txt \
+    offzC=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin3.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
 fi
-
-# combineCards.py \
-#     offzA=stats/${SAMPLESET}/${TAG}/offz_datacard_bin1.txt \
-#     offzB=stats/${SAMPLESET}/${TAG}/offz_datacard_bin2.txt \
-#     offzC=stats/${SAMPLESET}/${TAG}/offz_datacard_bin3.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
-#     # emu1=stats/${SAMPLESET}/${TAG}/emu_datacard_bin1.txt \
-#     # emu2=stats/${SAMPLESET}/${TAG}/emu_datacard_bin2.txt \
-#     # emu3=stats/${SAMPLESET}/${TAG}/emu_datacard_bin3.txt \
-#     # emu4=stats/${SAMPLESET}/${TAG}/emu_datacard_bin4.txt \
-#     # emu5=stats/${SAMPLESET}/${TAG}/emu_datacard_bin5.txt  > stats/${SAMPLESET}/${TAG}/stat.txt

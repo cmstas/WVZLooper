@@ -77,7 +77,10 @@ def write_datacards(ntuple_version, tag):
     # Each root files will correspond to a specific process and will contain histograms for the fit
     #===========================================================================
 
+    wwzonlysuffix = ""
+
     if args.wwz_only:
+        wwzonlysuffix = "wwzonly"
         if args.nonh_vh_split:
             fname_sig     = "outputs/{}/{}/nonh_wwz.root".format(ntuple_version, tag)
         else:
@@ -365,16 +368,16 @@ def write_datacards(ntuple_version, tag):
     for i in xrange(1, n_emu_bdt_bins+1):
         d.set_bin(i)
         d.set_region_name("bin{}".format(i))
-        d.write("stats/{}/emu_bdt_datacard_bin{}.txt".format(prefix, i))
+        d.write("stats/{}/emu_bdt_datacard{}_bin{}.txt".format(prefix, "_"+wwzonlysuffix if wwzonlysuffix != "" else "", i))
         if args.print_yields:
             vals = d.print_yields(detail=args.print_detail)
             if vals:
                 if n_emu_bdt_bins == 1: i = "One"
                 if args.nonh_vh_split:
-                    print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}".format(year, i))
+                    print_yield_table(vals[0], vals[1], "textable/bdtemuSplit{}{}{}".format(wwzonlysuffix, year, i))
                     finalyields.append(vals)
                 else:
-                    print_yield_table(vals[0], vals[1], "textable/emu{}{}".format(year, i))
+                    print_yield_table(vals[0], vals[1], "textable/bdtemu{}{}{}".format(wwzonlysuffix, year, i))
                     finalyields.append(vals)
 
     ###############################
@@ -533,16 +536,16 @@ def write_datacards(ntuple_version, tag):
     for i in xrange(1, n_offz_bdt_bins+1):
         d.set_bin(i)
         d.set_region_name("bin{}".format(i))
-        d.write("stats/{}/offz_bdt_datacard_bin{}.txt".format(prefix, i))
+        d.write("stats/{}/offz_bdt_datacard{}_bin{}.txt".format(prefix, "_"+wwzonlysuffix if wwzonlysuffix != "" else "", i))
         if args.print_yields:
             vals = d.print_yields(detail=args.print_detail)
             if vals:
                 if n_offz_bdt_bins == 1: i = "One"
                 if args.nonh_vh_split:
-                    print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}".format(year, i))
+                    print_yield_table(vals[0], vals[1], "textable/bdtoffzSplit{}{}{}".format(wwzonlysuffix, year, i))
                     finalyields.append(vals)
                 else:
-                    print_yield_table(vals[0], vals[1], "textable/offz{}{}".format(year, i))
+                    print_yield_table(vals[0], vals[1], "textable/bdtoffz{}{}{}".format(wwzonlysuffix, year, i))
                     finalyields.append(vals)
 
     # # colors = [2005, 2001, 2003, 2007, 920, 2012, 2011, 2002]
@@ -745,7 +748,7 @@ def write_datacards(ntuple_version, tag):
     #                print_yield_table(vals[0], vals[1], "textable/offz{}".format(year))
 
 
-    if len(finalyields) > 0:
+    if len(finalyields) > 5:
 
         procs = ["sig", "wzz", "zzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
         if args.nonh_vh_split:
@@ -793,7 +796,7 @@ def write_datacards(ntuple_version, tag):
         p.plot_hist(bgs=bkghists,
                 sigs=sighists,
                 options={
-                "output_name": "fitplot/bdtfit{}.pdf".format(year),
+                "output_name": "fitplot/bdtfit{}{}.pdf".format(wwzonlysuffix, year),
                 "print_yield":True,
                 "signal_scale": 1,
                 "legend_scalex":1.8,

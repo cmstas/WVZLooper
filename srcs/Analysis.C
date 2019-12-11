@@ -205,9 +205,10 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 }
                 , UNITY );
         cutflow.getCut("ChannelOffZ");
-        cutflow.addCutToLastActiveCut("ChannelOffZBDT"           , [&](){ return this->CutOffZBDT() and this->VarOffZBDT() > 0; } , [&]() { return this->CutOffZBDTWgt(); } );
-        cutflow.getCut("ChannelOffZ");
-        cutflow.addCutToLastActiveCut("ChannelOffZBDTCR"         , [&](){ return this->CutOffZBDT() and this->VarOffZBDT() < 0; } , [&]() { return this->CutOffZBDTWgt(); } );
+        cutflow.addCutToLastActiveCut("ChannelOffZBDTPre"        , [&](){ return this->CutOffZBDT();     } , [&]() { return this->CutOffZBDTWgt(); } );
+        cutflow.addCutToLastActiveCut("ChannelOffZBDT"           , [&](){ return this->VarOffZBDT() > 0; } , UNITY );
+        cutflow.getCut("ChannelOffZBDTPre");
+        cutflow.addCutToLastActiveCut("ChannelOffZBDTCR"         , [&](){ return this->VarOffZBDT() < 0; } , UNITY );
         cutflow.getCut("ChannelOffZBDT");
         cutflow.addCutToLastActiveCut("ChannelOffZBDTA"          , [&](){ return offzBDTBin() == 0; } , UNITY );
         cutflow.getCut("ChannelOffZBDT");
@@ -1085,6 +1086,14 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     histograms_Z_peak.addHistogram("lepVPt1"  , 180 , 0 , 200 , [&](){ return this->VarLepPt(lep_Veto_idx2); });
     histograms_Z_peak.addHistogram("lepVPt2"  , 180 , 0 , 200 , [&](){ return this->VarLepPt(lep_Veto_idx3); });
     histograms_Z_peak.addHistogram("lepVPt3"  , 180 , 0 , 200 , [&](){ return this->VarLepPt(lep_Veto_idx4); });
+    histograms_Z_peak.addHistogram("MET"      , 180 , 0       , 300    , [&](){ return this->VarMET(); });
+    histograms_Z_peak.addHistogram("Pt4l"     , 180 , 0       , 300    , [&](){ return (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(); });
+    histograms_Z_peak.addHistogram("METmod"   , 180 , 0       , 300    , [&](){ return this->VarMET() + (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() / 2.; });
+    histograms_Z_peak.addHistogram("OrigMET"  , 180 , 0       , 300    , [&](){ return useMVAID ? wvz.met_orig_pt() : wvz.met_pt(); });
+    histograms_Z_peak.addHistogram("Nbjet"    , 6   , 0       , 6      , [&](){ return this->VarNb(); });
+    histograms_Z_peak.addHistogram("Nbjetmed" , 6   , 0       , 6      , [&](){ return this->VarNbmed(); });
+    histograms_Z_peak.addHistogram("Njet"     , 9   , 0       , 9      , [&](){ return this->VarNjet(); });
+    histograms_Z_peak.addHistogram("METLarge" , 180 , 0       , 600    , [&](){ return this->VarMET(); });
 
     //==========================
     //
@@ -4027,7 +4036,8 @@ float Analysis::VarMll2ndZ()
 //______________________________________________________________________________________________
 float Analysis::VarMET(int var)
 {
-    return VarMETNoSmearing(var);
+    // return VarMETNoSmearing(var);
+    return VarMETSmearing(var);
 }
 
 //______________________________________________________________________________________________
@@ -4106,21 +4116,22 @@ float Analysis::VarMETSmearing(int var)
 //______________________________________________________________________________________________
 float Analysis::VarMETPhi(int var)
 {
-    return VarMETPhiNoSmearing(var);
+    // return VarMETPhiNoSmearing(var);
+    return VarMETPhiSmearing(var);
 }
 
 //______________________________________________________________________________________________
 float Analysis::VarMETPhiNoSmearing(int var)
 {
-    if      (var == 0) return wvz.met_phi();
-    else if (var == 1) return wvz.met_dn_phi();
-    else if (var == 2) return wvz.met_phi();
-    else if (var == 3) return wvz.met_phi();
-    else if (var == 4) return wvz.met_phi();
-    else if (var ==-1) return wvz.met_dn_phi();
-    else if (var ==-2) return wvz.met_phi();
-    else if (var ==-3) return wvz.met_phi();
-    else if (var ==-4) return wvz.met_phi();
+    if      (var == 0) return wvz.met_orig_phi();
+    else if (var == 1) return wvz.met_orig_dn_phi();
+    else if (var == 2) return wvz.met_orig_phi();
+    else if (var == 3) return wvz.met_orig_phi();
+    else if (var == 4) return wvz.met_orig_phi();
+    else if (var ==-1) return wvz.met_orig_dn_phi();
+    else if (var ==-2) return wvz.met_orig_phi();
+    else if (var ==-3) return wvz.met_orig_phi();
+    else if (var ==-4) return wvz.met_orig_phi();
     RooUtil::error(TString::Format("Unrecognized variation value var = %d", var).Data(), "VarMETPhiNoSmearing");
     return -999;
 }
