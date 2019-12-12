@@ -368,7 +368,7 @@ def write_datacards(ntuple_version, tag):
     for i in xrange(1, n_emu_bdt_bins+1):
         d.set_bin(i)
         d.set_region_name("bin{}".format(i))
-        d.write("stats/{}/emu_bdt_datacard{}_bin{}.txt".format(prefix, "_"+wwzonlysuffix if wwzonlysuffix != "" else "", i))
+        d.write("stats/{}/emu_bdt_datacard{}_bin{}{}.txt".format(prefix, "_"+wwzonlysuffix if wwzonlysuffix != "" else "", i, "_split" if args.nonh_vh_split else ""))
         if args.print_yields:
             vals = d.print_yields(detail=args.print_detail)
             if vals:
@@ -536,7 +536,7 @@ def write_datacards(ntuple_version, tag):
     for i in xrange(1, n_offz_bdt_bins+1):
         d.set_bin(i)
         d.set_region_name("bin{}".format(i))
-        d.write("stats/{}/offz_bdt_datacard{}_bin{}.txt".format(prefix, "_"+wwzonlysuffix if wwzonlysuffix != "" else "", i))
+        d.write("stats/{}/offz_bdt_datacard{}_bin{}{}.txt".format(prefix, "_"+wwzonlysuffix if wwzonlysuffix != "" else "", i, "_split" if args.nonh_vh_split else ""))
         if args.print_yields:
             vals = d.print_yields(detail=args.print_detail)
             if vals:

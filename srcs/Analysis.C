@@ -1094,6 +1094,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     histograms_Z_peak.addHistogram("Nbjetmed" , 6   , 0       , 6      , [&](){ return this->VarNbmed(); });
     histograms_Z_peak.addHistogram("Njet"     , 9   , 0       , 9      , [&](){ return this->VarNjet(); });
     histograms_Z_peak.addHistogram("METLarge" , 180 , 0       , 600    , [&](){ return this->VarMET(); });
+    histograms_Z_peak.addHistogram("Pt4lLarge", 180 , 0       , 600    , [&](){ return (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(); });
 
     //==========================
     //
@@ -1248,7 +1249,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         {
             if (doSkim)
             {
-                if (cutflow.getCut("ChannelEMu").pass or cutflow.getCut("ChannelOffZ").pass or cutflow.getCut("ChannelOnZ").pass or cutflow.getCut("ChannelBTagEMu").pass)
+                // if (cutflow.getCut("ChannelEMu").pass or cutflow.getCut("ChannelOffZ").pass or cutflow.getCut("ChannelOnZ").pass or cutflow.getCut("ChannelBTagEMu").pass)
+                if (cutflow.getCut("Cut4LepLeptonPt").pass)
                 {
                     fillSkimTree({cutflow.getCut("ChannelEMu").pass, cutflow.getCut("ChannelOffZ").pass, cutflow.getCut("ChannelOnZ").pass, cutflow.getCut("ChannelBTagEMu").pass});
                 }
