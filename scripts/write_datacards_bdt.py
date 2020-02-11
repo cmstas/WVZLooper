@@ -3,10 +3,7 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-import ROOT as r
 
-import pyrootutil as pr
-import plottery_wrapper as p
 import argparse
 import sys
 import os
@@ -153,7 +150,7 @@ def write_datacards(ntuple_version, tag):
     # Defining systematics to run
     #===========================================================================
 
-    systcategs = ["BTagHF", "BTagLF", "JES", "Pileup", "Qsq", "PDF", "AlphaS"] # Null string is the nominal variation
+    systcategs = ["BTagHF", "BTagLF", "JES", "Pileup", "Qsq", "PDF", "AlphaS", "MET", "JER", "METPileup"] # Null string is the nominal variation
     systnames = ["Nominal"] # Nominal always exist
     for systcateg in systcategs:
         systnames.append(systcateg+"Up")

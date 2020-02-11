@@ -32,12 +32,13 @@ usage()
   echo "  -a    run all year             (e.g. -a)"
   echo "  -c    one combined signal      (e.g. -c)"
   echo "  -i    stack signal             (e.g. -i)"
+  echo "  -U    remove underflow         (e.g. -U)"
   echo
   exit
 }
 
 # Command-line opts
-while getopts ":b:t:v:d:p:S:n:r:f:x:12uyskacih" OPTION; do
+while getopts ":b:t:v:d:p:S:n:r:f:x:12uyskaciUh" OPTION; do
   case $OPTION in
     b) BASELINE=${OPTARG};;
     t) NTUPLETYPE=${OPTARG};;
@@ -58,6 +59,7 @@ while getopts ":b:t:v:d:p:S:n:r:f:x:12uyskacih" OPTION; do
     a) RUNALLYEAR=true;;
     c) ONESIGNAL=" -c";;
     i) STACKSIGNAL=" -i";;
+    U) REMOVEUNDERFLOW=" -U";;
     h) usage;;
     :) usage;;
   esac
@@ -80,6 +82,7 @@ if [ -z "${YAXISRANGE}" ]; then YAXISRANGE=""; fi
 if [ -z ${RUNALLYEAR}  ]; then RUNALLYEAR=false; fi
 if [ -z ${ONESIGNAL}  ]; then ONESIGNAL=""; fi
 if [ -z ${STACKSIGNAL}  ]; then STACKSIGNAL=""; fi
+if [ -z ${REMOVEUNDERFLOW}  ]; then REMOVEUNDERFLOW=""; fi
 
 # Verbose
 date
@@ -176,14 +179,14 @@ if [ -n ${DIRNAME} ] && [ -n ${PATTERN} ]; then
 
     if ${RUNALLYEAR}; then
         # Plotting the output histograms by each year
-        python ./scripts/plot.py ${SIGNALSCALE} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION} -t y2016_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
-        python ./scripts/plot.py ${SIGNALSCALE} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2017_${NTUPLEVERSION} -t y2017_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
-        python ./scripts/plot.py ${SIGNALSCALE} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
+        python ./scripts/plot.py ${SIGNALSCALE} ${REMOVEUNDERFLOW} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION} -t y2016_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
+        python ./scripts/plot.py ${SIGNALSCALE} ${REMOVEUNDERFLOW} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2017_${NTUPLEVERSION} -t y2017_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
+        python ./scripts/plot.py ${SIGNALSCALE} ${REMOVEUNDERFLOW} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # The last two arguments must match the last two arguments from previous command
     fi
 
     # Plotting the output histograms of all year
     echo python ./scripts/plot.py ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION}_${NTUPLETYPE}2017_${NTUPLEVERSION}_${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2016_${BASELINE}_y2017_${BASELINE}_y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # Basically the tags are just concatenated with "_"
-    python ./scripts/plot.py ${SIGNALSCALE} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION}_${NTUPLETYPE}2017_${NTUPLEVERSION}_${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2016_${BASELINE}_y2017_${BASELINE}_y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # Basically the tags are just concatenated with "_"
+    python ./scripts/plot.py ${SIGNALSCALE} ${REMOVEUNDERFLOW} ${STACKSIGNAL} ${ONESIGNAL} -r "${YAXISRANGE}" -x "${XAXISLABEL}" ${YAXISLOG} ${UNBLIND} -s ${NTUPLETYPE}2016_${NTUPLEVERSION}_${NTUPLETYPE}2017_${NTUPLEVERSION}_${NTUPLETYPE}2018_${NTUPLEVERSION} -t y2016_${BASELINE}_y2017_${BASELINE}_y2018_${BASELINE} -d ${DIRNAME} -p ${PATTERN} ${NBINS} # Basically the tags are just concatenated with "_"
 
 fi
 

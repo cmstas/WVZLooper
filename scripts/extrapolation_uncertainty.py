@@ -18,10 +18,10 @@ from six.moves import zip
 # Baseline_Version = "syst"
 Ntuple_Type = "WVZMVA"
 Ntuple_Version = "v0.1.21"
-Baseline_Version = "v1"
+Baseline_Version = "v3"
 
-# syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
-syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "PDF", "Qsq", "AlphaS"]
+syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
+# syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "PDF", "Qsq", "AlphaS"]
 syst_list = ["Nominal", "JES", "JER", "Pileup", "MET", "METPileup"]
 syst_list = syst_list_all
 
@@ -75,12 +75,13 @@ def get_alpha_uncertainty(ntuple_version, tag, numerator, denominator, num_proc,
         # print (E_numer_data - E_numer_nonzzbkg)
         # print E_numer_zz
 
+        # print(E_numer_zz, E_denom_zz, E_denom_data, E_denom_nonzzbkg, denominator, numerator)
         data_eff =  (E_numer_data - E_numer_nonzzbkg) / (E_denom_data - E_denom_nonzzbkg)
         mc_eff =  E_numer_zz / E_denom_zz
         eff_ratio = data_eff / mc_eff
-        # print E_numer_data, E_numer_zz
-        # print "mc_eff:", mc_eff
-        # print "data_eff:", data_eff
+        # print(E_numer_data, E_numer_zz)
+        # print("mc_eff:", mc_eff)
+        # print("data_eff:", data_eff)
         if valopt == "eff":
             return mc_eff
         elif valopt == "den":
@@ -308,11 +309,11 @@ def get_eff_ratios(process, region, variable, valopt="ratio"):
         rtn_val[syst] = var
         # print syst, varup, vardn, nominal
 
-    # # Not entirely a correct treatment... but a work around
-    # pufracerr = rtn_val["Pileup"].err / rtn_val["Pileup"].val
-    # metpufracerr = rtn_val["METPileup"].err / rtn_val["METPileup"].val
-    # rtn_val["Pileup"] = E(rtn_val["Pileup"].val, rtn_val["Pileup"].val * math.sqrt(pufracerr**2 + metpufracerr**2))
-    # del rtn_val["METPileup"]
+    # Not entirely a correct treatment... but a work around
+    pufracerr = rtn_val["Pileup"].err / rtn_val["Pileup"].val
+    metpufracerr = rtn_val["METPileup"].err / rtn_val["METPileup"].val
+    rtn_val["Pileup"] = E(rtn_val["Pileup"].val, rtn_val["Pileup"].val * math.sqrt(pufracerr**2 + metpufracerr**2))
+    del rtn_val["METPileup"]
 
 
     # for key in syst_list:

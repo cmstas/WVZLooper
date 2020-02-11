@@ -42,6 +42,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     const float b3 =  0.733;
     const float b4 =  3.523;
 
+    doVVVOnlyBDT = true;
+
     // Parsing year
     if (ntupleVersion.Contains("v0.0.5")) year = -1; // Meaning use this sets to scale it up to 137
     else if (ntupleVersion.Contains("2016")) year = 2016;
@@ -64,10 +66,13 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     fast_forest_emu_zz = new FastForest("bdtmodel/emu_zz_bdt.txt", emu_zz_features);
     fast_forest_emu_ttz = new FastForest("bdtmodel/emu_ttz_bdt.txt", emu_ttz_features);
     fast_forest_offz_zz = new FastForest("bdtmodel/offz_zz_bdt.txt", offz_zz_features);
+    fast_forest_nonh_emu_zz = new FastForest("bdtmodel/wvz-analysis-master-models_nonh/models_nonh/emu_zz_bdt.txt", emu_zz_features);
+    fast_forest_nonh_emu_ttz = new FastForest("bdtmodel/wvz-analysis-master-models_nonh/models_nonh/emu_ttz_bdt.txt", emu_ttz_features);
+    fast_forest_nonh_offz_zz = new FastForest("bdtmodel/wvz-analysis-master-models_nonh/models_nonh/offz_zz_bdt.txt", offz_zz_features);
 
     // The RooUtil::Cutflow object facilitates various cutflow/histogramming
     RooUtil::Cutflow cutflow(output_file);
-    cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight(); } );
+    cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight() * this->PrefireWeight(); } );
     cutflow.addCutToLastActiveCut("GenFilter", [&](){ return this->CutGenFilter(); }, UNITY );
     cutflow.addCutToLastActiveCut("Weight", [&](){ return 1; }, UNITY );
 
@@ -177,33 +182,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.getCut("ChannelOffZ");
         cutflow.addCutToLastActiveCut("ChannelOffZLowMT"        , [&](){ return not this->CutEMuSig();           } , UNITY );
         cutflow.getCut("ChannelOffZ");
-        cutflow.addCutToLastActiveCut("ChannelOffZSR"           , [&]()
-                {
-                    if (this->VarMET() > 120.)
-                    {
-                        return true;
-                    }
-                    else if (this->VarMET() > 70.)
-                    {
-                        if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 70.)
-                        {
-                            return true;
-                        }
-                        else if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 40.)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                , UNITY );
+        cutflow.addCutToLastActiveCut("ChannelOffZSR"           , [&](){ return this->CutOffZSig();              } , UNITY );
+
         cutflow.getCut("ChannelOffZ");
         cutflow.addCutToLastActiveCut("ChannelOffZBDTPre"        , [&](){ return this->CutOffZBDT();     } , [&]() { return this->CutOffZBDTWgt(); } );
         cutflow.addCutToLastActiveCut("ChannelOffZBDT"           , [&](){ return this->VarOffZBDT() > 0; } , UNITY );
@@ -534,88 +514,100 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
 
         histograms.addHistogram("emuBDT_Nominal", 5, 0, 5, [&]()
                 {
-                //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                computeAllBDTScores();
-                float emuZZBDT = emu_zz_bdt_score;
-                if (emuZZBDT < b1) return 0;
-                float emuTTZBDT = emu_ttz_bdt_score;
-                if (emuTTZBDT < b2) return 2;
-                if (emuZZBDT < b3) return 1;
-                if (emuTTZBDT < b4) return 3;
-                return 4;
+                // //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                // // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                // // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                // // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                // // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                // // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                // computeAllBDTScores();
+                // float emuZZBDT = emu_zz_bdt_score;
+                // if (emuZZBDT < b1) return 0;
+                // float emuTTZBDT = emu_ttz_bdt_score;
+                // if (emuTTZBDT < b2) return 2;
+                // if (emuZZBDT < b3) return 1;
+                // if (emuTTZBDT < b4) return 3;
+                // return 4;
+
+                return emuBDTBin();
                 });
 
         histograms.addHistogram("emuBDT_JESUp", 5, 0, 5, [&]()
                 {
-                //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                computeAllBDTScores();
-                float emuZZBDT = emu_zz_bdt_score_up;
-                if (emuZZBDT < b1) return 0;
-                float emuTTZBDT = emu_ttz_bdt_score_up;
-                if (emuTTZBDT < b2) return 2;
-                if (emuZZBDT < b3) return 1;
-                if (emuTTZBDT < b4) return 3;
-                return 4;
+                // //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                // // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                // // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                // // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                // // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                // // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                // computeAllBDTScores();
+                // float emuZZBDT = emu_zz_bdt_score_up;
+                // if (emuZZBDT < b1) return 0;
+                // float emuTTZBDT = emu_ttz_bdt_score_up;
+                // if (emuTTZBDT < b2) return 2;
+                // if (emuZZBDT < b3) return 1;
+                // if (emuTTZBDT < b4) return 3;
+                // return 4;
+
+                return emuBDTBin(1);
                 });
 
         histograms.addHistogram("emuBDT_JESDown", 5, 0, 5, [&]()
                 {
-                //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
-                // 0 , -inf                , -0.9076937735080719 , -inf               , inf
-                // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
-                // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
-                // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
-                // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
-                computeAllBDTScores();
-                float emuZZBDT = emu_zz_bdt_score_up;
-                if (emuZZBDT < b1) return 0;
-                float emuTTZBDT = emu_ttz_bdt_score_up;
-                if (emuTTZBDT < b2) return 2;
-                if (emuZZBDT < b3) return 1;
-                if (emuTTZBDT < b4) return 3;
-                return 4;
+                // //   , zz_score_min        , zz_score_max        , ttz_score_min      , ttz_score_max
+                // // 0 , -inf                , -0.9076937735080719 , -inf               , inf
+                // // 1 , -0.9076937735080719 , inf                 , -inf               , 0.0148177370429039
+                // // 2 , -0.9076937735080719 , 0.7326840460300446  , 0.0148177370429039 , inf
+                // // 3 , 0.7326840460300446  , inf                 , 0.0148177370429039 , 3.523359537124634
+                // // 4 , 0.7326840460300446  , inf                 , 3.523359537124634  , inf
+                // computeAllBDTScores();
+                // float emuZZBDT = emu_zz_bdt_score_up;
+                // if (emuZZBDT < b1) return 0;
+                // float emuTTZBDT = emu_ttz_bdt_score_up;
+                // if (emuTTZBDT < b2) return 2;
+                // if (emuZZBDT < b3) return 1;
+                // if (emuTTZBDT < b4) return 3;
+                // return 4;
+
+                return emuBDTBin(-1);
                 });
 
         histograms.addHistogram("offzBDTScore", 180, -10, 10, [&]() { computeAllBDTScores(); return offz_zz_bdt_score; });
 
         histograms.addHistogram("offzBDT_Nominal", 2, 0, 2, [&]()
                 {
-                // 0 , -inf , 3.0
-                // 1 , 3.0  , inf
-                computeAllBDTScores();
-                float offzZZBDT = offz_zz_bdt_score;
-                if (offzZZBDT > 3.0) return 1;
-                else return 0;
+                // // 0 , -inf , 3.0
+                // // 1 , 3.0  , inf
+                // computeAllBDTScores();
+                // float offzZZBDT = offz_zz_bdt_score;
+                // if (offzZZBDT > 3.0) return 1;
+                // else return 0;
+
+                return offzBDTBin();
                 });
 
         histograms.addHistogram("offzBDT_JESUp", 2, 0, 2, [&]()
                 {
-                // 0 , -inf , 3.0
-                // 1 , 3.0  , inf
-                computeAllBDTScores();
-                float offzZZBDT = offz_zz_bdt_score_up;
-                if (offzZZBDT > 3.0) return 1;
-                else return 0;
+                // // 0 , -inf , 3.0
+                // // 1 , 3.0  , inf
+                // computeAllBDTScores();
+                // float offzZZBDT = offz_zz_bdt_score_up;
+                // if (offzZZBDT > 3.0) return 1;
+                // else return 0;
+
+                return offzBDTBin(1);
                 });
 
         histograms.addHistogram("offzBDT_JESDown", 2, 0, 2, [&]()
                 {
-                // 0 , -inf , 3.0
-                // 1 , 3.0  , inf
-                computeAllBDTScores();
-                float offzZZBDT = offz_zz_bdt_score_dn;
-                if (offzZZBDT > 3.0) return 1;
-                else return 0;
+                // // 0 , -inf , 3.0
+                // // 1 , 3.0  , inf
+                // computeAllBDTScores();
+                // float offzZZBDT = offz_zz_bdt_score_dn;
+                // if (offzZZBDT > 3.0) return 1;
+                // else return 0;
+
+                return offzBDTBin(-1);
                 });
 
 
@@ -729,6 +721,14 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             // histograms.addHistogram("WindowMllNom"   , 180 , 0       , 50     , [&](){ return fabs(this->VarMll(lep_Nom_idx1, lep_Nom_idx2)-91.1876); });
             histograms.addHistogram("lepFrelIso03EA" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EA()[lep_Fakeable_idx] : -999; });
             histograms.addHistogram("lepFrelIso04DB" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso04DB()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFrelIso03EAZoom" , 180 , 0       , 1.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EA()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFrelIso04DBZoom" , 180 , 0       , 1.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso04DB()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFElrelIso03EA" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 and abs(wvz.lep_id()[lep_Fakeable_idx]) == 11 ? wvz.lep_relIso03EA()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFElrelIso03EAZoom" , 180 , 0       , 1.0    , [&](){ return lep_Fakeable_idx >= 0  and abs(wvz.lep_id()[lep_Fakeable_idx]) == 11 ? wvz.lep_relIso03EA()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFElrelIso03EALep" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 and abs(wvz.lep_id()[lep_Fakeable_idx]) == 11 ? wvz.lep_relIso03EAwLep()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFElrelIso03EALepZoom" , 180 , 0       , 1.0    , [&](){ return lep_Fakeable_idx >= 0  and abs(wvz.lep_id()[lep_Fakeable_idx]) == 11 ? wvz.lep_relIso03EAwLep()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFrelIso03EALep" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EAwLep()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFrelIso03EALepZoom" , 180 , 0       , 1.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EAwLep()[lep_Fakeable_idx] : -999; });
             // histograms.addHistogram("jetPt0"         , 180 , 0.      , 200    , [&](){ return wvz.jets_p4().size() > 0 ? wvz.jets_p4()[0].pt() : -999; });
             // histograms.addHistogram("jetPt1"         , 180 , 0.      , 200    , [&](){ return wvz.jets_p4().size() > 1 ? wvz.jets_p4()[1].pt() : -999; });
             // histograms.addHistogram("jetPt2"         , 180 , 0.      , 200    , [&](){ return wvz.jets_p4().size() > 2 ? wvz.jets_p4()[2].pt() : -999; });
@@ -744,6 +744,27 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             histograms.addHistogram("pt_zeta"        , 180 , -200    , 200       , [&](){ return this->VarPtZetaDiff(); });
             histograms.addHistogram("pt_zeta_vis"    , 180 , -200    , 550       , [&](){ return this->VarPtZetaVis(); });
             histograms.addHistogram("pt_zeta_sum"    , 180 , -200    , 550       , [&](){ return this->VarPtZeta(); });
+
+            histograms.addHistogram("BDTInput_minDRJetToLep3" , 180 , 0   , 10  , [&](){ return (lep_Nom_idx1 < 0 ? -999 : this->VarMinDRJetsToLep(lep_Nom_idx1));                                                                      } );
+            histograms.addHistogram("BDTInput_minDRJetToLep4" , 180 , 0   , 10  , [&](){ return (lep_Nom_idx2 < 0 ? -999 : this->VarMinDRJetsToLep(lep_Nom_idx2));                                                                      } );
+            histograms.addHistogram("BDTInput_m_4l"           , 180 , 175 , 400 , [&](){ return (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).mass(); } );
+            histograms.addHistogram("BDTInput_m_4lLarge"      , 180 , 100 , 600 , [&](){ return (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).mass(); } );
+            histograms.addHistogram("BDTInput_vecsum_pt_4l"   , 180 , 0   , 300 , [&](){ return (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt();   } );
+            histograms.addHistogram("BDTInput_scalarsum_pt_4l", 180 , 0   , 600 , [&](){ return this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2);          } );
+            histograms.addHistogram("BDTInput_jet1Pt"         , 180 , 0   , 300 , [&](){ return (wvz.jets_p4().size() > 0 ? wvz.jets_p4()[0].pt() : -999);                                                                              } );
+            histograms.addHistogram("BDTInput_lep3Pt"         , 180 , 0   , 200 , [&](){ return this->VarLepPt(lep_Nom_idx1);                                                                                                           } );
+            histograms.addHistogram("BDTInput_lep4Pt"         , 180 , 0   , 150 , [&](){ return this->VarLepPt(lep_Nom_idx2);                                                                                                           } );
+            histograms.addHistogram("BDTInput_met_pt"         , 180 , 0   , 300 , [&](){ return this->VarMET();                                                                                                                         } );
+            histograms.addHistogram("BDTInput_mt2"            , 180 , 0   , 100 , [&](){ return this->VarMT2();                                                                                                                         } );
+            histograms.addHistogram("BDTInput_lep3MT"         , 180 , 0   , 200 , [&](){ return this->VarMTNom0();                                                                                                                      } );
+            histograms.addHistogram("BDTInput_lep4MT"         , 180 , 0   , 200 , [&](){ return this->VarMTNom1();                                                                                                                      } );
+            histograms.addHistogram("BDTInput_lep3MTLarge"    , 180 , 0   , 300 , [&](){ return this->VarMTNom0();                                                                                                                      } );
+            histograms.addHistogram("BDTInput_lep4MTLarge"    , 180 , 0   , 300 , [&](){ return this->VarMTNom1();                                                                                                                      } );
+            histograms.addHistogram("BDTInput_MllN"           , 180 , 0   , 200 , [&](){ return this->VarMll(lep_Nom_idx1, lep_Nom_idx2);                                                                                               } );
+            histograms.addHistogram("BDTInput_pt_zeta"        , 180 , -75 , 300 , [&](){ return this->VarPtZeta();                                                                                                                      } );
+            histograms.addHistogram("BDTInput_pt_zeta_vis"    , 180 , 0   , 400 , [&](){ return this->VarPtZetaVis();                                                                                                                   } );
+            histograms.addHistogram("BDTInput_ZPt"            , 180 , 0   , 350 , [&](){ return this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2);                                                                                          } );
+
         }
     }
     else if (ntupleVersion.Contains("Trilep"))
@@ -830,14 +851,14 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         // i.e. *MT*, *MET*, and *Cut4LepB* are the pattern used to search the cut names in the cutflow object to declare a systematic varations
         // e.g. ChannelBTagEMuHighMT contains "MT" and therefore a JES variations will be declared for these cuts
         // Then later below with "setCutSyst" function the variational cut defn will be defined
-        cutflow.addCutSyst("JESUp"         , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB"});
-        cutflow.addCutSyst("JESDown"       , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB"});
-        cutflow.addCutSyst("JERUp"         , {"PtZeta", "MT" , "MET"});
-        cutflow.addCutSyst("JERDown"       , {"PtZeta", "MT" , "MET"});
-        cutflow.addCutSyst("METUp"         , {"PtZeta", "MT" , "MET"});
-        cutflow.addCutSyst("METDown"       , {"PtZeta", "MT" , "MET"});
-        cutflow.addCutSyst("METPileupUp"   , {"PtZeta", "MT" , "MET"});
-        cutflow.addCutSyst("METPileupDown" , {"PtZeta", "MT" , "MET"});
+        cutflow.addCutSyst("JESUp"         , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto", "OffZSR", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB", "BDTCR"});
+        cutflow.addCutSyst("JESDown"       , {"PtZeta", "MT" , "MET" , "Cut4LepB", "FiveLeptonsBVeto", "OffZSR", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB", "BDTCR"});
+        cutflow.addCutSyst("JERUp"         , {"PtZeta", "MT" , "MET", "OffZSR", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB", "BDTCR"});
+        cutflow.addCutSyst("JERDown"       , {"PtZeta", "MT" , "MET", "OffZSR", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB", "BDTCR"});
+        cutflow.addCutSyst("METUp"         , {"PtZeta", "MT" , "MET", "OffZSR", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB", "BDTCR"});
+        cutflow.addCutSyst("METDown"       , {"PtZeta", "MT" , "MET", "OffZSR", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB", "BDTCR"});
+        cutflow.addCutSyst("METPileupUp"   , {"PtZeta", "MT" , "MET", "OffZSR", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB", "BDTCR"});
+        cutflow.addCutSyst("METPileupDown" , {"PtZeta", "MT" , "MET", "OffZSR", "BDT0", "BDT1", "BDT2", "BDT3", "BDT4", "BDTA", "BDTB", "BDTCR"});
 
         // 1 represents JESup variation
         //-1 represents JESdown variation
@@ -1036,31 +1057,126 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.setCutSyst("ARCut4LepBVeto"  , "JESDown" , [&]() { return this->Cut4LepBVeto(-1); }, [&]() { return this->BTagSF(); } );
         cutflow.setCutSyst("FiveLeptonsBVeto", "JESDown" , [&]() { return wvz.nb_dn() == 0;}       , [&]() { return this->BTagSF(); } );
 
-        cutflow.setCutSyst("ChannelEMuBDT0"  , "JESUp" , [&]() { return emuBDTBin(1) == 0; } , UNITY );
-        cutflow.setCutSyst("ChannelEMuBDT1"  , "JESUp" , [&]() { return emuBDTBin(1) == 1; } , UNITY );
-        cutflow.setCutSyst("ChannelEMuBDT2"  , "JESUp" , [&]() { return emuBDTBin(1) == 2; } , UNITY );
-        cutflow.setCutSyst("ChannelEMuBDT3"  , "JESUp" , [&]() { return emuBDTBin(1) == 3; } , UNITY );
-        cutflow.setCutSyst("ChannelEMuBDT4"  , "JESUp" , [&]() { return emuBDTBin(1) == 4; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT0"  , "JESUp" , [&]() { return emuBDTBin(1) == 0; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT1"  , "JESUp" , [&]() { return emuBDTBin(1) == 1; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT2"  , "JESUp" , [&]() { return emuBDTBin(1) == 2; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT3"  , "JESUp" , [&]() { return emuBDTBin(1) == 3; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT4"  , "JESUp" , [&]() { return emuBDTBin(1) == 4; } , UNITY );
-        cutflow.setCutSyst("ChannelOffZBDTA" , "JESUp" , [&]() { return offzBDTBin(1) == 0; } , UNITY );
-        cutflow.setCutSyst("ChannelOffZBDTB" , "JESUp" , [&]() { return offzBDTBin(1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "JESUp" , [&]() { return this->emuBDTBin(1) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "JESUp" , [&]() { return this->offzBDTBin(1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "JESUp" , [&]() { return this->offzBDTBin(1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTCR" , "JESUp" , [&]() { return this->VarOffZBDT(1) < 0; } , UNITY );
 
-        cutflow.setCutSyst("ChannelEMuBDT0"  , "JESDown" , [&]() { return emuBDTBin(-1) == 0; } , UNITY );
-        cutflow.setCutSyst("ChannelEMuBDT1"  , "JESDown" , [&]() { return emuBDTBin(-1) == 1; } , UNITY );
-        cutflow.setCutSyst("ChannelEMuBDT2"  , "JESDown" , [&]() { return emuBDTBin(-1) == 2; } , UNITY );
-        cutflow.setCutSyst("ChannelEMuBDT3"  , "JESDown" , [&]() { return emuBDTBin(-1) == 3; } , UNITY );
-        cutflow.setCutSyst("ChannelEMuBDT4"  , "JESDown" , [&]() { return emuBDTBin(-1) == 4; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT0"  , "JESDown" , [&]() { return emuBDTBin(-1) == 0; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT1"  , "JESDown" , [&]() { return emuBDTBin(-1) == 1; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT2"  , "JESDown" , [&]() { return emuBDTBin(-1) == 2; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT3"  , "JESDown" , [&]() { return emuBDTBin(-1) == 3; } , UNITY );
-        cutflow.setCutSyst("ChannelOnZBDT4"  , "JESDown" , [&]() { return emuBDTBin(-1) == 4; } , UNITY );
-        cutflow.setCutSyst("ChannelOffZBDTA" , "JESDown" , [&]() { return offzBDTBin(-1) == 0; } , UNITY );
-        cutflow.setCutSyst("ChannelOffZBDTB" , "JESDown" , [&]() { return offzBDTBin(-1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "JESDown" , [&]() { return this->emuBDTBin(-1) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "JESDown" , [&]() { return this->offzBDTBin(-1) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "JESDown" , [&]() { return this->offzBDTBin(-1) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTCR" , "JESDown" , [&]() { return this->VarOffZBDT(-1) < 0; } , UNITY );
+
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "JERUp" , [&]() { return this->emuBDTBin(2) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "JERUp" , [&]() { return this->offzBDTBin(2) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "JERUp" , [&]() { return this->offzBDTBin(2) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTCR" , "JERUp" , [&]() { return this->VarOffZBDT(2) < 0; } , UNITY );
+
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "JERDown" , [&]() { return this->emuBDTBin(-2) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "JERDown" , [&]() { return this->offzBDTBin(-2) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "JERDown" , [&]() { return this->offzBDTBin(-2) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTCR" , "JERDown" , [&]() { return this->VarOffZBDT(-2) < 0; } , UNITY );
+
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "METUp" , [&]() { return this->emuBDTBin(3) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "METUp" , [&]() { return this->emuBDTBin(3) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "METUp" , [&]() { return this->emuBDTBin(3) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "METUp" , [&]() { return this->emuBDTBin(3) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "METUp" , [&]() { return this->emuBDTBin(3) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "METUp" , [&]() { return this->emuBDTBin(3) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "METUp" , [&]() { return this->emuBDTBin(3) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "METUp" , [&]() { return this->emuBDTBin(3) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "METUp" , [&]() { return this->emuBDTBin(3) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "METUp" , [&]() { return this->emuBDTBin(3) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "METUp" , [&]() { return this->offzBDTBin(3) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "METUp" , [&]() { return this->offzBDTBin(3) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTCR" , "METUp" , [&]() { return this->VarOffZBDT(3) < 0; } , UNITY );
+
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "METDown" , [&]() { return this->emuBDTBin(-3) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "METDown" , [&]() { return this->offzBDTBin(-3) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "METDown" , [&]() { return this->offzBDTBin(-3) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTCR" , "METDown" , [&]() { return this->VarOffZBDT(-3) < 0; } , UNITY );
+
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "METPileupUp" , [&]() { return this->emuBDTBin(4) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "METPileupUp" , [&]() { return this->offzBDTBin(4) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "METPileupUp" , [&]() { return this->offzBDTBin(4) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTCR" , "METPileupUp" , [&]() { return this->VarOffZBDT(4) < 0; } , UNITY );
+
+        cutflow.setCutSyst("ChannelEMuBDT0"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT1"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT2"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT3"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelEMuBDT4"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT0"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT1"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT2"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 2; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT3"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 3; } , UNITY );
+        cutflow.setCutSyst("ChannelOnZBDT4"  , "METPileupDown" , [&]() { return this->emuBDTBin(-4) == 4; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTA" , "METPileupDown" , [&]() { return this->offzBDTBin(-4) == 0; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTB" , "METPileupDown" , [&]() { return this->offzBDTBin(-4) == 1; } , UNITY );
+        cutflow.setCutSyst("ChannelOffZBDTCR" , "METPileupDown" , [&]() { return this->VarOffZBDT(-4) < 0; } , UNITY );
+
+        cutflow.setCutSyst("ChannelOffZSR" , "JESUp"         , [&]() { return this->CutOffZSig(1); }  , UNITY );
+        cutflow.setCutSyst("ChannelOffZSR" , "JESDown"       , [&]() { return this->CutOffZSig(-1); } , UNITY );
+        cutflow.setCutSyst("ChannelOffZSR" , "JERUp"         , [&]() { return this->CutOffZSig(2); }  , UNITY );
+        cutflow.setCutSyst("ChannelOffZSR" , "JERDown"       , [&]() { return this->CutOffZSig(-2); } , UNITY );
+        cutflow.setCutSyst("ChannelOffZSR" , "METUp"         , [&]() { return this->CutOffZSig(3); }  , UNITY );
+        cutflow.setCutSyst("ChannelOffZSR" , "METDown"       , [&]() { return this->CutOffZSig(-3); } , UNITY );
+        cutflow.setCutSyst("ChannelOffZSR" , "METPileupUp"   , [&]() { return this->CutOffZSig(4); }  , UNITY );
+        cutflow.setCutSyst("ChannelOffZSR" , "METPileupDown" , [&]() { return this->CutOffZSig(-4); } , UNITY );
 
         // // 4. PtZeta
         // cutflow.setCutSyst("ChannelEMuLowPtZeta", "JESUp" , [&]() { return this->CutLowPtZeta(1); } , UNITY);
@@ -1103,7 +1219,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     //==========================
 
     // // Book Cutflow
-    // cutflow.bookCutflows();
+    cutflow.bookCutflows();
     if (doEventList)
         cutflow.bookEventLists();
 
@@ -1249,8 +1365,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         {
             if (doSkim)
             {
-                // if (cutflow.getCut("ChannelEMu").pass or cutflow.getCut("ChannelOffZ").pass or cutflow.getCut("ChannelOnZ").pass or cutflow.getCut("ChannelBTagEMu").pass)
-                if (cutflow.getCut("Cut4LepLeptonPt").pass)
+                if (cutflow.getCut("ChannelEMu").pass or cutflow.getCut("ChannelOffZ").pass or cutflow.getCut("ChannelOnZ").pass or cutflow.getCut("ChannelBTagEMu").pass)
+                // if (cutflow.getCut("Cut4LepLeptonPt").pass)
                 {
                     fillSkimTree({cutflow.getCut("ChannelEMu").pass, cutflow.getCut("ChannelOffZ").pass, cutflow.getCut("ChannelOnZ").pass, cutflow.getCut("ChannelBTagEMu").pass});
                 }
@@ -1370,8 +1486,9 @@ void Analysis::createNewBranches()
     tx->createBranch<int>("ChannelOffZ");
     tx->createBranch<int>("ChannelOnZ");
     tx->createBranch<int>("ChannelBTagEMu");
-    // tx->createBranch<float>("bdt_emu_zz");
-    // tx->createBranch<float>("bdt_emu_ttz");
+    tx->createBranch<float>("bdt_emu_zz");
+    tx->createBranch<float>("bdt_emu_ttz");
+    tx->createBranch<float>("bdt_offz_zz");
 
     newbranchesadded = true;
 
@@ -1448,8 +1565,9 @@ void Analysis::fillSkimTree(std::vector<int> region_flags)
     tx->setBranch<int>("ChannelOffZ", region_flags[1]);
     tx->setBranch<int>("ChannelOnZ", region_flags[2]);
     tx->setBranch<int>("ChannelBTagEMu", region_flags[3]);
-    // tx->setBranch<float>("bdt_emu_zz", this->VarZZBDT());
-    // tx->setBranch<float>("bdt_emu_ttz", this->VarTTZBDT());
+    tx->setBranch<float>("bdt_emu_zz", this->VarZZBDT());
+    tx->setBranch<float>("bdt_emu_ttz", this->VarTTZBDT());
+    tx->setBranch<float>("bdt_offz_zz", this->VarOffZBDT());
 
     looper->fillSkim();
 }
@@ -1494,6 +1612,41 @@ void Analysis::loadScaleFactors()
     histmap_2016_elec_mva_medium_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2016LegacyReReco_ElectronMVA90_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
     histmap_2017_elec_mva_medium_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2017_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
     histmap_2018_elec_mva_medium_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2018_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
+    // histmap_2016_elec_mva_loose_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2016LegacyReReco_ElectronMVA90_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
+    // histmap_2017_elec_mva_loose_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2017_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
+    // histmap_2018_elec_mva_loose_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2018_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
+
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2016vvv/electron/EGammaLooseNoIsoMVAPOG_EGammaVetoVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2016vvv/electron/EGammaVetoVVV_EGammaLooseVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2016vvv/electron/EGammaVetoVVV_EGammaTightVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2016vvv/electron/EGammaVetoVVV_EGammaTightVVV3l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2016vvv/electron/EGammaVetoVVV_EGammaTightVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2017vvv/electron/EGammaLooseNoIsoMVAPOG_EGammaVetoVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2017vvv/electron/EGammaVetoVVV_EGammaLooseVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2017vvv/electron/EGammaVetoVVV_EGammaTightVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2017vvv/electron/EGammaVetoVVV_EGammaTightVVV3l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2017vvv/electron/EGammaVetoVVV_EGammaTightVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2018vvv/electron/EGammaLooseNoIsoMVAPOG_EGammaVetoVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2018vvv/electron/EGammaVetoVVV_EGammaLooseVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2018vvv/electron/EGammaVetoVVV_EGammaTightVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2018vvv/electron/EGammaVetoVVV_EGammaTightVVV3l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/ElecID_2018vvv/electron/EGammaVetoVVV_EGammaTightVVV4l/sf.root
+
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuLoosePOG_MuVetoVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuVetoVVV_MuTightVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuVetoVVV_MuTightVVV3l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuLoosePOG_MuVetoVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuVetoVVV_MuTightVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuVetoVVV_MuTightVVV3l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuLoosePOG_MuVetoVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuVetoVVV_MuTightVVV/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuVetoVVV_MuTightVVV3l/sf.root
+// /nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root
 
     // MET MC Correction (scale factors)
     metcorrector.setup(year, TString::Format("%d", year), "StopAnalysis/StopCORE/METCorr/METSFs/");
@@ -2532,6 +2685,12 @@ float Analysis::EventWeight()
 }
 
 //______________________________________________________________________________________________
+float Analysis::PrefireWeight()
+{
+    return l1prefireweight.l1wgt(year, isData);
+}
+
+//______________________________________________________________________________________________
 float Analysis::LeptonScaleFactorv1()
 {
     if (wvz.isData())
@@ -3177,6 +3336,7 @@ bool Analysis::FindOSOneNomOneNotNomLeptons()
     if (lep_Nom_idx1 == -999)
         return false;
     if (nNominalLeptons != 1)
+    // if (nNominalLeptons >= 1)
         return false;
     if (lep_notnom_idxs.size() == 0)
         return false;
@@ -3335,6 +3495,34 @@ bool Analysis::CutEMuSig(int var)
         return true;
     }
     return true;
+}
+
+//______________________________________________________________________________________________
+bool Analysis::CutOffZSig(int var)
+{
+    if (this->VarMET(var) > 120.)
+    {
+        return true;
+    }
+    else if (this->VarMET(var) > 70.)
+    {
+        if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 70.)
+        {
+            return true;
+        }
+        else if ((this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt() > 40.)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
 }
 
 //______________________________________________________________________________________________
@@ -4070,12 +4258,12 @@ float Analysis::VarMETSmearing(int var)
         if      (var == 0) return wvz.met_pt();
         else if (var == 1) return wvz.met_up_pt();
         else if (var == 2) return wvz.met_pt();
-        else if (var == 3) return wvz.met_pt();
-        else if (var == 4) return wvz.met_pt();
+        else if (var == 3) return wvz.met_smearup_pt();
+        else if (var == 4) return wvz.met_pileupup_pt();
         else if (var ==-1) return wvz.met_dn_pt();
         else if (var ==-2) return wvz.met_pt();
-        else if (var ==-3) return wvz.met_pt();
-        else if (var ==-4) return wvz.met_pt();
+        else if (var ==-3) return wvz.met_smeardn_pt();
+        else if (var ==-4) return wvz.met_pileupdn_pt();
         RooUtil::error(TString::Format("Unrecognized variation value var = %d", var).Data(), "VarMETSmearing");
         return -999;
     }
@@ -4147,12 +4335,12 @@ float Analysis::VarMETPhiSmearing(int var)
         if      (var == 0) return wvz.met_phi();
         else if (var == 1) return wvz.met_up_phi();
         else if (var == 2) return wvz.met_phi();
-        else if (var == 3) return wvz.met_phi();
-        else if (var == 4) return wvz.met_phi();
+        else if (var == 3) return wvz.met_smearup_phi();
+        else if (var == 4) return wvz.met_pileupup_phi();
         else if (var ==-1) return wvz.met_dn_phi();
         else if (var ==-2) return wvz.met_phi();
-        else if (var ==-3) return wvz.met_phi();
-        else if (var ==-4) return wvz.met_phi();
+        else if (var ==-3) return wvz.met_smeardn_phi();
+        else if (var ==-4) return wvz.met_pileupdn_phi();
         RooUtil::error(TString::Format("Unrecognized variation value var = %d", var).Data(), "VarMETPhiSmearing");
         return -999;
     }
@@ -4615,15 +4803,60 @@ void Analysis::computeAllBDTScores()
 {
     if (not bdt_score_computed)
     {
-        emu_zz_bdt_score = VarZZBDT();
-        offz_zz_bdt_score = VarOffZBDT();
-        emu_ttz_bdt_score = VarTTZBDT();
-        emu_zz_bdt_score_up = VarZZBDT(1);
-        offz_zz_bdt_score_up = VarOffZBDT(1);
-        emu_ttz_bdt_score_up = VarTTZBDT(1);
-        emu_zz_bdt_score_dn = VarZZBDT(-1);
-        offz_zz_bdt_score_dn = VarOffZBDT(-1);
-        emu_ttz_bdt_score_dn = VarTTZBDT(-1);
+
+        if (not doVVVOnlyBDT)
+        {
+
+            emu_zz_bdt_score = VarZZBDT();
+            offz_zz_bdt_score = VarOffZBDT();
+            emu_ttz_bdt_score = VarTTZBDT();
+            emu_zz_bdt_score_up = VarZZBDT(1);
+            offz_zz_bdt_score_up = VarOffZBDT(1);
+            emu_ttz_bdt_score_up = VarTTZBDT(1);
+            emu_zz_bdt_score_dn = VarZZBDT(-1);
+            offz_zz_bdt_score_dn = VarOffZBDT(-1);
+            emu_ttz_bdt_score_dn = VarTTZBDT(-1);
+            emu_zz_bdt_score_met_up = VarZZBDT(3);
+            offz_zz_bdt_score_met_up = VarOffZBDT(3);
+            emu_ttz_bdt_score_met_up = VarTTZBDT(3);
+            emu_zz_bdt_score_met_dn = VarZZBDT(-3);
+            offz_zz_bdt_score_met_dn = VarOffZBDT(-3);
+            emu_ttz_bdt_score_met_dn = VarTTZBDT(-3);
+            emu_zz_bdt_score_metpileup_up = VarZZBDT(4);
+            offz_zz_bdt_score_metpileup_up = VarOffZBDT(4);
+            emu_ttz_bdt_score_metpileup_up = VarTTZBDT(4);
+            emu_zz_bdt_score_metpileup_dn = VarZZBDT(-4);
+            offz_zz_bdt_score_metpileup_dn = VarOffZBDT(-4);
+            emu_ttz_bdt_score_metpileup_dn = VarTTZBDT(-4);
+
+        }
+        else
+        {
+
+            nonh_emu_zz_bdt_score = VarZZBDT_NonH();
+            nonh_offz_zz_bdt_score = VarOffZBDT_NonH();
+            nonh_emu_ttz_bdt_score = VarTTZBDT_NonH();
+            nonh_emu_zz_bdt_score_up = VarZZBDT_NonH(1);
+            nonh_offz_zz_bdt_score_up = VarOffZBDT_NonH(1);
+            nonh_emu_ttz_bdt_score_up = VarTTZBDT_NonH(1);
+            nonh_emu_zz_bdt_score_dn = VarZZBDT_NonH(-1);
+            nonh_offz_zz_bdt_score_dn = VarOffZBDT_NonH(-1);
+            nonh_emu_ttz_bdt_score_dn = VarTTZBDT_NonH(-1);
+            nonh_emu_zz_bdt_score_met_up = VarZZBDT_NonH(3);
+            nonh_offz_zz_bdt_score_met_up = VarOffZBDT_NonH(3);
+            nonh_emu_ttz_bdt_score_met_up = VarTTZBDT_NonH(3);
+            nonh_emu_zz_bdt_score_met_dn = VarZZBDT_NonH(-3);
+            nonh_offz_zz_bdt_score_met_dn = VarOffZBDT_NonH(-3);
+            nonh_emu_ttz_bdt_score_met_dn = VarTTZBDT_NonH(-3);
+            nonh_emu_zz_bdt_score_metpileup_up = VarZZBDT_NonH(4);
+            nonh_offz_zz_bdt_score_metpileup_up = VarOffZBDT_NonH(4);
+            nonh_emu_ttz_bdt_score_metpileup_up = VarTTZBDT_NonH(4);
+            nonh_emu_zz_bdt_score_metpileup_dn = VarZZBDT_NonH(-4);
+            nonh_offz_zz_bdt_score_metpileup_dn = VarOffZBDT_NonH(-4);
+            nonh_emu_ttz_bdt_score_metpileup_dn = VarTTZBDT_NonH(-4);
+
+        }
+
         bdt_score_computed = true;
     }
 }
@@ -4641,6 +4874,41 @@ void Analysis::resetAllBDTScores()
     emu_zz_bdt_score_dn = -999;
     offz_zz_bdt_score_dn = -999;
     emu_ttz_bdt_score_dn = -999;
+    emu_zz_bdt_score_met_up = -999;
+    offz_zz_bdt_score_met_up = -999;
+    emu_ttz_bdt_score_met_up = -999;
+    emu_zz_bdt_score_met_dn = -999;
+    offz_zz_bdt_score_met_dn = -999;
+    emu_ttz_bdt_score_met_dn = -999;
+    emu_zz_bdt_score_metpileup_up = -999;
+    offz_zz_bdt_score_metpileup_up = -999;
+    emu_ttz_bdt_score_metpileup_up = -999;
+    emu_zz_bdt_score_metpileup_dn = -999;
+    offz_zz_bdt_score_metpileup_dn = -999;
+    emu_ttz_bdt_score_metpileup_dn = -999;
+
+    nonh_emu_zz_bdt_score = -999;
+    nonh_offz_zz_bdt_score = -999;
+    nonh_emu_ttz_bdt_score = -999;
+    nonh_emu_zz_bdt_score_up = -999;
+    nonh_offz_zz_bdt_score_up = -999;
+    nonh_emu_ttz_bdt_score_up = -999;
+    nonh_emu_zz_bdt_score_dn = -999;
+    nonh_offz_zz_bdt_score_dn = -999;
+    nonh_emu_ttz_bdt_score_dn = -999;
+    nonh_emu_zz_bdt_score_met_up = -999;
+    nonh_offz_zz_bdt_score_met_up = -999;
+    nonh_emu_ttz_bdt_score_met_up = -999;
+    nonh_emu_zz_bdt_score_met_dn = -999;
+    nonh_offz_zz_bdt_score_met_dn = -999;
+    nonh_emu_ttz_bdt_score_met_dn = -999;
+    nonh_emu_zz_bdt_score_metpileup_up = -999;
+    nonh_offz_zz_bdt_score_metpileup_up = -999;
+    nonh_emu_ttz_bdt_score_metpileup_up = -999;
+    nonh_emu_zz_bdt_score_metpileup_dn = -999;
+    nonh_offz_zz_bdt_score_metpileup_dn = -999;
+    nonh_emu_ttz_bdt_score_metpileup_dn = -999;
+
     bdt_score_computed = false;
 
 }
@@ -4716,75 +4984,234 @@ float Analysis::VarTTZBDT(int var)
 }
 
 //______________________________________________________________________________________________
+float Analysis::VarZZBDT_NonH(int var)
+{
+    // BDT variables
+    std::vector<float> emu_zz_input = {
+        this->VarMll(lep_Nom_idx1, lep_Nom_idx2), //"looper_MllN",
+        this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2), //"looper_ZPt",
+        this->VarMT2(var), //"looper_mt2",
+        this->VarLepPt(lep_Nom_idx1), //"looper_lep3Pt",
+        this->VarLepPt(lep_Nom_idx2), //"looper_lep4Pt",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(), //"looper_vecsum_pt_4l"
+        this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2), //"looper_scalarsum_pt_4l"
+        this->VarPtZeta(var), //"looper_pt_zeta",
+        this->VarPtZetaVis(var), //"looper_pt_zeta_vis",
+        this->VarMET(var), //"met_pt",
+        this->VarMTNom0(var), //"looper_lep3MT",
+        this->VarMTNom1(var), //"looper_lep4MT",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).mass() // "looper_m_4l"
+        };
+
+    // Evaluate the bdt score
+    return (*fast_forest_nonh_emu_zz)(emu_zz_input.data());
+}
+
+//______________________________________________________________________________________________
+float Analysis::VarOffZBDT_NonH(int var)
+{
+    // BDT variables
+    std::vector<float> offz_zz_input = {
+        this->VarMll(lep_Nom_idx1, lep_Nom_idx2), //"looper_MllN",
+        this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2), //"looper_ZPt",
+        this->VarMT2(var), //"looper_mt2",
+        this->VarLepPt(lep_Nom_idx1), //"looper_lep3Pt",
+        this->VarLepPt(lep_Nom_idx2), //"looper_lep4Pt",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(), //"looper_vecsum_pt_4l"
+        this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2), //"looper_scalarsum_pt_4l"
+        this->VarPtZeta(var), //"looper_pt_zeta",
+        this->VarPtZetaVis(var), //"looper_pt_zeta_vis",
+        this->VarMET(var), //"met_pt",
+        this->VarMTNom0(var), //"looper_lep3MT",
+        this->VarMTNom1(var), //"looper_lep4MT",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).mass() // "looper_m_4l"
+        };
+
+    // Evaluate the bdt score
+    return (*fast_forest_nonh_offz_zz)(offz_zz_input.data());
+}
+
+//______________________________________________________________________________________________
+float Analysis::VarTTZBDT_NonH(int var)
+{
+
+    std::vector<float> emu_ttz_input = {
+        this->VarMll(lep_Nom_idx1, lep_Nom_idx2), //"looper_MllN",
+        this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2), //"looper_ZPt",
+        this->VarMT2(var), //"looper_mt2",
+        this->VarLepPt(lep_Nom_idx1), //"looper_lep3Pt",
+        this->VarLepPt(lep_Nom_idx2), //"looper_lep4Pt",
+        (this->VarLepP4(lep_Nom_idx1) + this->VarLepP4(lep_Nom_idx2) + this->VarLepP4(lep_ZCand_idx1) + this->VarLepP4(lep_ZCand_idx2)).pt(), //"looper_vecsum_pt_4l"
+        this->VarLepPt(lep_Nom_idx1) + this->VarLepPt(lep_Nom_idx2) + this->VarLepPt(lep_ZCand_idx1) + this->VarLepPt(lep_ZCand_idx2), //"looper_scalarsum_pt_4l"
+        (lep_Nom_idx1 < 0 ? -999 : this->VarMinDRJetsToLep(lep_Nom_idx1)), //"looper_minDRJetToLep3",
+        (lep_Nom_idx2 < 0 ? -999 : this->VarMinDRJetsToLep(lep_Nom_idx2)), //"looper_minDRJetToLep4",
+        (wvz.jets_p4().size() > 0 ? wvz.jets_p4()[0].pt() : -999), //"looper_jet1Pt",
+        };
+    emu_ttz_features = {"looper_MllN", "looper_ZPt", "looper_mt2", "looper_lep3Pt", "looper_lep4Pt", "looper_vecsum_pt_4l", "looper_scalarsum_pt_4l", "looper_minDRJetToLep3", "looper_minDRJetToLep4", "looper_jet1Pt"};
+
+    // Evaluate the bdt score
+    return (*fast_forest_nonh_emu_ttz)(emu_ttz_input.data());
+}
+
+//______________________________________________________________________________________________
 int Analysis::emuBDTBin(int var)
+{
+
+    if (not doVVVOnlyBDT)
+    {
+        return emuBDTBin_withH(var);
+    }
+    else
+    {
+        return emuBDTBin_NonH(var);
+    }
+}
+
+//______________________________________________________________________________________________
+int Analysis::emuBDTBin_withH(int var)
 {
     computeAllBDTScores();
     const float b1 = -0.908;
     const float b2 =  0.015;
     const float b3 =  0.733;
     const float b4 =  3.523;
-    if (var == 0)
+
+    float emuZZBDT = emu_zz_bdt_score;
+    float emuTTZBDT = emu_ttz_bdt_score;
+
+    if (var == 1)
     {
-        float emuZZBDT = emu_zz_bdt_score;
-        if (emuZZBDT < b1) return 0;
-        float emuTTZBDT = emu_ttz_bdt_score;
-        if (emuTTZBDT < b2) return 2;
-        if (emuZZBDT < b3) return 1;
-        if (emuTTZBDT < b4) return 3;
-        return 4;
-    }
-    else if (var == 1)
-    {
-        float emuZZBDT = emu_zz_bdt_score_up;
-        if (emuZZBDT < b1) return 0;
-        float emuTTZBDT = emu_ttz_bdt_score_up;
-        if (emuTTZBDT < b2) return 2;
-        if (emuZZBDT < b3) return 1;
-        if (emuTTZBDT < b4) return 3;
-        return 4;
+        emuZZBDT = emu_zz_bdt_score_up;
+        emuTTZBDT = emu_ttz_bdt_score_up;
     }
     else if (var == -1)
     {
-        float emuZZBDT = emu_zz_bdt_score_dn;
-        if (emuZZBDT < b1) return 0;
-        float emuTTZBDT = emu_ttz_bdt_score_dn;
-        if (emuTTZBDT < b2) return 2;
-        if (emuZZBDT < b3) return 1;
-        if (emuTTZBDT < b4) return 3;
-        return 4;
+        emuZZBDT = emu_zz_bdt_score_dn;
+        emuTTZBDT = emu_ttz_bdt_score_dn;
     }
-    else
+    else if (var == 3)
     {
-        return -999;
+        emuZZBDT = emu_zz_bdt_score_met_up;
+        emuTTZBDT = emu_ttz_bdt_score_met_up;
     }
+    else if (var == -3)
+    {
+        emuZZBDT = emu_zz_bdt_score_met_dn;
+        emuTTZBDT = emu_ttz_bdt_score_met_dn;
+    }
+    else if (var == 4)
+    {
+        emuZZBDT = emu_zz_bdt_score_metpileup_up;
+        emuTTZBDT = emu_ttz_bdt_score_metpileup_up;
+    }
+    else if (var == -4)
+    {
+        emuZZBDT = emu_zz_bdt_score_metpileup_dn;
+        emuTTZBDT = emu_ttz_bdt_score_metpileup_dn;
+    }
+
+    if (emuZZBDT < b1) return 0;
+    if (emuTTZBDT < b2) return 2;
+    if (emuZZBDT < b3) return 1;
+    if (emuTTZBDT < b4) return 3;
+    return 4;
+}
+
+//______________________________________________________________________________________________
+int Analysis::emuBDTBin_NonH(int var)
+{
+    computeAllBDTScores();
+    const float b1 =  1.731;
+    const float b2 = -0.860;
+    const float b3 =  4.625;
+    const float b4 =  2.715;
+
+    float emuZZBDT = nonh_emu_zz_bdt_score;
+    float emuTTZBDT = nonh_emu_ttz_bdt_score;
+
+    if (var == 1)
+    {
+        emuZZBDT = nonh_emu_zz_bdt_score_up;
+        emuTTZBDT = nonh_emu_ttz_bdt_score_up;
+    }
+    else if (var == -1)
+    {
+        emuZZBDT = nonh_emu_zz_bdt_score_dn;
+        emuTTZBDT = nonh_emu_ttz_bdt_score_dn;
+    }
+    else if (var == 3)
+    {
+        emuZZBDT = nonh_emu_zz_bdt_score_met_up;
+        emuTTZBDT = nonh_emu_ttz_bdt_score_met_up;
+    }
+    else if (var == -3)
+    {
+        emuZZBDT = nonh_emu_zz_bdt_score_met_dn;
+        emuTTZBDT = nonh_emu_ttz_bdt_score_met_dn;
+    }
+    else if (var == 4)
+    {
+        emuZZBDT = nonh_emu_zz_bdt_score_metpileup_up;
+        emuTTZBDT = nonh_emu_ttz_bdt_score_metpileup_up;
+    }
+    else if (var == -4)
+    {
+        emuZZBDT = nonh_emu_zz_bdt_score_metpileup_dn;
+        emuTTZBDT = nonh_emu_ttz_bdt_score_metpileup_dn;
+    }
+
+    if (emuZZBDT < b1) return 0;
+    if (emuTTZBDT < b2) return 2;
+    if (emuZZBDT < b3) return 1;
+    if (emuTTZBDT < b4) return 3;
+    return 4;
 }
 
 //______________________________________________________________________________________________
 int Analysis::offzBDTBin(int var)
 {
-    computeAllBDTScores();
-    if (var == 0)
+    if (not doVVVOnlyBDT)
     {
-        float offzZZBDT = offz_zz_bdt_score;
-        if (offzZZBDT > 3.0) return 1;
-        else return 0;
-    }
-    else if (var == 1)
-    {
-        float offzZZBDT = offz_zz_bdt_score_up;
-        if (offzZZBDT > 3.0) return 1;
-        else return 0;
-    }
-    else if (var == -1)
-    {
-        float offzZZBDT = offz_zz_bdt_score_dn;
-        if (offzZZBDT > 3.0) return 1;
-        else return 0;
+        return offzBDTBin_withH(var);
     }
     else
     {
-        return -999;
+        return offzBDTBin_NonH(var);
     }
+}
+
+//______________________________________________________________________________________________
+int Analysis::offzBDTBin_withH(int var)
+{
+    computeAllBDTScores();
+
+    float offzZZBDT = offz_zz_bdt_score;
+    if      (var ==  1) { offzZZBDT = offz_zz_bdt_score_up; }
+    else if (var == -1) { offzZZBDT = offz_zz_bdt_score_dn; }
+    else if (var ==  3) { offzZZBDT = offz_zz_bdt_score_met_up; }
+    else if (var == -3) { offzZZBDT = offz_zz_bdt_score_met_dn; }
+    else if (var ==  4) { offzZZBDT = offz_zz_bdt_score_metpileup_up; }
+    else if (var == -4) { offzZZBDT = offz_zz_bdt_score_metpileup_dn; }
+
+    if (offzZZBDT > 3.0) return 1;
+    else return 0;
+}
+
+//______________________________________________________________________________________________
+int Analysis::offzBDTBin_NonH(int var)
+{
+    computeAllBDTScores();
+
+    float offzZZBDT = offz_zz_bdt_score;
+    if      (var ==  1) { offzZZBDT = nonh_offz_zz_bdt_score_up; }
+    else if (var == -1) { offzZZBDT = nonh_offz_zz_bdt_score_dn; }
+    else if (var ==  3) { offzZZBDT = nonh_offz_zz_bdt_score_met_up; }
+    else if (var == -3) { offzZZBDT = nonh_offz_zz_bdt_score_met_dn; }
+    else if (var ==  4) { offzZZBDT = nonh_offz_zz_bdt_score_metpileup_up; }
+    else if (var == -4) { offzZZBDT = nonh_offz_zz_bdt_score_metpileup_dn; }
+
+    if (offzZZBDT > 3.5) return 1;
+    else return 0;
 }
 
 //______________________________________________________________________________________________

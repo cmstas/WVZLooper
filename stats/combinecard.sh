@@ -15,17 +15,19 @@ usage()
   echo "  -t    tag                    (e.g. -t y2016_test)"
   echo "  -b    do bdt"
   echo "  -w    wwz only"
+  echo "  -s    split vvv v vh"
   echo
   exit
 }
 
 # Command-line opts
-while getopts ":s:t:bwh" OPTION; do
+while getopts ":s:t:bSwh" OPTION; do
   case $OPTION in
     s) SAMPLESET=${OPTARG};;
     t) TAG=${OPTARG};;
     b) DOBDT=true;;
     w) WWZONLY="_wwzonly";;
+    S) SPLITVH="_split";;
     h) usage;;
     :) usage;;
   esac
@@ -49,20 +51,20 @@ echo "================================================"
 
 if [ $DOBDT ]; then
 combineCards.py \
-    emu1=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin1.txt \
-    emu2=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin2.txt \
-    emu3=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin3.txt \
-    emu4=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin4.txt \
-    emu5=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin5.txt \
-    offzA=stats/${SAMPLESET}/${TAG}/offz_bdt_datacard${WWZONLY}_bin1.txt \
-    offzB=stats/${SAMPLESET}/${TAG}/offz_bdt_datacard${WWZONLY}_bin2.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+    emu1=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin1${SPLITVH}.txt \
+    emu2=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin2${SPLITVH}.txt \
+    emu3=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin3${SPLITVH}.txt \
+    emu4=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin4${SPLITVH}.txt \
+    emu5=stats/${SAMPLESET}/${TAG}/emu_bdt_datacard${WWZONLY}_bin5${SPLITVH}.txt \
+    offzA=stats/${SAMPLESET}/${TAG}/offz_bdt_datacard${WWZONLY}_bin1${SPLITVH}.txt \
+    offzB=stats/${SAMPLESET}/${TAG}/offz_bdt_datacard${WWZONLY}_bin2${SPLITVH}.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
 else
 combineCards.py \
-    emu1=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin1.txt \
-    emu2=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin2.txt \
-    emu3=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin3.txt \
-    emu4=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin4.txt \
-    offzA=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin1.txt \
-    offzB=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin2.txt \
-    offzC=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin3.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
+    emu1=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin1${SPLITVH}.txt \
+    emu2=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin2${SPLITVH}.txt \
+    emu3=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin3${SPLITVH}.txt \
+    emu4=stats/${SAMPLESET}/${TAG}/emu_datacard${WWZONLY}_bin4${SPLITVH}.txt \
+    offzA=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin1${SPLITVH}.txt \
+    offzB=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin2${SPLITVH}.txt \
+    offzC=stats/${SAMPLESET}/${TAG}/offz_datacard${WWZONLY}_bin3${SPLITVH}.txt  > stats/${SAMPLESET}/${TAG}/stat.txt
 fi

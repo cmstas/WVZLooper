@@ -29,6 +29,8 @@ def main_analysis_make_plot_userfilter():
     parser.add_argument('-r' , '--yaxis_range'     , dest='yaxis_range'     , help='yaxis range'         , default=[]                                                                                                )
     parser.add_argument('-i' , '--stack_signal'    , dest='stack_signal'    , help='stack signal'        , default=False, action='store_true'                                                                        )
     parser.add_argument('-S' , '--signal_scale'    , dest='signal_scale'    , help='signal scale'        , default=1                                                                                                 )
+    parser.add_argument('-U' , '--remove_underflow', dest='remove_underflow', help='remove underflow'    , default=False, action='store_true'                                                                        )
+    # parser.add_argument('-U' , '--remove_underflow', dest='remove_underflow', help='remove underflow'    , default=True, action='store_true'                                                                        )
     
     args = parser.parse_args()
 
@@ -52,8 +54,10 @@ def main_analysis_make_plot_userfilter():
             # "outputs/{}/{}/rare.root".format(ntuple_version, tag),
             # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
             "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
-            # "outputs/{}/{}/other.root".format(ntuple_version, tag),
+            # # "outputs/{}/{}/other.root".format(ntuple_version, tag),
             "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
+            # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
+            # "outputs/{}/{}/othernodyttbar.root".format(ntuple_version, tag),
             ]
     if args.stack_signal:
         bkgfiles = [
@@ -171,7 +175,7 @@ def main_analysis_make_plot_userfilter():
                 "ymax_scale": 1.5 if "PlusX" in filter_pattern else 1.2,
                 "lumi_value":lumi,
                 # "no_overflow": True,
-                "remove_underflow": True,
+                "remove_underflow": args.remove_underflow,
                 "xaxis_ndivisions":505,
                 "ratio_range":[0.,2.],
                 "xaxis_label":args.xaxis_label,

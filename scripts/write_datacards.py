@@ -3,10 +3,7 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-import ROOT as r
 
-import pyrootutil as pr
-import plottery_wrapper as p
 import argparse
 import sys
 import os
@@ -21,12 +18,12 @@ parser.add_argument('-b' , '--baseline_tag'    , dest='baseline_tag'    , help='
 parser.add_argument('-t' , '--ntuple_type'     , dest='ntuple_type'     , help='WVZ, Trilep, etc.'                            , required=True)
 parser.add_argument('-v' , '--ntuple_version'  , dest='ntuple_version'  , help='v0.1.6, v0.1.7, etc.'                         , required=True)
 parser.add_argument('-1' , '--emu_one_bin'     , dest='emu_one_bin'     , help='write emu in one bin'                         , action='store_true', default=False)
-parser.add_argument('-4' , '--emu_four_bin'    , dest='emu_four_bin'    , help='write emu in four bin'                        , action='store_true', default=False)
-parser.add_argument('-3' , '--eemm_three_bin'  , dest='eemm_three_bin'  , help='write eemm in three bin'                      , action='store_true', default=False)
+parser.add_argument('-4' , '--emu_four_bin'    , dest='emu_four_bin'    , help='write emu in four bin'                        , action='store_true', default=True)
+parser.add_argument('-3' , '--eemm_three_bin'  , dest='eemm_three_bin'  , help='write eemm in three bin'                      , action='store_true', default=True)
 parser.add_argument('-y' , '--print_yields'    , dest='print_yields'    , help='to print wysiwyg yields'                      , action='store_true', default=False)
 parser.add_argument('-d' , '--print_detail'    , dest='print_detail'    , help='to print wysiwyg uncertainty detail'          , action='store_true', default=False)
 parser.add_argument('-w' , '--wwz_only'        , dest='wwz_only'        , help='to write wwz only signal datacards'           , action='store_true', default=False)
-parser.add_argument('-s' , '--nonh_vh_split'   , dest='nonh_vh_split'   , help='to write wwz only signal datacards'           , action='store_true', default=False)
+parser.add_argument('-s' , '--nonh_vh_split'   , dest='nonh_vh_split'   , help='to write with vh and vvv split'               , action='store_true', default=False)
 
 args = parser.parse_args()
 
@@ -231,7 +228,6 @@ def write_datacards(ntuple_version, tag):
                 after_scale = h.Integral()
                 if syst == "Nominal":
                     print(year, "zz", before_scale, after_scale)
-            # if proc == "wz": h.Scale(2)
 
             hists_db[proc][syst] = h
 
@@ -310,12 +306,12 @@ def write_datacards(ntuple_version, tag):
     #     else: thissyst["emu{}_".format(year) + proc] = 0
     # systs.append( ("FlatSystMTexpZZ{}".format(year), "lnN", [], thissyst) )
 
-    # Flat additional systematics
-    thissyst = {}
-    for proc in mcprocs:
-        if proc == "wz": thissyst["emu{}_".format(year) + proc] = "1.3" # Fake Syst
-        else: thissyst["emu{}_".format(year) + proc] = 0
-    systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
+    # # Flat additional systematics
+    # thissyst = {}
+    # for proc in mcprocs:
+    #     if proc == "wz": thissyst["emu{}_".format(year) + proc] = "1.3" # Fake Syst
+    #     else: thissyst["emu{}_".format(year) + proc] = 0
+    # systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}
@@ -431,7 +427,7 @@ def write_datacards(ntuple_version, tag):
                 after_scale = h.Integral()
                 if syst == "Nominal":
                     print(year, "zz", before_scale, after_scale)
-            # if proc == "wz": h.Scale(2)
+            if proc == "wz": h.Scale(2.0)
 
             hists_db[proc][syst] = h
 
@@ -510,12 +506,12 @@ def write_datacards(ntuple_version, tag):
     #     else: thissyst["offz{}_".format(year) + proc] = 0
     # systs.append( ("FlatSystMETexpZZ{}".format(year), "lnN", [], thissyst) )
 
-    # Flat additional systematics
-    thissyst = {}
-    for proc in mcprocs:
-        if proc == "wz": thissyst["offz{}_".format(year) + proc] = "1.3" # Fake Syst
-        else: thissyst["offz{}_".format(year) + proc] = 0
-    systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
+    # # Flat additional systematics
+    # thissyst = {}
+    # for proc in mcprocs:
+    #     if proc == "wz": thissyst["offz{}_".format(year) + proc] = "1.3" # Fake Syst
+    #     else: thissyst["offz{}_".format(year) + proc] = 0
+    # systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}

@@ -37,6 +37,8 @@
 #include "wvztree.h"
 #include "hzzangles.h"
 
+#include "L1PrefireWeight.h"
+
 // MET MC Correction
 #include "METCorrectionHandler.h"
 
@@ -228,6 +230,12 @@ public:
     RooUtil::HistMap* histmap_2018_elec_mva_medium_sf;
     RooUtil::HistMap* histmap_2018_elec_mva_veto_sf;
 
+    RooUtil::HistMap* histmap_2016_elec_mva_loose_sf;
+    RooUtil::HistMap* histmap_2017_elec_mva_loose_sf;
+    RooUtil::HistMap* histmap_2018_elec_mva_loose_sf;
+
+    L1PrefireWeight l1prefireweight;
+
     // MET MC Correction for
     METCorrectionHandler metcorrector;
     METObject metobj;
@@ -247,9 +255,18 @@ public:
     FastForest* fast_forest_emu_zz;
     FastForest* fast_forest_emu_ttz;
     FastForest* fast_forest_offz_zz;
+
+    // FastForest
+    FastForest* fast_forest_nonh_emu_zz;
+    FastForest* fast_forest_nonh_emu_ttz;
+    FastForest* fast_forest_nonh_offz_zz;
+
+    // Feature string name
     std::vector<std::string> emu_zz_features;
     std::vector<std::string> offz_zz_features;
     std::vector<std::string> emu_ttz_features;
+
+    bool doVVVOnlyBDT;
 
     float emu_zz_bdt_score;
     float offz_zz_bdt_score;
@@ -260,6 +277,40 @@ public:
     float emu_zz_bdt_score_dn;
     float offz_zz_bdt_score_dn;
     float emu_ttz_bdt_score_dn;
+    float emu_zz_bdt_score_met_up;
+    float offz_zz_bdt_score_met_up;
+    float emu_ttz_bdt_score_met_up;
+    float emu_zz_bdt_score_met_dn;
+    float offz_zz_bdt_score_met_dn;
+    float emu_ttz_bdt_score_met_dn;
+    float emu_zz_bdt_score_metpileup_up;
+    float offz_zz_bdt_score_metpileup_up;
+    float emu_ttz_bdt_score_metpileup_up;
+    float emu_zz_bdt_score_metpileup_dn;
+    float offz_zz_bdt_score_metpileup_dn;
+    float emu_ttz_bdt_score_metpileup_dn;
+
+    float nonh_emu_zz_bdt_score;
+    float nonh_offz_zz_bdt_score;
+    float nonh_emu_ttz_bdt_score;
+    float nonh_emu_zz_bdt_score_up;
+    float nonh_offz_zz_bdt_score_up;
+    float nonh_emu_ttz_bdt_score_up;
+    float nonh_emu_zz_bdt_score_dn;
+    float nonh_offz_zz_bdt_score_dn;
+    float nonh_emu_ttz_bdt_score_dn;
+    float nonh_emu_zz_bdt_score_met_up;
+    float nonh_offz_zz_bdt_score_met_up;
+    float nonh_emu_ttz_bdt_score_met_up;
+    float nonh_emu_zz_bdt_score_met_dn;
+    float nonh_offz_zz_bdt_score_met_dn;
+    float nonh_emu_ttz_bdt_score_met_dn;
+    float nonh_emu_zz_bdt_score_metpileup_up;
+    float nonh_offz_zz_bdt_score_metpileup_up;
+    float nonh_emu_ttz_bdt_score_metpileup_up;
+    float nonh_emu_zz_bdt_score_metpileup_dn;
+    float nonh_offz_zz_bdt_score_metpileup_dn;
+    float nonh_emu_ttz_bdt_score_metpileup_dn;
 
     bool bdt_score_computed;
 
@@ -299,6 +350,7 @@ public:
     void selectWZCRLeptons();
 
     float EventWeight();
+    float PrefireWeight();
     float LeptonScaleFactor(int=0, int=0);
     float LeptonScaleFactorZZ4l();
     float LeptonScaleFactor5Lep(int=0, int=0);
@@ -348,6 +400,7 @@ public:
     bool Cut4LepBVeto(int=0);
     bool Cut4LepBTag(int=0);
     bool CutEMuSig(int=0);
+    bool CutOffZSig(int=0);
     bool CutEMuBDT();
     float CutEMuBDTWgt();
     bool CutOffZBDT();
@@ -425,9 +478,16 @@ public:
     void resetAllBDTScores();
     int emuBDTBin(int=0);
     int offzBDTBin(int=0);
+    int emuBDTBin_withH(int=0);
+    int offzBDTBin_withH(int=0);
+    int emuBDTBin_NonH(int=0);
+    int offzBDTBin_NonH(int=0);
     float VarZZBDT(int=0);
     float VarTTZBDT(int=0);
     float VarOffZBDT(int=0);
+    float VarZZBDT_NonH(int=0);
+    float VarTTZBDT_NonH(int=0);
+    float VarOffZBDT_NonH(int=0);
 
     LeptonVectors GetLeptonVectors();
 
