@@ -267,6 +267,7 @@ public:
     std::vector<std::string> emu_ttz_features;
 
     bool doVVVOnlyBDT;
+    bool doNotComputeBDT;
 
     float emu_zz_bdt_score;
     float offz_zz_bdt_score;

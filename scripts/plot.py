@@ -177,7 +177,7 @@ def main_analysis_make_plot_userfilter():
                 # "no_overflow": True,
                 "remove_underflow": args.remove_underflow,
                 "xaxis_ndivisions":505,
-                "ratio_range":[0.,2.],
+                "ratio_range":[0,2.],
                 "xaxis_label":args.xaxis_label,
                 "ratio_xaxis_title":args.xaxis_label,
                 "yaxis_range":[float(x) for x in args.yaxis_range.split(",")] if isinstance(args.yaxis_range, six.string_types) and len(args.yaxis_range) > 0 else [],

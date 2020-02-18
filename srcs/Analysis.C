@@ -35,14 +35,15 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     newbranchesadded = false; // This is needed to check whether the branches were added to the skim tree
 
     // To whether or not run eventlist
-    bool doEventList = false;
+    bool doEventList = true;
 
     const float b1 = -0.908;
     const float b2 =  0.015;
     const float b3 =  0.733;
     const float b4 =  3.523;
 
-    doVVVOnlyBDT = true;
+    doVVVOnlyBDT = false;
+    doNotComputeBDT = false;
 
     // Parsing year
     if (ntupleVersion.Contains("v0.0.5")) year = -1; // Meaning use this sets to scale it up to 137
@@ -289,6 +290,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.addCutToLastActiveCut("ARFindOSOneNomOneNotNomLeptons", [&](){ return this->FindOSOneNomOneNotNomLeptons(); }, UNITY );
         cutflow.addCutToLastActiveCut("ARCutHLT", [&](){ return this->CutHLT(); }, UNITY );
         cutflow.addCutToLastActiveCut("ARCut4LepLowMll", [&](){ return this->Cut4LepLowMll(true); }, UNITY );
+        cutflow.addCutToLastActiveCut("ARCut4LepLeptonPt", [&](){ return this->Cut4LepLeptonPt(true); }, UNITY );
         cutflow.addCutToLastActiveCut("ARCut4LepBVeto", [&](){ return this->Cut4LepBVeto(); }, [&](){ return this->BTagSF(); } );
         cutflow.getCut("ARCut4LepBVeto");
         cutflow.addCutToLastActiveCut("ChannelAREMu", [&](){ return this->IsChannelEMu(true); }, UNITY );
@@ -359,6 +361,37 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         //             return true;
 
         //         } , UNITY);
+
+        // // Studying ttbar and DY effect for double fake
+        // cutflow.getCut("CutHLT");
+        // cutflow.addCutToLastActiveCut("FoundZBosonCandidate",
+        //         [&]()
+        //         {
+        //             if (lep_ZCand_idx1 < 0) return false;
+        //             if (lep_ZCand_idx2 < 0) return false;
+        //             float mll = (wvz.lep_p4().at(lep_ZCand_idx1) + wvz.lep_p4().at(lep_ZCand_idx2)).M();
+        //             if (not (fabs(mll - 91.1876) < 10.))
+        //                 return false;
+        //             float pt1 = wvz.lep_p4().at(lep_ZCand_idx1).pt();
+        //             float pt2 = wvz.lep_p4().at(lep_ZCand_idx2).pt();
+        //             float ptlead = pt1 > pt2 ? pt1 : pt2;
+        //             float ptsubl = pt1 > pt2 ? pt2 : pt1;
+        //             if (ptlead < 25. or ptsubl < 10.) return false;
+        //             return true;
+        //         }, UNITY );
+        // cutflow.addCutToLastActiveCut("Pass4LepPreselection",
+        //         [&]()
+        //         {
+        //             if (lep_Nom_idx1 < 0) return false;
+        //             if (lep_Nom_idx2 < 0) return false;
+        //             if (not (lep_id->at(lep_Nom_idx1) * lep_id->at(lep_Nom_idx2) < 0)) return false;
+        //             float pt1 = wvz.lep_p4().at(lep_Nom_idx1).pt();
+        //             float pt2 = wvz.lep_p4().at(lep_Nom_idx2).pt();
+        //             float ptlead = pt1 > pt2 ? pt1 : pt2;
+        //             float ptsubl = pt1 > pt2 ? pt2 : pt1;
+        //             if (ptlead < 25. or ptsubl < 10.) return false;
+        //             return wvz.nb() == 0;
+        //         }, UNITY );
 
     }
     // For fake rate related studies
@@ -509,8 +542,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 }
                 });
 
-        histograms.addHistogram("emuBDTZZScore", 180, -10, 10, [&]() { computeAllBDTScores(); return emu_zz_bdt_score; });
-        histograms.addHistogram("emuBDTTTZScore", 180, -10, 10, [&]() { computeAllBDTScores(); return emu_ttz_bdt_score; });
+        histograms.addHistogram("emuBDTZZScore", 180, -10, 10, [&]() { computeAllBDTScores(); if (doVVVOnlyBDT) return nonh_emu_zz_bdt_score; else return emu_zz_bdt_score; });
+        histograms.addHistogram("emuBDTTTZScore", 180, -10, 10, [&]() { computeAllBDTScores(); if (doVVVOnlyBDT) return nonh_emu_ttz_bdt_score; else return emu_ttz_bdt_score; });
 
         histograms.addHistogram("emuBDT_Nominal", 5, 0, 5, [&]()
                 {
@@ -572,7 +605,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 return emuBDTBin(-1);
                 });
 
-        histograms.addHistogram("offzBDTScore", 180, -10, 10, [&]() { computeAllBDTScores(); return offz_zz_bdt_score; });
+        histograms.addHistogram("offzBDTScore", 180, -10, 10, [&]() { computeAllBDTScores(); if (doVVVOnlyBDT) return nonh_offz_zz_bdt_score; else return offz_zz_bdt_score; });
 
         histograms.addHistogram("offzBDT_Nominal", 2, 0, 2, [&]()
                 {
@@ -729,6 +762,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             histograms.addHistogram("lepFElrelIso03EALepZoom" , 180 , 0       , 1.0    , [&](){ return lep_Fakeable_idx >= 0  and abs(wvz.lep_id()[lep_Fakeable_idx]) == 11 ? wvz.lep_relIso03EAwLep()[lep_Fakeable_idx] : -999; });
             histograms.addHistogram("lepFrelIso03EALep" , 180 , 0       , 6.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EAwLep()[lep_Fakeable_idx] : -999; });
             histograms.addHistogram("lepFrelIso03EALepZoom" , 180 , 0       , 1.0    , [&](){ return lep_Fakeable_idx >= 0 ? wvz.lep_relIso03EAwLep()[lep_Fakeable_idx] : -999; });
+            histograms.addHistogram("lepFElMVA90Iso" , 2 , 0       , 2    , [&](){ return lep_Fakeable_idx >= 0  and abs(wvz.lep_id()[lep_Fakeable_idx]) == 11 ? wvz.lep_isMVAwp90IsoPOG()[lep_Fakeable_idx] : -999; });
             // histograms.addHistogram("jetPt0"         , 180 , 0.      , 200    , [&](){ return wvz.jets_p4().size() > 0 ? wvz.jets_p4()[0].pt() : -999; });
             // histograms.addHistogram("jetPt1"         , 180 , 0.      , 200    , [&](){ return wvz.jets_p4().size() > 1 ? wvz.jets_p4()[1].pt() : -999; });
             // histograms.addHistogram("jetPt2"         , 180 , 0.      , 200    , [&](){ return wvz.jets_p4().size() > 2 ? wvz.jets_p4()[2].pt() : -999; });
@@ -764,6 +798,31 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             histograms.addHistogram("BDTInput_pt_zeta"        , 180 , -75 , 300 , [&](){ return this->VarPtZeta();                                                                                                                      } );
             histograms.addHistogram("BDTInput_pt_zeta_vis"    , 180 , 0   , 400 , [&](){ return this->VarPtZetaVis();                                                                                                                   } );
             histograms.addHistogram("BDTInput_ZPt"            , 180 , 0   , 350 , [&](){ return this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2);                                                                                          } );
+            histograms.addHistogram("minDR"                   , 180 , 0.  ,  3. ,
+                    [&]()
+                    {
+                        if (lep_Nom_idx1 < 0) return -999.f;
+                        if (lep_Nom_idx2 < 0) return -999.f;
+                        if (lep_ZCand_idx1 < 0) return -999.f;
+                        if (lep_ZCand_idx2 < 0) return -999.f;
+                        std::vector<unsigned int> vetoidxs = {lep_Nom_idx1, lep_Nom_idx2, lep_ZCand_idx1, lep_ZCand_idx2};
+                        float minDR = 999;
+                        for (auto& vetoidx1 : vetoidxs)
+                        {
+                            for (auto& vetoidx2 : vetoidxs)
+                            {
+                                if (vetoidx1 != vetoidx2)
+                                {
+                                    float tmpdr = RooUtil::Calc::DeltaR(wvz.lep_p4().at(vetoidx1), wvz.lep_p4().at(vetoidx2));
+                                    if (tmpdr < minDR)
+                                    {
+                                        minDR = tmpdr;
+                                    }
+                                }
+                            }
+                        }
+                        return minDR;
+                    });
 
         }
     }
@@ -1219,7 +1278,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     //==========================
 
     // // Book Cutflow
-    cutflow.bookCutflows();
+    // cutflow.bookCutflows();
     if (doEventList)
         cutflow.bookEventLists();
 
@@ -1241,6 +1300,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             cutflow.bookHistogramsForCutAndBelow(histograms, "CutHLTZZ4l");
             cutflow.bookHistogramsForCutAndBelow(histograms, "WZCRPresel");
             cutflow.bookHistogramsForCut(histograms_Z_peak, "Cut4LepLeptonPt");
+            // cutflow.bookHistogramsForCut(histograms_Z_peak, "Pass4LepPreselection");
         }
         else
         {
@@ -1412,8 +1472,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         theoryweight.histmap_neventsinfile->hist->Write();
     }
 
-    if (doEventList)
-        cutflow.getCut("ChannelEMuBDT").writeEventList("eventlist.txt");
+    // if (doEventList)
+    //     cutflow.getCut("FiveLeptonsMT5th").writeEventList("eventlist.txt");
 
 
 }//end of whole function
@@ -4801,6 +4861,8 @@ float Analysis::VarARMT2(int var)
 //______________________________________________________________________________________________
 void Analysis::computeAllBDTScores()
 {
+    if (doNotComputeBDT)
+        return;
     if (not bdt_score_computed)
     {
 
@@ -5202,7 +5264,7 @@ int Analysis::offzBDTBin_NonH(int var)
 {
     computeAllBDTScores();
 
-    float offzZZBDT = offz_zz_bdt_score;
+    float offzZZBDT = nonh_offz_zz_bdt_score;
     if      (var ==  1) { offzZZBDT = nonh_offz_zz_bdt_score_up; }
     else if (var == -1) { offzZZBDT = nonh_offz_zz_bdt_score_dn; }
     else if (var ==  3) { offzZZBDT = nonh_offz_zz_bdt_score_met_up; }
