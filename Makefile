@@ -2,7 +2,7 @@
 
 EXE=Analysis.exe
 
-SOURCES=$(wildcard srcs/*.C) rooutil/rooutil.cc
+SOURCES=$(wildcard srcs/*.cc) $(wildcard srcs/*.C) rooutil/rooutil.cc
 TMPOBJECTS=$(SOURCES:.C=.o)
 OBJECTS=$(TMPOBJECTS:.cc=.o)
 

@@ -2893,10 +2893,10 @@ float Analysis::LeptonScaleFactor(int vare, int varm)
     if (nVetoLeptons == 4)
     {
         float scalefactor = 1;
-        scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx1, false, vare, varm);
-        scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx2, false, vare, varm);
-        scalefactor *= IndividualLeptonScaleFactor(lep_Nom_idx1, true, vare, varm);
-        scalefactor *= IndividualLeptonScaleFactor(lep_Nom_idx2, true, vare, varm);
+        scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx1, LeptonID::zCandidate, vare, varm);
+        scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx2, LeptonID::zCandidate, vare, varm);
+        scalefactor *= IndividualLeptonScaleFactor(lep_Nom_idx1, LeptonID::wCandidate, vare, varm);
+        scalefactor *= IndividualLeptonScaleFactor(lep_Nom_idx2, LeptonID::wCandidate, vare, varm);
         return scalefactor;
     }
     else if (nVetoLeptons == 5)
@@ -2920,10 +2920,10 @@ float Analysis::LeptonScaleFactorZZ4l()
         return 1.;
     // Based on lep_Veto indices
     float scalefactor = 1;
-    scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx1, false);
-    scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx2, false);
-    scalefactor *= IndividualLeptonScaleFactor(lep_Z2Cand_idx1, false);
-    scalefactor *= IndividualLeptonScaleFactor(lep_Z2Cand_idx2, false);
+    scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx1, LeptonID::zCandidate);
+    scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx2, LeptonID::zCandidate);
+    scalefactor *= IndividualLeptonScaleFactor(lep_Z2Cand_idx1, LeptonID::zCandidate);
+    scalefactor *= IndividualLeptonScaleFactor(lep_Z2Cand_idx2, LeptonID::zCandidate);
     return scalefactor;
 }
 
@@ -2934,11 +2934,11 @@ float Analysis::LeptonScaleFactor5Lep(int vare, int varm)
         return 1.;
     // Based on lep_Veto indices
     float scalefactor = 1;
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z1_idx1, false, vare, varm);
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z1_idx2, false, vare, varm);
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx1, false, vare, varm);
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx2, false, vare, varm);
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_W_idx, false, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z1_idx1, LeptonID::commonVeto, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z1_idx2, LeptonID::commonVeto, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx1, LeptonID::commonVeto, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx2, LeptonID::commonVeto, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_W_idx, LeptonID::wCandidate, vare, varm);
     return scalefactor;
 }
 
@@ -2951,13 +2951,13 @@ float Analysis::LeptonScaleFactor6Lep(int vare, int varm)
     float scalefactor = 1;
     for(unsigned int i=0; i<wvz.lep_pt().size(); i++)
     {
-      scalefactor *= IndividualLeptonScaleFactor(i, false, vare, varm);
+      scalefactor *= IndividualLeptonScaleFactor(i, LeptonID::commonVeto, vare, varm);
     }
     return scalefactor;
 }
 
 //______________________________________________________________________________________________
-float Analysis::IndividualLeptonScaleFactor(int lep_idx, bool isNominal, int vare, int varm)
+float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, int vare, int varm)
 {
     if (vare != 0 and vare != 1 and vare != -1)
         RooUtil::error(TString::Format("Unrecognized variation value vare = %d", vare).Data(), "IndividualLeptonScaleFactor");
@@ -2975,6 +2975,10 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, bool isNominal, int var
     float abseta = fabs(eta);
     if (absid == 11)
     {
+        if (useMVAID) {
+            scalefactor *= electronScaleFactors_(year, leptonId, eta, pt, vare);
+        }
+
         if (year == 2016)
         {
             if (pt > 20)
@@ -2995,31 +2999,9 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, bool isNominal, int var
                 if (vare ==-1)
                     scalefactor *= histmap_2016_elec_reco_lowpt_sf     ->eval_down(eta, pt); // x=eta, y=pt
             }
-            if (useMVAID)
+            if (!useMVAID)
             {
-                if (isNominal)
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2016_elec_mva_medium_sf         ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2016_elec_mva_medium_sf         ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2016_elec_mva_medium_sf         ->eval_down(eta, pt); // x=eta, y=pt
-                }
-                else
-                {
-                    scalefactor *= 1.; // TODO
-                    // if (vare == 0)
-                    //     scalefactor *= histmap_2016_elec_veto_sf           ->eval(eta, pt); // x=eta, y=pt
-                    // if (vare == 1)
-                    //     scalefactor *= histmap_2016_elec_veto_sf           ->eval_up(eta, pt); // x=eta, y=pt
-                    // if (vare ==-1)
-                    //     scalefactor *= histmap_2016_elec_veto_sf           ->eval_down(eta, pt); // x=eta, y=pt
-                }
-            }
-            else
-            {
-                if (isNominal)
+                if (leptonId == LeptonID::wCandidate)
                 {
                     if (vare == 0)
                         scalefactor *= histmap_2016_elec_medium_sf         ->eval(eta, pt); // x=eta, y=pt
@@ -3059,31 +3041,9 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, bool isNominal, int var
                 if (vare ==-1)
                     scalefactor *= histmap_2017_elec_reco_lowpt_sf     ->eval_down(eta, pt); // x=eta, y=pt
             }
-            if (useMVAID)
+            if (!useMVAID)
             {
-                if (isNominal)
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2017_elec_mva_medium_sf         ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2017_elec_mva_medium_sf         ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2017_elec_mva_medium_sf         ->eval_down(eta, pt); // x=eta, y=pt
-                }
-                else
-                {
-                    scalefactor *= 1.; // TODO
-                    // if (vare == 0)
-                    //     scalefactor *= histmap_2017_elec_veto_sf           ->eval(eta, pt); // x=eta, y=pt
-                    // if (vare == 1)
-                    //     scalefactor *= histmap_2017_elec_veto_sf           ->eval_up(eta, pt); // x=eta, y=pt
-                    // if (vare ==-1)
-                    //     scalefactor *= histmap_2017_elec_veto_sf           ->eval_down(eta, pt); // x=eta, y=pt
-                }
-            }
-            else
-            {
-                if (isNominal)
+                if (leptonId == LeptonID::wCandidate)
                 {
                     if (vare == 0)
                         scalefactor *= histmap_2017_elec_medium_sf         ->eval(eta, pt); // x=eta, y=pt
@@ -3113,29 +3073,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, bool isNominal, int var
                 scalefactor *= histmap_2018_elec_reco_sf           ->eval_down(eta, pt); // x=eta, y=pt
             if (useMVAID)
             {
-                if (isNominal)
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2018_elec_mva_medium_sf         ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2018_elec_mva_medium_sf         ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2018_elec_mva_medium_sf         ->eval_down(eta, pt); // x=eta, y=pt
-                }
-                else
-                {
-                    scalefactor *= 1.; // TODO
-                    // if (vare == 0)
-                    //     scalefactor *= histmap_2018_elec_veto_sf           ->eval(eta, pt); // x=eta, y=pt
-                    // if (vare == 1)
-                    //     scalefactor *= histmap_2018_elec_veto_sf           ->eval_up(eta, pt); // x=eta, y=pt
-                    // if (vare ==-1)
-                    //     scalefactor *= histmap_2018_elec_veto_sf           ->eval_down(eta, pt); // x=eta, y=pt
-                }
-            }
-            else
-            {
-                if (isNominal)
+                if (leptonId == LeptonID::wCandidate)
                 {
                     if (vare == 0)
                         scalefactor *= histmap_2018_elec_medium_sf         ->eval(eta, pt); // x=eta, y=pt
@@ -3184,7 +3122,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, bool isNominal, int var
                     scalefactor *= 0.550 * histmap_2016_muon_BCDEF_id_lowpt_sf ->eval_down(pt, abseta)  // x=pt, y=abseta
                                   +0.450 * histmap_2016_muon_GH_id_lowpt_sf    ->eval_down(pt, abseta); // x=pt, y=abseta 0.450 of 2016 data
             }
-            if (isNominal)
+            if (leptonId == LeptonID::wCandidate)
             {
                 if (varm == 0)
                     scalefactor *= 0.550 * histmap_2016_muon_BCDEF_tightiso_sf ->eval(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
@@ -3229,7 +3167,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, bool isNominal, int var
                 if (varm ==-1)
                     scalefactor *= histmap_2017_muon_id_lowpt_sf       ->eval_down(pt, abseta); // x=pt, y=abseta
             }
-            if (isNominal)
+            if (leptonId == LeptonID::wCandidate)
             {
                 if (varm == 0)
                     scalefactor *= histmap_2017_muon_tightiso_sf       ->eval(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
@@ -3268,7 +3206,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, bool isNominal, int var
                 if (varm ==-1)
                     scalefactor *= histmap_2018_muon_id_lowpt_sf       ->eval_down(pt, abseta); // x=pt, y=abseta
             }
-            if (isNominal)
+            if (leptonId == LeptonID::wCandidate)
             {
                 if (varm == 0)
                     scalefactor *= histmap_2018_muon_tightiso_sf       ->eval(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
