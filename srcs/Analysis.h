@@ -501,7 +501,7 @@ public:
 
 #ifdef Analysis_C
 Analysis::Analysis(const char* ifileName, const char* RootName)
-    : electronScaleFactors_("scale_factors/WVZLooper/scale_factors/electron")
+    : electronScaleFactors_("scale_factors/electron")
 {
 
     // Create histograms
