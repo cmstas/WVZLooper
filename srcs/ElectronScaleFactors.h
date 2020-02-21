@@ -19,11 +19,17 @@
 
 // ID names in enum so we don't have to use strings in the event loop
 enum class LeptonID {
-  commonVeto,
-  zCandidate,
-  wCandidate,
-  threeLepton,
-  sameSign,
+  CommonVeto,
+  ZCandidate,
+  WCandidate,
+  ThreeLepton,
+  SameSign,
+};
+
+enum class SystematicVariation {
+  Nominal = 0,
+  Up = 1,
+  Down = -1,
 };
 
 class ElectronScaleFactors {
@@ -36,13 +42,19 @@ public:
 
   ElectronScaleFactors(std::string const& electronScaleFactorsPath);
 
-  float operator()(int year, LeptonID id, float eta, float pt, int vare = 0);
+  float operator()(int year, LeptonID id, float eta, float pt, SystematicVariation = SystematicVariation::Nominal);
 
   // get the index in the histMap array corresponding to the ID and the year
-  static constexpr int getHistMapIndex(int year, LeptonID id) { return (year - yearMin) * nIDs + static_cast<int>(id); }
+  // static_casting the enum class to int undermines a bit the idea of type safety,
+  // therefore we'll check in ElectronScaleFactors.cc with some static_casts that everything goes well
+  static constexpr int getIDHistMapIndex(int year, LeptonID id) {
+    return (year - yearMin) * nIDs + static_cast<int>(id);
+  }
 
 private:
-  std::vector<RooUtil::HistMap> histMaps_;
+  std::vector<RooUtil::HistMap> histMapsReconstruction_;
+  std::vector<RooUtil::HistMap> histMapsReconstructionLowPt_;
+  std::vector<RooUtil::HistMap> histMapsIdentification_;
 };
 
 #endif

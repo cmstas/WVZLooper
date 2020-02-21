@@ -354,12 +354,12 @@ public:
 
     float EventWeight();
     float PrefireWeight();
-    float LeptonScaleFactor(int=0, int=0);
+    float LeptonScaleFactor(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float LeptonScaleFactorZZ4l();
-    float LeptonScaleFactor5Lep(int=0, int=0);
-    float LeptonScaleFactor6Lep(int=0, int=0);
+    float LeptonScaleFactor5Lep(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
+    float LeptonScaleFactor6Lep(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float LeptonScaleFactorv1();
-    float IndividualLeptonScaleFactor(int, LeptonID, int=0, int=0);
+    float IndividualLeptonScaleFactor(int, LeptonID, SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float FakeFactor();
     float BTagSF();
 

@@ -883,12 +883,12 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.addWgtSyst("QsqDown"   , [&]() { if (wvz.isData()) return 1.f; return wvz.weight_fr_r1_f1() == 0 or theoryweight.qsqdn() == 0 ? 1 : wvz.weight_fr_r0p5_f0p5() / wvz.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.qsqdn(); } );
         cutflow.addWgtSyst("AlphaSUp"  , [&]() { if (wvz.isData()) return 1.f; return wvz.weight_fr_r1_f1() == 0 or theoryweight.alsup() == 0 ? 1 : wvz.weight_alphas_up()   / wvz.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.alsup(); } );
         cutflow.addWgtSyst("AlphaSDown", [&]() { if (wvz.isData()) return 1.f; return wvz.weight_fr_r1_f1() == 0 or theoryweight.alsdn() == 0 ? 1 : wvz.weight_alphas_down() / wvz.weight_fr_r1_f1() * theoryweight.nominal() / theoryweight.alsdn(); } );
-        cutflow.addWgtSyst("LepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(1,1) / this->LeptonScaleFactor() : 1; } );
-        cutflow.addWgtSyst("LepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(-1,-1) / this->LeptonScaleFactor() : 1; } );
-        cutflow.addWgtSyst("ElLepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(1,0) / this->LeptonScaleFactor() : 1; } );
-        cutflow.addWgtSyst("ElLepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(-1,0) / this->LeptonScaleFactor() : 1; } );
-        cutflow.addWgtSyst("MuLepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(0,1) / this->LeptonScaleFactor() : 1; } );
-        cutflow.addWgtSyst("MuLepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(0,-1) / this->LeptonScaleFactor() : 1; } );
+        cutflow.addWgtSyst("LepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Up,1) / this->LeptonScaleFactor() : 1; } );
+        cutflow.addWgtSyst("LepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Down,-1) / this->LeptonScaleFactor() : 1; } );
+        cutflow.addWgtSyst("ElLepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Up,0) / this->LeptonScaleFactor() : 1; } );
+        cutflow.addWgtSyst("ElLepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Up,0) / this->LeptonScaleFactor() : 1; } );
+        cutflow.addWgtSyst("MuLepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Nominal,1) / this->LeptonScaleFactor() : 1; } );
+        cutflow.addWgtSyst("MuLepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Nominal,-1) / this->LeptonScaleFactor() : 1; } );
         cutflow.addWgtSyst("PileupUp"  , [&]()
                 {
                 if (wvz.isData()) return 1.f;
@@ -2885,7 +2885,7 @@ float Analysis::LeptonScaleFactorv1()
 }
 
 //______________________________________________________________________________________________
-float Analysis::LeptonScaleFactor(int vare, int varm)
+float Analysis::LeptonScaleFactor(SystematicVariation vare, int varm)
 {
     if (wvz.isData())
         return 1.;
@@ -2893,10 +2893,10 @@ float Analysis::LeptonScaleFactor(int vare, int varm)
     if (nVetoLeptons == 4)
     {
         float scalefactor = 1;
-        scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx1, LeptonID::zCandidate, vare, varm);
-        scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx2, LeptonID::zCandidate, vare, varm);
-        scalefactor *= IndividualLeptonScaleFactor(lep_Nom_idx1, LeptonID::wCandidate, vare, varm);
-        scalefactor *= IndividualLeptonScaleFactor(lep_Nom_idx2, LeptonID::wCandidate, vare, varm);
+        scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx1, LeptonID::ZCandidate, vare, varm);
+        scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx2, LeptonID::ZCandidate, vare, varm);
+        scalefactor *= IndividualLeptonScaleFactor(lep_Nom_idx1, LeptonID::WCandidate, vare, varm);
+        scalefactor *= IndividualLeptonScaleFactor(lep_Nom_idx2, LeptonID::WCandidate, vare, varm);
         return scalefactor;
     }
     else if (nVetoLeptons == 5)
@@ -2920,30 +2920,30 @@ float Analysis::LeptonScaleFactorZZ4l()
         return 1.;
     // Based on lep_Veto indices
     float scalefactor = 1;
-    scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx1, LeptonID::zCandidate);
-    scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx2, LeptonID::zCandidate);
-    scalefactor *= IndividualLeptonScaleFactor(lep_Z2Cand_idx1, LeptonID::zCandidate);
-    scalefactor *= IndividualLeptonScaleFactor(lep_Z2Cand_idx2, LeptonID::zCandidate);
+    scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx1, LeptonID::ZCandidate);
+    scalefactor *= IndividualLeptonScaleFactor(lep_ZCand_idx2, LeptonID::ZCandidate);
+    scalefactor *= IndividualLeptonScaleFactor(lep_Z2Cand_idx1, LeptonID::ZCandidate);
+    scalefactor *= IndividualLeptonScaleFactor(lep_Z2Cand_idx2, LeptonID::ZCandidate);
     return scalefactor;
 }
 
 //______________________________________________________________________________________________
-float Analysis::LeptonScaleFactor5Lep(int vare, int varm)
+float Analysis::LeptonScaleFactor5Lep(SystematicVariation vare, int varm)
 {
     if (wvz.isData())
         return 1.;
     // Based on lep_Veto indices
     float scalefactor = 1;
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z1_idx1, LeptonID::commonVeto, vare, varm);
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z1_idx2, LeptonID::commonVeto, vare, varm);
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx1, LeptonID::commonVeto, vare, varm);
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx2, LeptonID::commonVeto, vare, varm);
-    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_W_idx, LeptonID::wCandidate, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z1_idx1, LeptonID::CommonVeto, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z1_idx2, LeptonID::CommonVeto, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx1, LeptonID::CommonVeto, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_Z2_idx2, LeptonID::CommonVeto, vare, varm);
+    scalefactor *= IndividualLeptonScaleFactor(lep_5Lep_W_idx, LeptonID::WCandidate, vare, varm);
     return scalefactor;
 }
 
 //______________________________________________________________________________________________
-float Analysis::LeptonScaleFactor6Lep(int vare, int varm)
+float Analysis::LeptonScaleFactor6Lep(SystematicVariation vare, int varm)
 {
     if (wvz.isData())
         return 1.;
@@ -2951,16 +2951,15 @@ float Analysis::LeptonScaleFactor6Lep(int vare, int varm)
     float scalefactor = 1;
     for(unsigned int i=0; i<wvz.lep_pt().size(); i++)
     {
-      scalefactor *= IndividualLeptonScaleFactor(i, LeptonID::commonVeto, vare, varm);
+      scalefactor *= IndividualLeptonScaleFactor(i, LeptonID::CommonVeto, vare, varm);
     }
     return scalefactor;
 }
 
 //______________________________________________________________________________________________
-float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, int vare, int varm)
+float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, SystematicVariation vare, int varm)
 {
-    if (vare != 0 and vare != 1 and vare != -1)
-        RooUtil::error(TString::Format("Unrecognized variation value vare = %d", vare).Data(), "IndividualLeptonScaleFactor");
+    // Unrecognized variation value for electron not possible by design (if nobody works around it with casts)
     if (varm != 0 and varm != 1 and varm != -1)
         RooUtil::error(TString::Format("Unrecognized variation value varm = %d", varm).Data(), "IndividualLeptonScaleFactor");
     if (wvz.isData())
@@ -2976,123 +2975,10 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, int 
     if (absid == 11)
     {
         if (useMVAID) {
-            scalefactor *= electronScaleFactors_(year, leptonId, eta, pt, vare);
+            std::cout << "Warning! The electron scale factors were derived for the MVA IDs, so they are not valid!" << std::endl;
         }
+        scalefactor *= electronScaleFactors_(year, leptonId, eta, pt, vare);
 
-        if (year == 2016)
-        {
-            if (pt > 20)
-            {
-                if (vare == 0)
-                    scalefactor *= histmap_2016_elec_reco_highpt_sf    ->eval(eta, pt); // x=eta, y=pt
-                if (vare == 1)
-                    scalefactor *= histmap_2016_elec_reco_highpt_sf    ->eval_up(eta, pt); // x=eta, y=pt
-                if (vare ==-1)
-                    scalefactor *= histmap_2016_elec_reco_highpt_sf    ->eval_down(eta, pt); // x=eta, y=pt
-            }
-            else
-            {
-                if (vare == 0)
-                    scalefactor *= histmap_2016_elec_reco_lowpt_sf     ->eval(eta, pt); // x=eta, y=pt
-                if (vare == 1)
-                    scalefactor *= histmap_2016_elec_reco_lowpt_sf     ->eval_up(eta, pt); // x=eta, y=pt
-                if (vare ==-1)
-                    scalefactor *= histmap_2016_elec_reco_lowpt_sf     ->eval_down(eta, pt); // x=eta, y=pt
-            }
-            if (!useMVAID)
-            {
-                if (leptonId == LeptonID::wCandidate)
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2016_elec_medium_sf         ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2016_elec_medium_sf         ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2016_elec_medium_sf         ->eval_down(eta, pt); // x=eta, y=pt
-                }
-                else
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2016_elec_veto_sf           ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2016_elec_veto_sf           ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2016_elec_veto_sf           ->eval_down(eta, pt); // x=eta, y=pt
-                }
-            }
-        }
-        else if (year == 2017)
-        {
-            if (pt > 20)
-            {
-                if (vare == 0)
-                    scalefactor *= histmap_2017_elec_reco_highpt_sf    ->eval(eta, pt); // x=eta, y=pt
-                if (vare == 1)
-                    scalefactor *= histmap_2017_elec_reco_highpt_sf    ->eval_up(eta, pt); // x=eta, y=pt
-                if (vare ==-1)
-                    scalefactor *= histmap_2017_elec_reco_highpt_sf    ->eval_down(eta, pt); // x=eta, y=pt
-            }
-            else
-            {
-                if (vare == 0)
-                    scalefactor *= histmap_2017_elec_reco_lowpt_sf     ->eval(eta, pt); // x=eta, y=pt
-                if (vare == 1)
-                    scalefactor *= histmap_2017_elec_reco_lowpt_sf     ->eval_up(eta, pt); // x=eta, y=pt
-                if (vare ==-1)
-                    scalefactor *= histmap_2017_elec_reco_lowpt_sf     ->eval_down(eta, pt); // x=eta, y=pt
-            }
-            if (!useMVAID)
-            {
-                if (leptonId == LeptonID::wCandidate)
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2017_elec_medium_sf         ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2017_elec_medium_sf         ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2017_elec_medium_sf         ->eval_down(eta, pt); // x=eta, y=pt
-                }
-                else
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2017_elec_veto_sf           ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2017_elec_veto_sf           ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2017_elec_veto_sf           ->eval_down(eta, pt); // x=eta, y=pt
-                }
-            }
-        }
-        else if (year == 2018)
-        {
-            if (vare == 0)
-                scalefactor *= histmap_2018_elec_reco_sf           ->eval(eta, pt); // x=eta, y=pt
-            if (vare == 1)
-                scalefactor *= histmap_2018_elec_reco_sf           ->eval_up(eta, pt); // x=eta, y=pt
-            if (vare ==-1)
-                scalefactor *= histmap_2018_elec_reco_sf           ->eval_down(eta, pt); // x=eta, y=pt
-            if (useMVAID)
-            {
-                if (leptonId == LeptonID::wCandidate)
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2018_elec_medium_sf         ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2018_elec_medium_sf         ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2018_elec_medium_sf         ->eval_down(eta, pt); // x=eta, y=pt
-                }
-                else
-                {
-                    if (vare == 0)
-                        scalefactor *= histmap_2018_elec_veto_sf           ->eval(eta, pt); // x=eta, y=pt
-                    if (vare == 1)
-                        scalefactor *= histmap_2018_elec_veto_sf           ->eval_up(eta, pt); // x=eta, y=pt
-                    if (vare ==-1)
-                        scalefactor *= histmap_2018_elec_veto_sf           ->eval_down(eta, pt); // x=eta, y=pt
-                }
-            }
-        }
     }
     else if (absid == 13)
     {
@@ -3122,7 +3008,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, int 
                     scalefactor *= 0.550 * histmap_2016_muon_BCDEF_id_lowpt_sf ->eval_down(pt, abseta)  // x=pt, y=abseta
                                   +0.450 * histmap_2016_muon_GH_id_lowpt_sf    ->eval_down(pt, abseta); // x=pt, y=abseta 0.450 of 2016 data
             }
-            if (leptonId == LeptonID::wCandidate)
+            if (leptonId == LeptonID::WCandidate)
             {
                 if (varm == 0)
                     scalefactor *= 0.550 * histmap_2016_muon_BCDEF_tightiso_sf ->eval(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
@@ -3167,7 +3053,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, int 
                 if (varm ==-1)
                     scalefactor *= histmap_2017_muon_id_lowpt_sf       ->eval_down(pt, abseta); // x=pt, y=abseta
             }
-            if (leptonId == LeptonID::wCandidate)
+            if (leptonId == LeptonID::WCandidate)
             {
                 if (varm == 0)
                     scalefactor *= histmap_2017_muon_tightiso_sf       ->eval(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
@@ -3206,7 +3092,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, int 
                 if (varm ==-1)
                     scalefactor *= histmap_2018_muon_id_lowpt_sf       ->eval_down(pt, abseta); // x=pt, y=abseta
             }
-            if (leptonId == LeptonID::wCandidate)
+            if (leptonId == LeptonID::WCandidate)
             {
                 if (varm == 0)
                     scalefactor *= histmap_2018_muon_tightiso_sf       ->eval(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
