@@ -139,6 +139,7 @@ public:
     bool doSkim;
     bool newbranchesadded;
     bool useMVAID;
+    bool testStandardIsolation;
     bool doNotApplyMETSmear;
     std::vector<LV> leptons;
     std::vector<int> lep_veto_idxs;
@@ -658,6 +659,14 @@ struct less_than_key
     inline bool operator() (const MyLepton& struct1, const MyLepton& struct2)
     {
         return (struct1.pt > struct2.pt);
+    }
+};
+
+struct less_than_pt_key
+{
+    inline bool operator() (const unsigned int& idx1, const unsigned int& idx2)
+    {
+        return (wvz.lep_pt()[idx1] > wvz.lep_pt()[idx2]);
     }
 };
 

@@ -35,7 +35,9 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
     newbranchesadded = false; // This is needed to check whether the branches were added to the skim tree
 
     // To whether or not run eventlist
-    bool doEventList = true;
+    bool doEventList = false;
+
+    bool doLite = false;
 
     const float b1 = -0.908;
     const float b2 =  0.015;
@@ -44,6 +46,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
 
     doVVVOnlyBDT = false;
     doNotComputeBDT = false;
+    testStandardIsolation = false;
+    // testStandardIsolation = true;
 
     // Parsing year
     if (ntupleVersion.Contains("v0.0.5")) year = -1; // Meaning use this sets to scale it up to 137
@@ -73,7 +77,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
 
     // The RooUtil::Cutflow object facilitates various cutflow/histogramming
     RooUtil::Cutflow cutflow(output_file);
-    cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight() * this->PrefireWeight(); } );
+    // cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight() * this->PrefireWeight(); } );
+    cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight(); } );
     cutflow.addCutToLastActiveCut("GenFilter", [&](){ return this->CutGenFilter(); }, UNITY );
     cutflow.addCutToLastActiveCut("Weight", [&](){ return 1; }, UNITY );
 
@@ -644,7 +649,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                 });
 
 
-        if (not doSyst)
+        if (not doSyst and not doLite)
         {
             histograms.addHistogram("Mll"            , 180 , 0       , 300    , [&](){ return this->VarMll(); });
             histograms.addHistogram("MET"            , 180 , 0       , 300    , [&](){ return this->VarMET(); });
@@ -798,18 +803,13 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             histograms.addHistogram("BDTInput_pt_zeta"        , 180 , -75 , 300 , [&](){ return this->VarPtZeta();                                                                                                                      } );
             histograms.addHistogram("BDTInput_pt_zeta_vis"    , 180 , 0   , 400 , [&](){ return this->VarPtZetaVis();                                                                                                                   } );
             histograms.addHistogram("BDTInput_ZPt"            , 180 , 0   , 350 , [&](){ return this->VarPtll(lep_ZCand_idx1, lep_ZCand_idx2);                                                                                          } );
-            histograms.addHistogram("minDR"                   , 180 , 0.  ,  3. ,
+            histograms.addHistogram("minDR"          , 180 , 0.  ,  3. ,
                     [&]()
                     {
-                        if (lep_Nom_idx1 < 0) return -999.f;
-                        if (lep_Nom_idx2 < 0) return -999.f;
-                        if (lep_ZCand_idx1 < 0) return -999.f;
-                        if (lep_ZCand_idx2 < 0) return -999.f;
-                        std::vector<unsigned int> vetoidxs = {lep_Nom_idx1, lep_Nom_idx2, lep_ZCand_idx1, lep_ZCand_idx2};
                         float minDR = 999;
-                        for (auto& vetoidx1 : vetoidxs)
+                        for (auto& vetoidx1 : lep_veto_idxs)
                         {
-                            for (auto& vetoidx2 : vetoidxs)
+                            for (auto& vetoidx2 : lep_veto_idxs)
                             {
                                 if (vetoidx1 != vetoidx2)
                                 {
@@ -822,6 +822,38 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
                             }
                         }
                         return minDR;
+                    });
+            histograms.addHistogram("lepTwoMuAbove120"   , 2 , 0       , 2    , [&]()
+                    {
+                        int nMu120 = 0;
+                        int n25 = 0;
+                        for (auto& vetoidx : lep_veto_idxs)
+                        {
+                            if (abs(wvz.lep_id().at(vetoidx)) == 13 and this->VarLepPt(vetoidx) > 120.)
+                                nMu120++;
+                            if (this->VarLepPt(vetoidx) > 25.)
+                                n25++;
+                        }
+                        if (nMu120 == 2 and n25 == 2)
+                        {
+                            return 1.f;
+                        }
+                        else
+                        {
+                            return 0.f;
+                        }
+                    });
+            histograms.addHistogram("lepVPt0"   , 180 , 0       , 200    , [&]() { if (lep_veto_idxs.size() > 0) return this->VarLepPt(lep_veto_idxs.at(0)); else return -999.f; });
+            histograms.addHistogram("lepVPt1"   , 180 , 0       , 200    , [&]() { if (lep_veto_idxs.size() > 1) return this->VarLepPt(lep_veto_idxs.at(1)); else return -999.f; });
+            histograms.addHistogram("lepVPt2"   , 180 , 0       , 200    , [&]() { if (lep_veto_idxs.size() > 2) return this->VarLepPt(lep_veto_idxs.at(2)); else return -999.f; });
+            histograms.addHistogram("lepVPt3"   , 180 , 0       , 200    , [&]() { if (lep_veto_idxs.size() > 3) return this->VarLepPt(lep_veto_idxs.at(3)); else return -999.f; });
+            histograms.addHistogram("SumPt"     , 180 , 0       , 700    , [&]() {
+                    float sumLepPt = 0.0;
+                    for (unsigned int i = 0; i < lep_veto_idxs.size(); ++i)
+                    {
+                        sumLepPt +=  wvz.lep_pt().at(lep_veto_idxs.at(i));
+                    }
+                    return sumLepPt;
                     });
 
         }
@@ -1290,17 +1322,20 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelEMu");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelOnZ");
             cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelOffZ");
-            cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelBTagEMu");
-            cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelBTagOnZ");
-            cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelBTagOffZ");
             cutflow.bookHistogramsForCutAndBelow(histograms, "FiveLeptons");
             cutflow.bookHistogramsForCutAndBelow(histograms, "SixLeptons");
-            cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAREMu");
-            cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAROffZ");
-            cutflow.bookHistogramsForCutAndBelow(histograms, "CutHLTZZ4l");
-            cutflow.bookHistogramsForCutAndBelow(histograms, "WZCRPresel");
-            cutflow.bookHistogramsForCut(histograms_Z_peak, "Cut4LepLeptonPt");
-            // cutflow.bookHistogramsForCut(histograms_Z_peak, "Pass4LepPreselection");
+            if (not doLite)
+            {
+                cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelBTagEMu");
+                cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelBTagOnZ");
+                cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelBTagOffZ");
+                cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAREMu");
+                cutflow.bookHistogramsForCutAndBelow(histograms, "ChannelAROffZ");
+                cutflow.bookHistogramsForCutAndBelow(histograms, "CutHLTZZ4l");
+                cutflow.bookHistogramsForCutAndBelow(histograms, "WZCRPresel");
+                cutflow.bookHistogramsForCut(histograms_Z_peak, "Cut4LepLeptonPt");
+                // cutflow.bookHistogramsForCut(histograms_Z_peak, "Pass4LepPreselection");
+            }
         }
         else
         {
@@ -2428,6 +2463,16 @@ bool Analysis::passVetoLeptonID(int idx)
 bool Analysis::passVetoElectronID(int idx)
 {
 
+    if (testStandardIsolation)
+    {
+        if (!( wvz.lep_isMVAwpLooseNoIsoPOG()[idx]    )) return false;
+        if (!( fabs(wvz.lep_p4()[idx].eta()) < 2.5    )) return false;
+        if (!( fabs(wvz.lep_dxy()[idx]) < 0.05        )) return false;
+        if (!( fabs(wvz.lep_dz()[idx]) < 0.1          )) return false;
+        if (!( wvz.lep_relIso03EA()[idx] < 0.4        )) return false;
+        return true;
+    }
+
     if (useMVAID)
     {
         if (not (wvz.lep_isVVVVeto()[idx])) return false;
@@ -2474,6 +2519,16 @@ bool Analysis::passVetoElectronID(int idx)
 //______________________________________________________________________________________________
 bool Analysis::passVetoMuonID(int idx)
 {
+
+    if (testStandardIsolation)
+    {
+        // if (!( isLooseMuonPOG(idx)                    )) return false; // Already applied at babymaker
+        if (!( fabs(wvz.lep_p4()[idx].eta()) < 2.5    )) return false;
+        if (!( fabs(wvz.lep_dxy()[idx]) < 0.05        )) return false;
+        if (!( fabs(wvz.lep_dz()[idx]) < 0.1          )) return false;
+        if (!( wvz.lep_relIso03EA()[idx] < 0.4        )) return false;
+        return true;
+    }
 
     if (useMVAID)
     {
@@ -5135,8 +5190,10 @@ int Analysis::emuBDTBin_withH(int var)
     computeAllBDTScores();
     const float b1 = -0.908;
     const float b2 =  0.015;
-    const float b3 =  0.733;
-    const float b4 =  3.523;
+    const float b3 =  0.733; // default value from Jonas
+    // const float b3 =  0.233; // Made up value to try it out
+    const float b4 =  3.523; // default value from Jonas
+    // const float b4 =  2.523; // Made up value to try it out
 
     float emuZZBDT = emu_zz_bdt_score;
     float emuTTZBDT = emu_ttz_bdt_score;
