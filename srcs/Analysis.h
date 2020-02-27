@@ -37,6 +37,8 @@
 #include "wvztree.h"
 #include "hzzangles.h"
 
+#include "ElectronScaleFactors.h"
+
 #include "L1PrefireWeight.h"
 
 // MET MC Correction
@@ -353,12 +355,12 @@ public:
 
     float EventWeight();
     float PrefireWeight();
-    float LeptonScaleFactor(int=0, int=0);
+    float LeptonScaleFactor(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float LeptonScaleFactorZZ4l();
-    float LeptonScaleFactor5Lep(int=0, int=0);
-    float LeptonScaleFactor6Lep(int=0, int=0);
+    float LeptonScaleFactor5Lep(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
+    float LeptonScaleFactor6Lep(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float LeptonScaleFactorv1();
-    float IndividualLeptonScaleFactor(int, bool, int=0, int=0);
+    float IndividualLeptonScaleFactor(int, LeptonID, SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float FakeFactor();
     float BTagSF();
 
@@ -493,11 +495,14 @@ public:
 
     LeptonVectors GetLeptonVectors();
 
+    ElectronScaleFactors electronScaleFactors_;
+
 };
 #endif
 
 #ifdef Analysis_C
 Analysis::Analysis(const char* ifileName, const char* RootName)
+    : electronScaleFactors_("scale_factors/electron")
 {
 
     // Create histograms
