@@ -4165,8 +4165,10 @@ float Analysis::VarMll2ndZ()
 //______________________________________________________________________________________________
 float Analysis::VarMET(int var)
 {
-    // return VarMETNoSmearing(var);
-    return VarMETSmearing(var);
+    if (nVetoLeptons == 5)
+        return VarMETNoSmearing(var);
+    else
+        return VarMETSmearing(var);
 }
 
 //______________________________________________________________________________________________
@@ -4245,8 +4247,10 @@ float Analysis::VarMETSmearing(int var)
 //______________________________________________________________________________________________
 float Analysis::VarMETPhi(int var)
 {
-    // return VarMETPhiNoSmearing(var);
-    return VarMETPhiSmearing(var);
+    if (nVetoLeptons == 5)
+        return VarMETPhiNoSmearing(var);
+    else
+        return VarMETPhiSmearing(var);
 }
 
 //______________________________________________________________________________________________

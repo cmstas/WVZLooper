@@ -66,7 +66,9 @@ echo " Will only show progress for ZZ to 4L sample. since that is the bottle nec
 
 rm -f .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}_${FILTERCUTS}.txt
 for i in $(ls -r /nfs-7/userdata/phchang/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/); do
-    # if [[ $i == *"ttbar_"* ]] || [[ $i == *"dy_"* ]] || [[ $i == *"wz_3l"* ]] || [[ $i == *"wz_2l"* ]] || [[ $i == *"zg_"* ]]; then
+    # # if [[ $i == *"ttbar_"* ]] || [[ $i == *"dy_"* ]] || [[ $i == *"wz_3l"* ]] || [[ $i == *"wz_2l"* ]] || [[ $i == *"zg_"* ]]; then
+    # # if [[ $i == *"ttz_"* ]]; then
+    # if [[ $i == *"zzz_4l"* ]]; then
     #     :
     # else
     #     continue
