@@ -886,7 +886,7 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
         cutflow.addWgtSyst("LepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Up,1) / this->LeptonScaleFactor() : 1; } );
         cutflow.addWgtSyst("LepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Down,-1) / this->LeptonScaleFactor() : 1; } );
         cutflow.addWgtSyst("ElLepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Up,0) / this->LeptonScaleFactor() : 1; } );
-        cutflow.addWgtSyst("ElLepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Up,0) / this->LeptonScaleFactor() : 1; } );
+        cutflow.addWgtSyst("ElLepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Down,0) / this->LeptonScaleFactor() : 1; } );
         cutflow.addWgtSyst("MuLepSFUp"   , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Nominal,1) / this->LeptonScaleFactor() : 1; } );
         cutflow.addWgtSyst("MuLepSFDown" , [&]() { if (wvz.isData()) return 1.f; return this->LeptonScaleFactor() != 0 ? this->LeptonScaleFactor(SystematicVariation::Nominal,-1) / this->LeptonScaleFactor() : 1; } );
         cutflow.addWgtSyst("PileupUp"  , [&]()
@@ -2974,7 +2974,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
     float abseta = fabs(eta);
     if (absid == 11)
     {
-        if (useMVAID) {
+        if (!useMVAID) {
             std::cout << "Warning! The electron scale factors were derived for the MVA IDs, so they are not valid!" << std::endl;
         }
         scalefactor *= electronScaleFactors_(year, leptonId, eta, pt, vare);
