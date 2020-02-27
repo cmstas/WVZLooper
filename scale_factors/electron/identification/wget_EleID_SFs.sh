@@ -12,7 +12,7 @@
 # Author: Jonas Rembser 2020
 #
 
-WEBSITE_BASE=https://rembserj.web.cern.ch/rembserj/plots/egamma/20200218_electron_scale_factors/Ele_MVA_V2
+WEBSITE_BASE=https://rembserj.web.cern.ch/rembserj/plots/egamma/20200226_electron_scale_factors/Ele_MVA_V2
 
 # The scale factors are in the EGamma_SF2D histogram directly in the ROOT file
 # eta is on X axis, pt is on Y axis
