@@ -77,8 +77,8 @@ void Analysis::Loop(const char* NtupleVersion, const char* TagName, bool dosyst,
 
     // The RooUtil::Cutflow object facilitates various cutflow/histogramming
     RooUtil::Cutflow cutflow(output_file);
-    // cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight() * this->PrefireWeight(); } );
-    cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight(); } );
+    cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight() * this->PrefireWeight(); } );
+    // cutflow.addCut("EventWeight", [&](){ return 1; }, [&](){ return this->EventWeight(); } );
     cutflow.addCutToLastActiveCut("GenFilter", [&](){ return this->CutGenFilter(); }, UNITY );
     cutflow.addCutToLastActiveCut("Weight", [&](){ return 1; }, UNITY );
 
@@ -4165,10 +4165,11 @@ float Analysis::VarMll2ndZ()
 //______________________________________________________________________________________________
 float Analysis::VarMET(int var)
 {
-    if (nVetoLeptons == 5)
-        return VarMETNoSmearing(var);
-    else
-        return VarMETSmearing(var);
+    // if (nVetoLeptons == 5)
+    //     return VarMETNoSmearing(var);
+    // else
+    //     return VarMETSmearing(var);
+    return VarMETSmearing(var);
 }
 
 //______________________________________________________________________________________________
@@ -4247,10 +4248,11 @@ float Analysis::VarMETSmearing(int var)
 //______________________________________________________________________________________________
 float Analysis::VarMETPhi(int var)
 {
-    if (nVetoLeptons == 5)
-        return VarMETPhiNoSmearing(var);
-    else
-        return VarMETPhiSmearing(var);
+    // if (nVetoLeptons == 5)
+    //     return VarMETPhiNoSmearing(var);
+    // else
+    //     return VarMETPhiSmearing(var);
+    return VarMETPhiSmearing(var);
 }
 
 //______________________________________________________________________________________________
