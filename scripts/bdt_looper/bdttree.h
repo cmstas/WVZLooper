@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/nfs-7/userdata/phchang/babies/BDT_v0.1.12.7/wwz_20172018_skim.root", "t", "bdttree", "tas", "bdt")
+// makeCMS3ClassFiles("${WVZ_DATA_PATH}/babies/BDT_v0.1.12.7/wwz_20172018_skim.root", "t", "bdttree", "tas", "bdt")
 
 #ifndef bdttree_H
 #define bdttree_H

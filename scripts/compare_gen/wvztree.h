@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // This is a header file generated with the command:
-// makeCMS3ClassFiles("/nfs-7/userdata/phchang/babies/WVZ2017_v0.1.12.5/wwz_amcatnlo_1.root", "t", "wvztree", "tas", "wvz")
+// makeCMS3ClassFiles("${WVZ_DATA_PATH}/babies/WVZ2017_v0.1.12.5/wwz_amcatnlo_1.root", "t", "wvztree", "tas", "wvz")
 
 #ifndef wvztree_H
 #define wvztree_H

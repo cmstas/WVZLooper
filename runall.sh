@@ -115,9 +115,9 @@ echo "================================================"
 shift $(($OPTIND - 1))
 
 # Sanity check that the sample referred exists
-if [ ! -d /nfs-7/userdata/phchang/babies/${NTUPLETYPE}2016_${NTUPLEVERSION}/ ]; then echo "Asked to run over the ${NTUPLEVERSION} of ${NTUPLETYPE} but /nfs-7/userdata/phchang/babies/${NTUPLETYPE}2016_${NTUPLEVERSION}/ does not exists!"; exit; fi
-if [ ! -d /nfs-7/userdata/phchang/babies/${NTUPLETYPE}2017_${NTUPLEVERSION}/ ]; then echo "Asked to run over the ${NTUPLEVERSION} of ${NTUPLETYPE} but /nfs-7/userdata/phchang/babies/${NTUPLETYPE}2017_${NTUPLEVERSION}/ does not exists!"; exit; fi
-if [ ! -d /nfs-7/userdata/phchang/babies/${NTUPLETYPE}2018_${NTUPLEVERSION}/ ]; then echo "Asked to run over the ${NTUPLEVERSION} of ${NTUPLETYPE} but /nfs-7/userdata/phchang/babies/${NTUPLETYPE}2018_${NTUPLEVERSION}/ does not exists!"; exit; fi
+if [ ! -d ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}2016_${NTUPLEVERSION}/ ]; then echo "Asked to run over the ${NTUPLEVERSION} of ${NTUPLETYPE} but ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}2016_${NTUPLEVERSION}/ does not exists!"; exit; fi
+if [ ! -d ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}2017_${NTUPLEVERSION}/ ]; then echo "Asked to run over the ${NTUPLEVERSION} of ${NTUPLETYPE} but ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}2017_${NTUPLEVERSION}/ does not exists!"; exit; fi
+if [ ! -d ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}2018_${NTUPLEVERSION}/ ]; then echo "Asked to run over the ${NTUPLEVERSION} of ${NTUPLETYPE} but ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}2018_${NTUPLEVERSION}/ does not exists!"; exit; fi
 
 #
 #

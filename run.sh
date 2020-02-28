@@ -60,12 +60,12 @@ echo "SKIM           : ${SKIM}"
 echo "================================================"
 
 # Sanity check that the sample referred exists
-if [ ! -d /nfs-7/userdata/phchang/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/ ]; then echo "Asked to run over the ${NTUPLEVERSION} of ${NTUPLETYPE} but /nfs-7/userdata/phchang/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/ does not exists!"; exit; fi
+if [ ! -d ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/ ]; then echo "Asked to run over the ${NTUPLEVERSION} of ${NTUPLETYPE} but ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/ does not exists!"; exit; fi
 
 echo " Will only show progress for ZZ to 4L sample. since that is the bottle neck processing"
 
 rm -f .jobs_${YEAR}_${NTUPLEVERSION}_${NTUPLETYPE}_${TAG}_${SYST}_${SKIM}_${FILTERCUTS}.txt
-for i in $(ls -r /nfs-7/userdata/phchang/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/); do
+for i in $(ls -r ${WVZ_DATA_PATH}/babies/${NTUPLETYPE}${YEAR}_${NTUPLEVERSION}/); do
     # # if [[ $i == *"ttbar_"* ]] || [[ $i == *"dy_"* ]] || [[ $i == *"wz_3l"* ]] || [[ $i == *"wz_2l"* ]] || [[ $i == *"zg_"* ]]; then
     # # if [[ $i == *"ttz_"* ]]; then
     # if [[ $i == *"zzz_4l"* ]]; then

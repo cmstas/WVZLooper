@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BDTINPUTDIR=/nfs-7/userdata/phchang/babies/BDT_v0.1.12.7/
+BDTINPUTDIR=${WVZ_DATA_PATH}/babies/BDT_v0.1.12.7/
 mkdir -p outputs/
 rm -rf outputs/*.root
 rm -f .cmd.txt
