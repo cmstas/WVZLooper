@@ -37,8 +37,14 @@
 #include "wvztree.h"
 #include "hzzangles.h"
 
+#include "ElectronScaleFactors.h"
+
+#include "L1PrefireWeight.h"
+
 // MET MC Correction
 #include "METCorrectionHandler.h"
+
+#include "fastforest.h"
 
 using namespace std;
 
@@ -133,6 +139,10 @@ public:
     bool doFakeEst;
     bool doSyst;
     bool doSkim;
+    bool newbranchesadded;
+    bool useMVAID;
+    bool testStandardIsolation;
+    bool doNotApplyMETSmear;
     std::vector<LV> leptons;
     std::vector<int> lep_veto_idxs;
     std::vector<int> lep_tight_idxs;
@@ -173,6 +183,10 @@ public:
     int lep_5Lep_Z2_idx1;
     int lep_5Lep_Z2_idx2;
     int lep_5Lep_W_idx;
+    int lep_wzcr_idx1;
+    int lep_wzcr_idx2;
+    int lep_wzcr_idx3;
+    int lep_wzcr_idxe;
     LV dilepZCand;
     LV dilepNominal;
     TString output_tfile_name;
@@ -192,26 +206,39 @@ public:
     RooUtil::HistMap* histmap_2018_elec_veto_sf;
     RooUtil::HistMap* histmap_2016_muon_BCDEF_id_sf;
     RooUtil::HistMap* histmap_2016_muon_BCDEF_id_lowpt_sf;
-    RooUtil::HistMap* histmap_2016_muon_BCDEF_tightiso_sf;
-    RooUtil::HistMap* histmap_2016_muon_BCDEF_looseiso_sf;
     RooUtil::HistMap* histmap_2016_muon_GH_id_sf;
     RooUtil::HistMap* histmap_2016_muon_GH_id_lowpt_sf;
-    RooUtil::HistMap* histmap_2016_muon_GH_tightiso_sf;
-    RooUtil::HistMap* histmap_2016_muon_GH_looseiso_sf;
+    RooUtil::HistMap* histmap_2016_muon_veto_iso_sf;
+    RooUtil::HistMap* histmap_2016_muon_zid_iso_sf;
+    RooUtil::HistMap* histmap_2016_muon_wid_iso_sf;
     RooUtil::HistMap* histmap_2017_muon_id_sf;
     RooUtil::HistMap* histmap_2017_muon_id_lowpt_sf;
-    RooUtil::HistMap* histmap_2017_muon_tightiso_sf;
-    RooUtil::HistMap* histmap_2017_muon_looseiso_sf;
+    RooUtil::HistMap* histmap_2017_muon_veto_iso_sf;
+    RooUtil::HistMap* histmap_2017_muon_zid_iso_sf;
+    RooUtil::HistMap* histmap_2017_muon_wid_iso_sf;
     RooUtil::HistMap* histmap_2018_muon_id_sf;
     RooUtil::HistMap* histmap_2018_muon_id_lowpt_sf;
-    RooUtil::HistMap* histmap_2018_muon_tightiso_sf;
-    RooUtil::HistMap* histmap_2018_muon_looseiso_sf;
+    RooUtil::HistMap* histmap_2018_muon_veto_iso_sf;
+    RooUtil::HistMap* histmap_2018_muon_zid_iso_sf;
+    RooUtil::HistMap* histmap_2018_muon_wid_iso_sf;
     RooUtil::HistMap* histmap_2016_fake_rate_el;
     RooUtil::HistMap* histmap_2016_fake_rate_mu;
     RooUtil::HistMap* histmap_2017_fake_rate_el;
     RooUtil::HistMap* histmap_2017_fake_rate_mu;
     RooUtil::HistMap* histmap_2018_fake_rate_el;
     RooUtil::HistMap* histmap_2018_fake_rate_mu;
+    RooUtil::HistMap* histmap_2016_elec_mva_medium_sf;
+    RooUtil::HistMap* histmap_2016_elec_mva_veto_sf;
+    RooUtil::HistMap* histmap_2017_elec_mva_medium_sf;
+    RooUtil::HistMap* histmap_2017_elec_mva_veto_sf;
+    RooUtil::HistMap* histmap_2018_elec_mva_medium_sf;
+    RooUtil::HistMap* histmap_2018_elec_mva_veto_sf;
+
+    RooUtil::HistMap* histmap_2016_elec_mva_loose_sf;
+    RooUtil::HistMap* histmap_2017_elec_mva_loose_sf;
+    RooUtil::HistMap* histmap_2018_elec_mva_loose_sf;
+
+    L1PrefireWeight l1prefireweight;
 
     // MET MC Correction for
     METCorrectionHandler metcorrector;
@@ -228,11 +255,75 @@ public:
     TFile* BDTinputFile;
     RooUtil::TTreeX* tx;
 
+    // FastForest
+    FastForest* fast_forest_emu_zz;
+    FastForest* fast_forest_emu_ttz;
+    FastForest* fast_forest_offz_zz;
+
+    // FastForest
+    FastForest* fast_forest_nonh_emu_zz;
+    FastForest* fast_forest_nonh_emu_ttz;
+    FastForest* fast_forest_nonh_offz_zz;
+
+    // Feature string name
+    std::vector<std::string> emu_zz_features;
+    std::vector<std::string> offz_zz_features;
+    std::vector<std::string> emu_ttz_features;
+
+    bool doVVVOnlyBDT;
+    bool doNotComputeBDT;
+
+    float emu_zz_bdt_score;
+    float offz_zz_bdt_score;
+    float emu_ttz_bdt_score;
+    float emu_zz_bdt_score_up;
+    float offz_zz_bdt_score_up;
+    float emu_ttz_bdt_score_up;
+    float emu_zz_bdt_score_dn;
+    float offz_zz_bdt_score_dn;
+    float emu_ttz_bdt_score_dn;
+    float emu_zz_bdt_score_met_up;
+    float offz_zz_bdt_score_met_up;
+    float emu_ttz_bdt_score_met_up;
+    float emu_zz_bdt_score_met_dn;
+    float offz_zz_bdt_score_met_dn;
+    float emu_ttz_bdt_score_met_dn;
+    float emu_zz_bdt_score_metpileup_up;
+    float offz_zz_bdt_score_metpileup_up;
+    float emu_ttz_bdt_score_metpileup_up;
+    float emu_zz_bdt_score_metpileup_dn;
+    float offz_zz_bdt_score_metpileup_dn;
+    float emu_ttz_bdt_score_metpileup_dn;
+
+    float nonh_emu_zz_bdt_score;
+    float nonh_offz_zz_bdt_score;
+    float nonh_emu_ttz_bdt_score;
+    float nonh_emu_zz_bdt_score_up;
+    float nonh_offz_zz_bdt_score_up;
+    float nonh_emu_ttz_bdt_score_up;
+    float nonh_emu_zz_bdt_score_dn;
+    float nonh_offz_zz_bdt_score_dn;
+    float nonh_emu_ttz_bdt_score_dn;
+    float nonh_emu_zz_bdt_score_met_up;
+    float nonh_offz_zz_bdt_score_met_up;
+    float nonh_emu_ttz_bdt_score_met_up;
+    float nonh_emu_zz_bdt_score_met_dn;
+    float nonh_offz_zz_bdt_score_met_dn;
+    float nonh_emu_ttz_bdt_score_met_dn;
+    float nonh_emu_zz_bdt_score_metpileup_up;
+    float nonh_offz_zz_bdt_score_metpileup_up;
+    float nonh_emu_ttz_bdt_score_metpileup_up;
+    float nonh_emu_zz_bdt_score_metpileup_dn;
+    float nonh_offz_zz_bdt_score_metpileup_dn;
+    float nonh_emu_ttz_bdt_score_metpileup_dn;
+
+    bool bdt_score_computed;
+
 //*******functions********//
     Analysis(const char* ifileName, const char* RootName);
     virtual ~Analysis();
     virtual void  Initial(const char* RootName, int RootNumber);
-    virtual void  Loop(const char* NtupleVersion, const char* TagName, bool dosyst, bool doskim);
+    virtual void  Loop(const char* NtupleVersion, const char* TagName, bool dosyst, bool doskim, TString filtercuts="");
     virtual void  End(int RootNumber);
     virtual void  Finish(int RootNumber);
     virtual void  Output();
@@ -242,7 +333,7 @@ public:
 
     void setDoSkim(bool=true);
     void createNewBranches();
-    void fillSkimTree();
+    void fillSkimTree(std::vector<int>);
 
     void loadScaleFactors();
 
@@ -261,13 +352,16 @@ public:
     void sortLeptonIndex();
     void setDilepMasses();
     void correctMET();
+    void selectWZCRLeptons();
 
     float EventWeight();
-    float LeptonScaleFactor(int=0, int=0);
+    float PrefireWeight();
+    float LeptonScaleFactor(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float LeptonScaleFactorZZ4l();
-    float LeptonScaleFactor5Lep(int=0, int=0);
+    float LeptonScaleFactor5Lep(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
+    float LeptonScaleFactor6Lep(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float LeptonScaleFactorv1();
-    float IndividualLeptonScaleFactor(int, bool, int=0, int=0);
+    float IndividualLeptonScaleFactor(int, LeptonID, SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float FakeFactor();
     float BTagSF();
 
@@ -294,6 +388,7 @@ public:
     bool Is4LeptonFakeValidationEvents();
     bool Is3LeptonFakeValidationEvents();
     bool Is5LeptonEvent();
+    bool Is6LeptonEvent();
     bool IsTwoOSLeptonEvent();
     bool FindZCandLeptons();
     bool FindTwoOSNominalLeptons();
@@ -305,14 +400,24 @@ public:
 
     bool Cut4LepLeptonPt(bool=false);
     bool CutZZ4LepLeptonPt();
-    bool CutHLT();
+    bool CutHLT(std::vector<int> idxs=std::vector<int>());
     bool Cut4LepLowMll(bool=false);
     bool Cut4LepBVeto(int=0);
     bool Cut4LepBTag(int=0);
+    bool CutEMuSig(int=0);
+    bool CutOffZSig(int=0);
+    bool CutEMuBDT();
+    float CutEMuBDTWgt();
+    bool CutOffZBDT();
+    float CutOffZBDTWgt();
     bool CutHighMT(int=0);
     bool CutHighMET(int=0);
+    bool CutMedMET(int=0);
     bool CutHighMTAR(int=0);
     bool CutLowPtZeta(int=0);
+    bool CutHighPt4l();
+    bool CutMedPt4l();
+    bool CutHighSumLepPt();
 
     bool IsChannelEMu(bool=false);
     bool IsChannelOnZ(bool=false);
@@ -333,6 +438,8 @@ public:
     float VarMjj();
     float VarMjjMinDR();
     float VarMET(int=0);
+    float VarMETNoSmearing(int=0);
+    float VarMETSmearing(int=0);
     float VarNvtx();
     float VarMll2ndZ();
     float VarMT(int,int=0);
@@ -353,6 +460,7 @@ public:
     float VarNbmed();
     float VarMll2l();
     float VarNSFOS();
+    LV VarLepP4(int);
     float VarLepPt(int);
     float VarLepEta(int idx);
     float VarLepPhi(int idx);
@@ -362,19 +470,40 @@ public:
     float VarHTLep(int, int, int, int);
     float VarHTLep5();
     float VarMETPhi(int=0);
+    float VarMETPhiNoSmearing(int=0);
+    float VarMETPhiSmearing(int=0);
     float VarTauTauDisc(int=0);
     float VarPtZetaDiff(int=0);
     float VarPtZeta(int=0);
     float VarPtZetaVis(int=0);
     float VarMinDRJetsToLep(int);
+    float VarARMT2(int=0);
+    float VarMT2(int=0);
+    void computeAllBDTScores();
+    void resetAllBDTScores();
+    int emuBDTBin(int=0);
+    int offzBDTBin(int=0);
+    int emuBDTBin_withH(int=0);
+    int offzBDTBin_withH(int=0);
+    int emuBDTBin_NonH(int=0);
+    int offzBDTBin_NonH(int=0);
+    float VarZZBDT(int=0);
+    float VarTTZBDT(int=0);
+    float VarOffZBDT(int=0);
+    float VarZZBDT_NonH(int=0);
+    float VarTTZBDT_NonH(int=0);
+    float VarOffZBDT_NonH(int=0);
 
     LeptonVectors GetLeptonVectors();
+
+    ElectronScaleFactors electronScaleFactors_;
 
 };
 #endif
 
 #ifdef Analysis_C
 Analysis::Analysis(const char* ifileName, const char* RootName)
+    : electronScaleFactors_("scale_factors/electron")
 {
 
     // Create histograms
@@ -536,6 +665,14 @@ struct less_than_key
     inline bool operator() (const MyLepton& struct1, const MyLepton& struct2)
     {
         return (struct1.pt > struct2.pt);
+    }
+};
+
+struct less_than_pt_key
+{
+    inline bool operator() (const unsigned int& idx1, const unsigned int& idx2)
+    {
+        return (wvz.lep_pt()[idx1] > wvz.lep_pt()[idx2]);
     }
 };
 
