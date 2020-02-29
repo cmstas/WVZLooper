@@ -1,6 +1,5 @@
 #!/bin/env python
 
-from __future__ import absolute_import
 import ROOT as r
 
 import pyrootutil as pr
@@ -10,7 +9,6 @@ import sys
 import os
 from errors import E
 import datacard_writer as dw
-from six.moves import zip
 
 parser = argparse.ArgumentParser(description="Plotter for the WVZ analysis")
 parser.add_argument('-b' , '--baseline_tag'    , dest='baseline_tag'    , help='baseline tag (e.g. test, test1. test2, etc.)' , required=True)
@@ -99,16 +97,14 @@ def write_datacards(ntuple_version, tag):
     tfiles = {}
     for proc, fname in zip(procs, fnames):
         tfiles[proc] = r.TFile(fname)
-        tfiles[proc].Get("FiveLeptonsMT5th__Yield").Print("all")
-
-    r.gROOT.cd()
+        tfiles[proc].Get("SixLeptonsSumPtCut__Yield").Print("all")
 
     ###############################
     # EMu channel data card writing
     ###############################
 
     # number of bins
-    fitreg = "FiveLeptonsMT5th"
+    fitreg = "SixLeptonsSumPtCut"
     nbins = 1
     fitvar = "Yield"
 
@@ -128,19 +124,20 @@ def write_datacards(ntuple_version, tag):
         for syst in systnames:
 
             if syst == "Nominal":
-                h = tfiles[proc].Get("{}__{}".format(fitreg, fitvar)).Clone()
+                # h = tfiles[proc].Get("{}__{}".format(fitreg, fitvar)).Clone()
+                h = tfiles[proc].Get("{}__{}".format(fitreg, fitvar)).Clone(proc+fitreg+fitvar+syst)
 
             else:
                 systhacked = syst
                 if proc == "NONE":
                     systhacked = ""
-                h = tfiles[proc].Get("{}{}__{}".format(fitreg, systhacked, fitvar)).Clone()
+                h = tfiles[proc].Get("{}{}__{}".format(fitreg, systhacked, fitvar)).Clone(proc+fitreg+fitvar+syst)
 
                 # print tfiles[proc]
                 # print proc
                 # h.Print("all")
 
-            h.SetTitle("five{}_{}".format(year, proc))
+            h.SetTitle("six{}_{}".format(year, proc))
 
             hists_db[proc][syst] = h
 
@@ -150,32 +147,32 @@ def write_datacards(ntuple_version, tag):
     for systcateg in systcategs:
         thissyst = {}
         for proc in mcprocs:
-            thissyst["five{}_".format(year) + proc] = [hists_db[proc][systcateg+"Up"], hists_db[proc][systcateg+"Down"]]
+            thissyst["six{}_".format(year) + proc] = [hists_db[proc][systcateg+"Up"], hists_db[proc][systcateg+"Down"]]
         systs.append( (systcateg+year, "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        if proc == "zz": thissyst["five{}_".format(year) + proc] = "1.3"
-        else: thissyst["five{}_".format(year) + proc] = 0
-    systs.append( ("FlatSystFiveZZ{}".format(year), "lnN", [], thissyst) )
+        if proc == "zz": thissyst["six{}_".format(year) + proc] = "1.3"
+        else: thissyst["six{}_".format(year) + proc] = 0
+    systs.append( ("FlatSystSixZZ{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        thissyst["five{}_".format(year) + proc] = "1.025"
+        thissyst["six{}_".format(year) + proc] = "1.025"
     systs.append( ("FlatSystLumi{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        thissyst["five{}_".format(year) + proc] = "1.03"
+        thissyst["six{}_".format(year) + proc] = "1.03"
     systs.append( ("FlatSystsIP3D{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        thissyst["five{}_".format(year) + proc] = "1.02"
+        thissyst["six{}_".format(year) + proc] = "1.02"
     systs.append( ("FlatSystsTrigSF{}".format(year), "lnN", [], thissyst) )
 
     # Now create data card writer
@@ -187,11 +184,11 @@ def write_datacards(ntuple_version, tag):
     finalyields = []
     d.set_bin(1)
     d.set_region_name("bin{}".format(1))
-    d.write("stats/{}/five_datacard_singlebin{}.txt".format(prefix, 1))
+    d.write("stats/{}/six_datacard_singlebin{}.txt".format(prefix, 1))
     if args.print_yields and args.wzz_only:
         vals = d.print_yields(detail=args.print_detail)
         if vals:
-            print_yield_table(vals[0], vals[1], "textable/five{}".format(year))
+            print_yield_table(vals[0], vals[1], "textable/six{}".format(year))
 
 
 def rebin36(h):

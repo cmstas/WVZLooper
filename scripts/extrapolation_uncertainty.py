@@ -1,5 +1,7 @@
 #!/bin/env python
 
+from __future__ import absolute_import
+from __future__ import print_function
 from plottery import plottery as ply
 import plottery_wrapper as p
 import ROOT as r
@@ -10,11 +12,16 @@ from errors import E
 from array import array
 import pyrootutil as pr
 import math
+from six.moves import zip
 
-Ntuple_Version = "v0.1.12.7"
-Baseline_Version = "syst"
+# Ntuple_Version = "v0.1.12.7"
+# Baseline_Version = "syst"
+Ntuple_Type = "WVZMVA"
+Ntuple_Version = "v0.1.21"
+Baseline_Version = "v3"
 
 syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
+# syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "PDF", "Qsq", "AlphaS"]
 syst_list = ["Nominal", "JES", "JER", "Pileup", "MET", "METPileup"]
 syst_list = syst_list_all
 
@@ -68,12 +75,13 @@ def get_alpha_uncertainty(ntuple_version, tag, numerator, denominator, num_proc,
         # print (E_numer_data - E_numer_nonzzbkg)
         # print E_numer_zz
 
+        # print(E_numer_zz, E_denom_zz, E_denom_data, E_denom_nonzzbkg, denominator, numerator)
         data_eff =  (E_numer_data - E_numer_nonzzbkg) / (E_denom_data - E_denom_nonzzbkg)
         mc_eff =  E_numer_zz / E_denom_zz
         eff_ratio = data_eff / mc_eff
-        # print E_numer_data, E_numer_zz
-        # print "mc_eff:", mc_eff
-        # print "data_eff:", data_eff
+        # print(E_numer_data, E_numer_zz)
+        # print("mc_eff:", mc_eff)
+        # print("data_eff:", data_eff)
         if valopt == "eff":
             return mc_eff
         elif valopt == "den":
@@ -229,51 +237,54 @@ def get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, n
 
 def run_for_variation(variation=""):
 
-    ntuple_version = "WVZ2016_{}_WVZ2017_{}_WVZ2018_{}".format(Ntuple_Version, Ntuple_Version, Ntuple_Version)
+    ntuple_version = "{}2016_{}_{}2017_{}_{}2018_{}".format(Ntuple_Type, Ntuple_Version, Ntuple_Type, Ntuple_Version, Ntuple_Type, Ntuple_Version)
     tag = "y2016_{}_y2017_{}_y2018_{}".format(Baseline_Version, Baseline_Version, Baseline_Version)
 
     denominator = "ChannelBTagEMu{}__Yield".format(variation)
     numerator = "ChannelBTagEMuHighMET{}__Yield".format(variation)
     # print "Cut denominator:", denominator
-    print "Cut numerator:", numerator
-    print get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "ttz")
-    print ""
-    print ""
+    print("Cut numerator:", numerator)
+    print(get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "ttz"))
+    print("")
+    print("")
 
     denominator = "ChannelBTagEMu{}__Yield".format(variation)
     numerator = "ChannelBTagEMuHighMT{}__Yield".format(variation)
     # print "Cut denominator:", denominator
-    print "Cut numerator:", numerator
-    print get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "ttz")
-    print ""
-    print ""
+    print("Cut numerator:", numerator)
+    print(get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "ttz"))
+    print("")
+    print("")
 
     denominator = "ChannelOnZ{}__Yield".format(variation)
     numerator = "ChannelOnZHighMET{}__Yield".format(variation)
     # print "Cut denominator:", denominator
-    print "Cut numerator:", numerator
-    print get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "zz")
-    print ""
-    print ""
+    print("Cut numerator:", numerator)
+    print(get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "zz"))
+    print("")
+    print("")
 
     denominator = "ChannelOnZ{}__Yield".format(variation)
     numerator = "ChannelOnZHighMT{}__Yield".format(variation)
     # print "Cut denominator:", denominator
-    print "Cut numerator:", numerator
-    print get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "zz")
-    print ""
-    print ""
+    print("Cut numerator:", numerator)
+    print(get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, "zz"))
+    print("")
+    print("")
 
 def run(process, region, variable, variation="", valopt="ratio"):
-    ntuple_version = "WVZ2016_{}_WVZ2017_{}_WVZ2018_{}".format(Ntuple_Version,Ntuple_Version,Ntuple_Version)
+    ntuple_version = "{}2016_{}_{}2017_{}_{}2018_{}".format(Ntuple_Type,Ntuple_Version,Ntuple_Type,Ntuple_Version,Ntuple_Type,Ntuple_Version)
     tag = "y2016_{}_y2017_{}_y2018_{}".format(Baseline_Version, Baseline_Version, Baseline_Version)
     denominator = "Channel{}{}__Yield".format(region, variation)
-    numerator = "Channel{}High{}{}__Yield".format(region, variable, variation)
+    if variable == "SR":
+        numerator = "Channel{}{}{}__Yield".format(region, variable, variation)
+    else:
+        numerator = "Channel{}High{}{}__Yield".format(region, variable, variation)
     # print denominator, numerator
     return get_extrapolation_uncertainty(ntuple_version, tag, numerator, denominator, process, valopt)
 
 def run_alpha(process, numerator_region, denominator_region, variation="", valopt="eff"):
-    ntuple_version = "WVZ2016_{}_WVZ2017_{}_WVZ2018_{}".format(Ntuple_Version, Ntuple_Version, Ntuple_Version)
+    ntuple_version = "{}2016_{}_{}2017_{}_{}2018_{}".format(Ntuple_Type,Ntuple_Version,Ntuple_Type, Ntuple_Version, Ntuple_Type, Ntuple_Version)
     tag = "y2016_{}_y2017_{}_y2018_{}".format(Baseline_Version, Baseline_Version, Baseline_Version)
     denominator = "{}{}__Yield".format(denominator_region, variation)
     numerator = "{}{}__Yield".format(numerator_region, variation)
@@ -338,11 +349,11 @@ def get_alpha(process, numerator_region, denominator_region, valopt="eff"):
         rtn_val[syst] = var
         # print syst, varup, vardn, nominal
 
-    # Not entirely a correct treatment... but a work around
-    pufracerr = rtn_val["Pileup"].err / rtn_val["Pileup"].val
-    metpufracerr = rtn_val["METPileup"].err / rtn_val["METPileup"].val
-    rtn_val["Pileup"] = E(rtn_val["Pileup"].val, rtn_val["Pileup"].val * math.sqrt(pufracerr**2 + metpufracerr**2))
-    del rtn_val["METPileup"]
+    # # Not entirely a correct treatment... but a work around
+    # pufracerr = rtn_val["Pileup"].err / rtn_val["Pileup"].val
+    # metpufracerr = rtn_val["METPileup"].err / rtn_val["METPileup"].val
+    # rtn_val["Pileup"] = E(rtn_val["Pileup"].val, rtn_val["Pileup"].val * math.sqrt(pufracerr**2 + metpufracerr**2))
+    # del rtn_val["METPileup"]
 
     # for key in syst_list_all:
     #     if key == "METPileup": continue
@@ -536,25 +547,56 @@ def main():
     # -- combined version where only one transfer factor is computed
 
     # MET/Mll combined extrapolation
-    hists = get_alpha_hists("zz", "ChannelOffZHighMET", "ChannelOnZ")
+    print("TF OnZ -> OffZ SR")
+    hists = get_alpha_hists("zz", "ChannelOffZSR", "ChannelOnZ")
     p.print_yield_table_from_list(hists, "exp/zz_eemm_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
     p.print_yield_tex_table_from_list(hists, "exp/zz_eemm_tf.tex", prec=4, caption="eemm zz transfer factor", noerror=True)
 
     # flavor/Mll/MT combined extrapolation
+    print("TF OnZ -> EMu SR")
     hists = get_alpha_hists("zz", "ChannelEMuHighMT", "ChannelOnZ")
     p.print_yield_table_from_list(hists, "exp/zz_emu_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
     p.print_yield_tex_table_from_list(hists, "exp/zz_emu_tf.tex", prec=4, caption="emu zz transfer factor", noerror=True)
 
+    # flavor/nbjet/MET combined extrapolation
+    print("TF BTag -> OffZ SR")
+    hists = get_alpha_hists("ttz", "ChannelOffZSR", "ChannelBTagEMu")
+    p.print_yield_table_from_list(hists, "exp/ttz_eemm_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
+    p.print_yield_tex_table_from_list(hists, "exp/ttz_eemm_tf.tex", prec=4, caption="eemm ttz transfer factor", noerror=True)
+
     # nbjet/MT combined extrapolation
+    print("TF BTag -> EMu SR")
     hists = get_alpha_hists("ttz", "ChannelEMuHighMT", "ChannelBTagEMu")
     p.print_yield_table_from_list(hists, "exp/ttz_emu_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
     p.print_yield_tex_table_from_list(hists, "exp/ttz_emu_tf.tex", prec=4, caption="emu ttz transfer factor", noerror=True)
 
-    # flavor/nbjet/MET combined extrapolation
-    hists = get_alpha_hists("ttz", "ChannelOffZHighMET", "ChannelBTagEMu")
-    p.print_yield_table_from_list(hists, "exp/ttz_eemm_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
-    p.print_yield_tex_table_from_list(hists, "exp/ttz_eemm_tf.tex", prec=4, caption="eemm ttz transfer factor", noerror=True)
+def main_bdt():
 
+    for i in xrange(5):
+        print("TF OnZ -> EMu SR BDT bin {}".format(i))
+        hists = get_alpha_hists("zz", "ChannelEMuBDT{}".format(i), "ChannelOnZBDT{}".format(i))
+        p.print_yield_table_from_list(hists, "exp/zz_emu_tf_bdt{}.txt".format(i), prec=4, binrange=[1,2,3], noerror=True)
+        p.print_yield_tex_table_from_list(hists, "exp/zz_emu_tf_bdt{}.tex".format(i), prec=4, caption="emu zz transfer factor BDT{}".format(i), noerror=True)
+
+    for i in ["A", "B"]:
+        print("TF OnZ -> EEMM SR BDT bin {}".format(i))
+        hists = get_alpha_hists("zz", "ChannelOffZBDT{}".format(i), "ChannelOffZBDTCR")
+        p.print_yield_table_from_list(hists, "exp/zz_eemm_tf_bdt{}.txt".format(i), prec=4, binrange=[1,2,3], noerror=True)
+        p.print_yield_tex_table_from_list(hists, "exp/zz_eemm_tf_bdt{}.tex".format(i), prec=4, caption="eemm zz transfer factor BDT{}".format(i), noerror=True)
+
+    for i in xrange(5):
+        # flav BDT bin 0 combined extrapolation
+        print("TF BTag EMu -> EMu SR BDT bin {}".format(i))
+        hists = get_alpha_hists("ttz", "ChannelEMuBDT{}".format(i), "ChannelBTagEMu".format(i))
+        p.print_yield_table_from_list(hists, "exp/ttz_emu_tf_bdt{}.txt".format(i), prec=4, binrange=[1,2,3], noerror=True)
+        p.print_yield_tex_table_from_list(hists, "exp/ttz_emu_tf_bdt{}.tex".format(i), prec=4, caption="emu ttz transfer factor BDT{}".format(i), noerror=True)
+
+    for i in ["A", "B"]:
+        # flav BDT bin 0 combined extrapolation
+        print("TF BTag EMu -> EEMM SR BDT bin {}".format(i))
+        hists = get_alpha_hists("ttz", "ChannelOffZBDT{}".format(i), "ChannelBTagEMu".format(i))
+        p.print_yield_table_from_list(hists, "exp/ttz_eemm_tf_bdt{}.txt".format(i), prec=4, binrange=[1,2,3], noerror=True)
+        p.print_yield_tex_table_from_list(hists, "exp/ttz_eemm_tf_bdt{}.tex".format(i), prec=4, caption="eemm ttz transfer factor BDT{}".format(i), noerror=True)
 
 def main_add():
 
@@ -606,7 +648,74 @@ def main_add():
     p.print_yield_table_from_list(hists, "exp/eff_ratio_zz_mt.txt", prec=4, binrange=[1], noerror=False)
     p.print_yield_tex_table_from_list(hists, "exp/eff_ratio_zz_mt.tex", prec=4, caption="zz cut eff. comparison", noerror=False)
 
+def main_ttz_btag_cut_efficiency_check():
+
+    print("MET/Pt4l cut check in btag (MC)")
+    hists = get_eff_ratios("ttz" , "BTagEMu" , "MET" , "mc")
+    p.print_yield_table_from_list(hists, "exp/mc_eff_ratio_ttz_met.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/mc_eff_ratio_ttz_met.tex", prec=4, caption="ttz cut eff. comparison", noerror=False)
+
+    print("MET/Pt4l cut check in btag (data)")
+    hists = get_eff_ratios("ttz" , "BTagEMu" , "MET" , "data")
+    p.print_yield_table_from_list(hists, "exp/data_eff_ratio_ttz_met.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/data_eff_ratio_ttz_met.tex", prec=4, caption="ttz cut eff. comparison", noerror=False)
+
+    print("MET/Pt4l cut check in btag (data/MC)")
+    hists = get_eff_ratios("ttz" , "BTagEMu" , "MET" , "ratio")
+    p.print_yield_table_from_list(hists, "exp/eff_ratio_ttz_met.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/eff_ratio_ttz_met.tex", prec=4, caption="ttz cut eff. comparison", noerror=False)
+
+    print("MT2 cut check in btag (MC)")
+    hists = get_eff_ratios("ttz" , "BTagEMu" , "MT" , "mc")
+    p.print_yield_table_from_list(hists, "exp/mc_eff_ratio_ttz_mt.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/mc_eff_ratio_ttz_mt.tex", prec=4, caption="ttz cut eff. comparison", noerror=False)
+
+    print("MT2 cut check in btag (data)")
+    hists = get_eff_ratios("ttz" , "BTagEMu" , "MT" , "data")
+    p.print_yield_table_from_list(hists, "exp/data_eff_ratio_ttz_mt.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/data_eff_ratio_ttz_mt.tex", prec=4, caption="ttz cut eff. comparison", noerror=False)
+
+    print("MT2 cut check in btag (data/MC)")
+    hists = get_eff_ratios("ttz" , "BTagEMu" , "MT" , "ratio")
+    p.print_yield_table_from_list(hists, "exp/eff_ratio_ttz_mt.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/eff_ratio_ttz_mt.tex", prec=4, caption="ttz cut eff. comparison", noerror=False)
+
+def main_zz_onz_cut_efficiency_check():
+
+    print("MET/Pt4l cut check in onz (MC)")
+    hists = get_eff_ratios("zz" , "OnZ" , "SR" , "mc")
+    p.print_yield_table_from_list(hists, "exp/mc_eff_ratio_zz_met.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/mc_eff_ratio_zz_met.tex", prec=4, caption="zz cut eff. comparison", noerror=False)
+
+    print("MET/Pt4l cut check in onz (data)")
+    hists = get_eff_ratios("zz" , "OnZ" , "SR" , "data")
+    p.print_yield_table_from_list(hists, "exp/data_eff_ratio_zz_met.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/data_eff_ratio_zz_met.tex", prec=4, caption="zz cut eff. comparison", noerror=False)
+
+    print("MET/Pt4l cut check in onz (data/MC)")
+    hists = get_eff_ratios("zz" , "OnZ" , "SR" , "ratio")
+    p.print_yield_table_from_list(hists, "exp/eff_ratio_zz_met.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/eff_ratio_zz_met.tex", prec=4, caption="zz cut eff. comparison", noerror=False)
+
+    print("MT2 cut check in onz (MC)")
+    hists = get_eff_ratios("zz" , "OnZ" , "MT" , "mc")
+    p.print_yield_table_from_list(hists, "exp/mc_eff_ratio_zz_mt.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/mc_eff_ratio_zz_mt.tex", prec=4, caption="zz cut eff. comparison", noerror=False)
+
+    print("MT2 cut check in onz (data)")
+    hists = get_eff_ratios("zz" , "OnZ" , "MT" , "data")
+    p.print_yield_table_from_list(hists, "exp/data_eff_ratio_zz_mt.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/data_eff_ratio_zz_mt.tex", prec=4, caption="zz cut eff. comparison", noerror=False)
+
+    print("MT2 cut check in onz (data/MC)")
+    hists = get_eff_ratios("zz" , "OnZ" , "MT" , "ratio")
+    p.print_yield_table_from_list(hists, "exp/eff_ratio_zz_mt.txt", prec=4, binrange=[1], noerror=False)
+    p.print_yield_tex_table_from_list(hists, "exp/eff_ratio_zz_mt.tex", prec=4, caption="zz cut eff. comparison", noerror=False)
+
 if __name__ == "__main__":
 
-    main_add()
+    main_zz_onz_cut_efficiency_check()
+    main_ttz_btag_cut_efficiency_check()
+    main()
+    main_bdt()
 

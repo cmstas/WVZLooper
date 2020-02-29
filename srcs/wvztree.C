@@ -6,6 +6,8 @@ void wvztree::Init(TTree *tree) {
   if (gen_V_p4_branch) gen_V_p4_branch->SetAddress(&gen_V_p4_);
   gen_lep_p4_branch = tree->GetBranch("gen_lep_p4");
   if (gen_lep_p4_branch) gen_lep_p4_branch->SetAddress(&gen_lep_p4_);
+  gen_child_p4_branch = tree->GetBranch("gen_child_p4");
+  if (gen_child_p4_branch) gen_child_p4_branch->SetAddress(&gen_child_p4_);
   gen_part_p4_branch = tree->GetBranch("gen_part_p4");
   if (gen_part_p4_branch) gen_part_p4_branch->SetAddress(&gen_part_p4_);
   lep_p4_branch = tree->GetBranch("lep_p4");
@@ -18,6 +20,8 @@ void wvztree::Init(TTree *tree) {
   if (jets_cen_p4_branch) jets_cen_p4_branch->SetAddress(&jets_cen_p4_);
   rawjets_p4_branch = tree->GetBranch("rawjets_p4");
   if (rawjets_p4_branch) rawjets_p4_branch->SetAddress(&rawjets_p4_);
+  J_p4_branch = tree->GetBranch("J_p4");
+  if (J_p4_branch) J_p4_branch->SetAddress(&J_p4_);
 
   tree->SetMakeClass(1);
 
@@ -31,6 +35,8 @@ void wvztree::Init(TTree *tree) {
   if (isData_branch) isData_branch->SetAddress(&isData_);
   evt_scale1fb_branch = tree->GetBranch("evt_scale1fb");
   if (evt_scale1fb_branch) evt_scale1fb_branch->SetAddress(&evt_scale1fb_);
+  nevents_branch = tree->GetBranch("nevents");
+  if (nevents_branch) nevents_branch->SetAddress(&nevents_);
   genps_weight_branch = tree->GetBranch("genps_weight");
   if (genps_weight_branch) genps_weight_branch->SetAddress(&genps_weight_);
   xsec_br_branch = tree->GetBranch("xsec_br");
@@ -67,6 +73,8 @@ void wvztree::Init(TTree *tree) {
   if (weight_alphas_down_branch) weight_alphas_down_branch->SetAddress(&weight_alphas_down_);
   weight_alphas_up_branch = tree->GetBranch("weight_alphas_up");
   if (weight_alphas_up_branch) weight_alphas_up_branch->SetAddress(&weight_alphas_up_);
+  weight_nominal_branch = tree->GetBranch("weight_nominal");
+  if (weight_nominal_branch) weight_nominal_branch->SetAddress(&weight_nominal_);
   HLT_DoubleMu_branch = tree->GetBranch("HLT_DoubleMu");
   if (HLT_DoubleMu_branch) HLT_DoubleMu_branch->SetAddress(&HLT_DoubleMu_);
   HLT_DoubleEl_branch = tree->GetBranch("HLT_DoubleEl");
@@ -99,6 +107,16 @@ void wvztree::Init(TTree *tree) {
   if (gen_lep_mass_branch) gen_lep_mass_branch->SetAddress(&gen_lep_mass_);
   gen_lep_id_branch = tree->GetBranch("gen_lep_id");
   if (gen_lep_id_branch) gen_lep_id_branch->SetAddress(&gen_lep_id_);
+  gen_child_pt_branch = tree->GetBranch("gen_child_pt");
+  if (gen_child_pt_branch) gen_child_pt_branch->SetAddress(&gen_child_pt_);
+  gen_child_eta_branch = tree->GetBranch("gen_child_eta");
+  if (gen_child_eta_branch) gen_child_eta_branch->SetAddress(&gen_child_eta_);
+  gen_child_phi_branch = tree->GetBranch("gen_child_phi");
+  if (gen_child_phi_branch) gen_child_phi_branch->SetAddress(&gen_child_phi_);
+  gen_child_mass_branch = tree->GetBranch("gen_child_mass");
+  if (gen_child_mass_branch) gen_child_mass_branch->SetAddress(&gen_child_mass_);
+  gen_child_id_branch = tree->GetBranch("gen_child_id");
+  if (gen_child_id_branch) gen_child_id_branch->SetAddress(&gen_child_id_);
   gen_part_pt_branch = tree->GetBranch("gen_part_pt");
   if (gen_part_pt_branch) gen_part_pt_branch->SetAddress(&gen_part_pt_);
   gen_part_eta_branch = tree->GetBranch("gen_part_eta");
@@ -133,6 +151,14 @@ void wvztree::Init(TTree *tree) {
   if (nvtx_branch) nvtx_branch->SetAddress(&nvtx_);
   nTrueInt_branch = tree->GetBranch("nTrueInt");
   if (nTrueInt_branch) nTrueInt_branch->SetAddress(&nTrueInt_);
+  lumival_branch = tree->GetBranch("lumival");
+  if (lumival_branch) lumival_branch->SetAddress(&lumival_);
+  puwgt_branch = tree->GetBranch("puwgt");
+  if (puwgt_branch) puwgt_branch->SetAddress(&puwgt_);
+  puwgt_up_branch = tree->GetBranch("puwgt_up");
+  if (puwgt_up_branch) puwgt_up_branch->SetAddress(&puwgt_up_);
+  puwgt_dn_branch = tree->GetBranch("puwgt_dn");
+  if (puwgt_dn_branch) puwgt_dn_branch->SetAddress(&puwgt_dn_);
   lep_pt_branch = tree->GetBranch("lep_pt");
   if (lep_pt_branch) lep_pt_branch->SetAddress(&lep_pt_);
   lep_eta_branch = tree->GetBranch("lep_eta");
@@ -155,6 +181,8 @@ void wvztree::Init(TTree *tree) {
   if (lep_relIso03EAv4_branch) lep_relIso03EAv4_branch->SetAddress(&lep_relIso03EAv4_);
   lep_relIso03EAwLep_branch = tree->GetBranch("lep_relIso03EAwLep");
   if (lep_relIso03EAwLep_branch) lep_relIso03EAwLep_branch->SetAddress(&lep_relIso03EAwLep_);
+  lep_relIso03EAv4wLep_branch = tree->GetBranch("lep_relIso03EAv4wLep");
+  if (lep_relIso03EAv4wLep_branch) lep_relIso03EAv4wLep_branch->SetAddress(&lep_relIso03EAv4wLep_);
   lep_ip3d_branch = tree->GetBranch("lep_ip3d");
   if (lep_ip3d_branch) lep_ip3d_branch->SetAddress(&lep_ip3d_);
   lep_sip3d_branch = tree->GetBranch("lep_sip3d");
@@ -173,6 +201,14 @@ void wvztree::Init(TTree *tree) {
   if (lep_idx_branch) lep_idx_branch->SetAddress(&lep_idx_);
   lep_id_branch = tree->GetBranch("lep_id");
   if (lep_id_branch) lep_id_branch->SetAddress(&lep_id_);
+  lep_isWVZVeto_branch = tree->GetBranch("lep_isWVZVeto");
+  if (lep_isWVZVeto_branch) lep_isWVZVeto_branch->SetAddress(&lep_isWVZVeto_);
+  lep_isWVZNominal_branch = tree->GetBranch("lep_isWVZNominal");
+  if (lep_isWVZNominal_branch) lep_isWVZNominal_branch->SetAddress(&lep_isWVZNominal_);
+  lep_isVVVVeto_branch = tree->GetBranch("lep_isVVVVeto");
+  if (lep_isVVVVeto_branch) lep_isVVVVeto_branch->SetAddress(&lep_isVVVVeto_);
+  lep_isVVVNominal_branch = tree->GetBranch("lep_isVVVNominal");
+  if (lep_isVVVNominal_branch) lep_isVVVNominal_branch->SetAddress(&lep_isVVVNominal_);
   lep_isTightPOG_branch = tree->GetBranch("lep_isTightPOG");
   if (lep_isTightPOG_branch) lep_isTightPOG_branch->SetAddress(&lep_isTightPOG_);
   lep_isMediumPOG_branch = tree->GetBranch("lep_isMediumPOG");
@@ -207,6 +243,18 @@ void wvztree::Init(TTree *tree) {
   if (lep_isCutBasedIsoMediumPOG_branch) lep_isCutBasedIsoMediumPOG_branch->SetAddress(&lep_isCutBasedIsoMediumPOG_);
   lep_isCutBasedIsoTightPOG_branch = tree->GetBranch("lep_isCutBasedIsoTightPOG");
   if (lep_isCutBasedIsoTightPOG_branch) lep_isCutBasedIsoTightPOG_branch->SetAddress(&lep_isCutBasedIsoTightPOG_);
+  met_orig_pt_branch = tree->GetBranch("met_orig_pt");
+  if (met_orig_pt_branch) met_orig_pt_branch->SetAddress(&met_orig_pt_);
+  met_orig_phi_branch = tree->GetBranch("met_orig_phi");
+  if (met_orig_phi_branch) met_orig_phi_branch->SetAddress(&met_orig_phi_);
+  met_orig_up_pt_branch = tree->GetBranch("met_orig_up_pt");
+  if (met_orig_up_pt_branch) met_orig_up_pt_branch->SetAddress(&met_orig_up_pt_);
+  met_orig_up_phi_branch = tree->GetBranch("met_orig_up_phi");
+  if (met_orig_up_phi_branch) met_orig_up_phi_branch->SetAddress(&met_orig_up_phi_);
+  met_orig_dn_pt_branch = tree->GetBranch("met_orig_dn_pt");
+  if (met_orig_dn_pt_branch) met_orig_dn_pt_branch->SetAddress(&met_orig_dn_pt_);
+  met_orig_dn_phi_branch = tree->GetBranch("met_orig_dn_phi");
+  if (met_orig_dn_phi_branch) met_orig_dn_phi_branch->SetAddress(&met_orig_dn_phi_);
   met_pt_branch = tree->GetBranch("met_pt");
   if (met_pt_branch) met_pt_branch->SetAddress(&met_pt_);
   met_phi_branch = tree->GetBranch("met_phi");
@@ -219,6 +267,22 @@ void wvztree::Init(TTree *tree) {
   if (met_dn_pt_branch) met_dn_pt_branch->SetAddress(&met_dn_pt_);
   met_dn_phi_branch = tree->GetBranch("met_dn_phi");
   if (met_dn_phi_branch) met_dn_phi_branch->SetAddress(&met_dn_phi_);
+  met_smearup_pt_branch = tree->GetBranch("met_smearup_pt");
+  if (met_smearup_pt_branch) met_smearup_pt_branch->SetAddress(&met_smearup_pt_);
+  met_smearup_phi_branch = tree->GetBranch("met_smearup_phi");
+  if (met_smearup_phi_branch) met_smearup_phi_branch->SetAddress(&met_smearup_phi_);
+  met_smeardn_pt_branch = tree->GetBranch("met_smeardn_pt");
+  if (met_smeardn_pt_branch) met_smeardn_pt_branch->SetAddress(&met_smeardn_pt_);
+  met_smeardn_phi_branch = tree->GetBranch("met_smeardn_phi");
+  if (met_smeardn_phi_branch) met_smeardn_phi_branch->SetAddress(&met_smeardn_phi_);
+  met_pileupup_pt_branch = tree->GetBranch("met_pileupup_pt");
+  if (met_pileupup_pt_branch) met_pileupup_pt_branch->SetAddress(&met_pileupup_pt_);
+  met_pileupup_phi_branch = tree->GetBranch("met_pileupup_phi");
+  if (met_pileupup_phi_branch) met_pileupup_phi_branch->SetAddress(&met_pileupup_phi_);
+  met_pileupdn_pt_branch = tree->GetBranch("met_pileupdn_pt");
+  if (met_pileupdn_pt_branch) met_pileupdn_pt_branch->SetAddress(&met_pileupdn_pt_);
+  met_pileupdn_phi_branch = tree->GetBranch("met_pileupdn_phi");
+  if (met_pileupdn_phi_branch) met_pileupdn_phi_branch->SetAddress(&met_pileupdn_phi_);
   met_gen_pt_branch = tree->GetBranch("met_gen_pt");
   if (met_gen_pt_branch) met_gen_pt_branch->SetAddress(&met_gen_pt_);
   met_gen_phi_branch = tree->GetBranch("met_gen_phi");
@@ -253,6 +317,8 @@ void wvztree::Init(TTree *tree) {
   if (rawjets_mass_branch) rawjets_mass_branch->SetAddress(&rawjets_mass_);
   rawjets_JEC_branch = tree->GetBranch("rawjets_JEC");
   if (rawjets_JEC_branch) rawjets_JEC_branch->SetAddress(&rawjets_JEC_);
+  rawjets_btag_score_branch = tree->GetBranch("rawjets_btag_score");
+  if (rawjets_btag_score_branch) rawjets_btag_score_branch->SetAddress(&rawjets_btag_score_);
   rawjets_passJetID_branch = tree->GetBranch("rawjets_passJetID");
   if (rawjets_passJetID_branch) rawjets_passJetID_branch->SetAddress(&rawjets_passJetID_);
   rawjets_isORwLep_branch = tree->GetBranch("rawjets_isORwLep");
@@ -271,6 +337,16 @@ void wvztree::Init(TTree *tree) {
   if (nb_dn_branch) nb_dn_branch->SetAddress(&nb_dn_);
   nbmed_branch = tree->GetBranch("nbmed");
   if (nbmed_branch) nbmed_branch->SetAddress(&nbmed_);
+  nbmed_up_branch = tree->GetBranch("nbmed_up");
+  if (nbmed_up_branch) nbmed_up_branch->SetAddress(&nbmed_up_);
+  nbmed_dn_branch = tree->GetBranch("nbmed_dn");
+  if (nbmed_dn_branch) nbmed_dn_branch->SetAddress(&nbmed_dn_);
+  nbtight_branch = tree->GetBranch("nbtight");
+  if (nbtight_branch) nbtight_branch->SetAddress(&nbtight_);
+  nbtight_up_branch = tree->GetBranch("nbtight_up");
+  if (nbtight_up_branch) nbtight_up_branch->SetAddress(&nbtight_up_);
+  nbtight_dn_branch = tree->GetBranch("nbtight_dn");
+  if (nbtight_dn_branch) nbtight_dn_branch->SetAddress(&nbtight_dn_);
   ht_branch = tree->GetBranch("ht");
   if (ht_branch) ht_branch->SetAddress(&ht_);
   nj_cen_branch = tree->GetBranch("nj_cen");
@@ -289,6 +365,88 @@ void wvztree::Init(TTree *tree) {
   if (weight_btagsf_light_DN_branch) weight_btagsf_light_DN_branch->SetAddress(&weight_btagsf_light_DN_);
   weight_btagsf_light_UP_branch = tree->GetBranch("weight_btagsf_light_UP");
   if (weight_btagsf_light_UP_branch) weight_btagsf_light_UP_branch->SetAddress(&weight_btagsf_light_UP_);
+  weight_med_btagsf_branch = tree->GetBranch("weight_med_btagsf");
+  if (weight_med_btagsf_branch) weight_med_btagsf_branch->SetAddress(&weight_med_btagsf_);
+  weight_med_btagsf_heavy_DN_branch = tree->GetBranch("weight_med_btagsf_heavy_DN");
+  if (weight_med_btagsf_heavy_DN_branch) weight_med_btagsf_heavy_DN_branch->SetAddress(&weight_med_btagsf_heavy_DN_);
+  weight_med_btagsf_heavy_UP_branch = tree->GetBranch("weight_med_btagsf_heavy_UP");
+  if (weight_med_btagsf_heavy_UP_branch) weight_med_btagsf_heavy_UP_branch->SetAddress(&weight_med_btagsf_heavy_UP_);
+  weight_med_btagsf_light_DN_branch = tree->GetBranch("weight_med_btagsf_light_DN");
+  if (weight_med_btagsf_light_DN_branch) weight_med_btagsf_light_DN_branch->SetAddress(&weight_med_btagsf_light_DN_);
+  weight_med_btagsf_light_UP_branch = tree->GetBranch("weight_med_btagsf_light_UP");
+  if (weight_med_btagsf_light_UP_branch) weight_med_btagsf_light_UP_branch->SetAddress(&weight_med_btagsf_light_UP_);
+  weight_tight_btagsf_branch = tree->GetBranch("weight_tight_btagsf");
+  if (weight_tight_btagsf_branch) weight_tight_btagsf_branch->SetAddress(&weight_tight_btagsf_);
+  weight_tight_btagsf_heavy_DN_branch = tree->GetBranch("weight_tight_btagsf_heavy_DN");
+  if (weight_tight_btagsf_heavy_DN_branch) weight_tight_btagsf_heavy_DN_branch->SetAddress(&weight_tight_btagsf_heavy_DN_);
+  weight_tight_btagsf_heavy_UP_branch = tree->GetBranch("weight_tight_btagsf_heavy_UP");
+  if (weight_tight_btagsf_heavy_UP_branch) weight_tight_btagsf_heavy_UP_branch->SetAddress(&weight_tight_btagsf_heavy_UP_);
+  weight_tight_btagsf_light_DN_branch = tree->GetBranch("weight_tight_btagsf_light_DN");
+  if (weight_tight_btagsf_light_DN_branch) weight_tight_btagsf_light_DN_branch->SetAddress(&weight_tight_btagsf_light_DN_);
+  weight_tight_btagsf_light_UP_branch = tree->GetBranch("weight_tight_btagsf_light_UP");
+  if (weight_tight_btagsf_light_UP_branch) weight_tight_btagsf_light_UP_branch->SetAddress(&weight_tight_btagsf_light_UP_);
+  J_pt_branch = tree->GetBranch("J_pt");
+  if (J_pt_branch) J_pt_branch->SetAddress(&J_pt_);
+  J_eta_branch = tree->GetBranch("J_eta");
+  if (J_eta_branch) J_eta_branch->SetAddress(&J_eta_);
+  J_phi_branch = tree->GetBranch("J_phi");
+  if (J_phi_branch) J_phi_branch->SetAddress(&J_phi_);
+  J_mass_branch = tree->GetBranch("J_mass");
+  if (J_mass_branch) J_mass_branch->SetAddress(&J_mass_);
+  J_energy_branch = tree->GetBranch("J_energy");
+  if (J_energy_branch) J_energy_branch->SetAddress(&J_energy_);
+  J_SD_mass_branch = tree->GetBranch("J_SD_mass");
+  if (J_SD_mass_branch) J_SD_mass_branch->SetAddress(&J_SD_mass_);
+  J_tau31_branch = tree->GetBranch("J_tau31");
+  if (J_tau31_branch) J_tau31_branch->SetAddress(&J_tau31_);
+  J_tau32_branch = tree->GetBranch("J_tau32");
+  if (J_tau32_branch) J_tau32_branch->SetAddress(&J_tau32_);
+  J_tau21_branch = tree->GetBranch("J_tau21");
+  if (J_tau21_branch) J_tau21_branch->SetAddress(&J_tau21_);
+  J_tau1_branch = tree->GetBranch("J_tau1");
+  if (J_tau1_branch) J_tau1_branch->SetAddress(&J_tau1_);
+  J_tau2_branch = tree->GetBranch("J_tau2");
+  if (J_tau2_branch) J_tau2_branch->SetAddress(&J_tau2_);
+  J_tau3_branch = tree->GetBranch("J_tau3");
+  if (J_tau3_branch) J_tau3_branch->SetAddress(&J_tau3_);
+  J_undoJEC_branch = tree->GetBranch("J_undoJEC");
+  if (J_undoJEC_branch) J_undoJEC_branch->SetAddress(&J_undoJEC_);
+  J_shift_branch = tree->GetBranch("J_shift");
+  if (J_shift_branch) J_shift_branch->SetAddress(&J_shift_);
+  J_deep_rawdisc_h4q_branch = tree->GetBranch("J_deep_rawdisc_h4q");
+  if (J_deep_rawdisc_h4q_branch) J_deep_rawdisc_h4q_branch->SetAddress(&J_deep_rawdisc_h4q_);
+  J_deep_rawdisc_hbb_branch = tree->GetBranch("J_deep_rawdisc_hbb");
+  if (J_deep_rawdisc_hbb_branch) J_deep_rawdisc_hbb_branch->SetAddress(&J_deep_rawdisc_hbb_);
+  J_deep_rawdisc_qcd_branch = tree->GetBranch("J_deep_rawdisc_qcd");
+  if (J_deep_rawdisc_qcd_branch) J_deep_rawdisc_qcd_branch->SetAddress(&J_deep_rawdisc_qcd_);
+  J_deep_rawdisc_top_branch = tree->GetBranch("J_deep_rawdisc_top");
+  if (J_deep_rawdisc_top_branch) J_deep_rawdisc_top_branch->SetAddress(&J_deep_rawdisc_top_);
+  J_deep_rawdisc_w_branch = tree->GetBranch("J_deep_rawdisc_w");
+  if (J_deep_rawdisc_w_branch) J_deep_rawdisc_w_branch->SetAddress(&J_deep_rawdisc_w_);
+  J_deep_rawdisc_z_branch = tree->GetBranch("J_deep_rawdisc_z");
+  if (J_deep_rawdisc_z_branch) J_deep_rawdisc_z_branch->SetAddress(&J_deep_rawdisc_z_);
+  J_deep_rawdisc_zbb_branch = tree->GetBranch("J_deep_rawdisc_zbb");
+  if (J_deep_rawdisc_zbb_branch) J_deep_rawdisc_zbb_branch->SetAddress(&J_deep_rawdisc_zbb_);
+  J_softdropPuppiSubjet1_pt_branch = tree->GetBranch("J_softdropPuppiSubjet1_pt");
+  if (J_softdropPuppiSubjet1_pt_branch) J_softdropPuppiSubjet1_pt_branch->SetAddress(&J_softdropPuppiSubjet1_pt_);
+  J_softdropPuppiSubjet1_eta_branch = tree->GetBranch("J_softdropPuppiSubjet1_eta");
+  if (J_softdropPuppiSubjet1_eta_branch) J_softdropPuppiSubjet1_eta_branch->SetAddress(&J_softdropPuppiSubjet1_eta_);
+  J_softdropPuppiSubjet1_phi_branch = tree->GetBranch("J_softdropPuppiSubjet1_phi");
+  if (J_softdropPuppiSubjet1_phi_branch) J_softdropPuppiSubjet1_phi_branch->SetAddress(&J_softdropPuppiSubjet1_phi_);
+  J_softdropPuppiSubjet1_mass_branch = tree->GetBranch("J_softdropPuppiSubjet1_mass");
+  if (J_softdropPuppiSubjet1_mass_branch) J_softdropPuppiSubjet1_mass_branch->SetAddress(&J_softdropPuppiSubjet1_mass_);
+  J_softdropPuppiSubjet1_energy_branch = tree->GetBranch("J_softdropPuppiSubjet1_energy");
+  if (J_softdropPuppiSubjet1_energy_branch) J_softdropPuppiSubjet1_energy_branch->SetAddress(&J_softdropPuppiSubjet1_energy_);
+  J_softdropPuppiSubjet2_pt_branch = tree->GetBranch("J_softdropPuppiSubjet2_pt");
+  if (J_softdropPuppiSubjet2_pt_branch) J_softdropPuppiSubjet2_pt_branch->SetAddress(&J_softdropPuppiSubjet2_pt_);
+  J_softdropPuppiSubjet2_eta_branch = tree->GetBranch("J_softdropPuppiSubjet2_eta");
+  if (J_softdropPuppiSubjet2_eta_branch) J_softdropPuppiSubjet2_eta_branch->SetAddress(&J_softdropPuppiSubjet2_eta_);
+  J_softdropPuppiSubjet2_phi_branch = tree->GetBranch("J_softdropPuppiSubjet2_phi");
+  if (J_softdropPuppiSubjet2_phi_branch) J_softdropPuppiSubjet2_phi_branch->SetAddress(&J_softdropPuppiSubjet2_phi_);
+  J_softdropPuppiSubjet2_mass_branch = tree->GetBranch("J_softdropPuppiSubjet2_mass");
+  if (J_softdropPuppiSubjet2_mass_branch) J_softdropPuppiSubjet2_mass_branch->SetAddress(&J_softdropPuppiSubjet2_mass_);
+  J_softdropPuppiSubjet2_energy_branch = tree->GetBranch("J_softdropPuppiSubjet2_energy");
+  if (J_softdropPuppiSubjet2_energy_branch) J_softdropPuppiSubjet2_energy_branch->SetAddress(&J_softdropPuppiSubjet2_energy_);
 
   tree->SetMakeClass(0);
 }
@@ -301,6 +459,7 @@ void wvztree::GetEntry(unsigned int idx) {
   evt_isLoaded = false;
   isData_isLoaded = false;
   evt_scale1fb_isLoaded = false;
+  nevents_isLoaded = false;
   genps_weight_isLoaded = false;
   xsec_br_isLoaded = false;
   evt_passgoodrunlist_isLoaded = false;
@@ -319,6 +478,7 @@ void wvztree::GetEntry(unsigned int idx) {
   weight_pdf_down_isLoaded = false;
   weight_alphas_down_isLoaded = false;
   weight_alphas_up_isLoaded = false;
+  weight_nominal_isLoaded = false;
   HLT_DoubleMu_isLoaded = false;
   HLT_DoubleEl_isLoaded = false;
   HLT_MuEG_isLoaded = false;
@@ -337,6 +497,12 @@ void wvztree::GetEntry(unsigned int idx) {
   gen_lep_phi_isLoaded = false;
   gen_lep_mass_isLoaded = false;
   gen_lep_id_isLoaded = false;
+  gen_child_p4_isLoaded = false;
+  gen_child_pt_isLoaded = false;
+  gen_child_eta_isLoaded = false;
+  gen_child_phi_isLoaded = false;
+  gen_child_mass_isLoaded = false;
+  gen_child_id_isLoaded = false;
   gen_part_p4_isLoaded = false;
   gen_part_pt_isLoaded = false;
   gen_part_eta_isLoaded = false;
@@ -355,6 +521,10 @@ void wvztree::GetEntry(unsigned int idx) {
   firstgoodvertex_isLoaded = false;
   nvtx_isLoaded = false;
   nTrueInt_isLoaded = false;
+  lumival_isLoaded = false;
+  puwgt_isLoaded = false;
+  puwgt_up_isLoaded = false;
+  puwgt_dn_isLoaded = false;
   lep_p4_isLoaded = false;
   lep_pt_isLoaded = false;
   lep_eta_isLoaded = false;
@@ -367,6 +537,7 @@ void wvztree::GetEntry(unsigned int idx) {
   lep_relIso03EA_isLoaded = false;
   lep_relIso03EAv4_isLoaded = false;
   lep_relIso03EAwLep_isLoaded = false;
+  lep_relIso03EAv4wLep_isLoaded = false;
   lep_ip3d_isLoaded = false;
   lep_sip3d_isLoaded = false;
   lep_dxy_isLoaded = false;
@@ -376,6 +547,10 @@ void wvztree::GetEntry(unsigned int idx) {
   lep_motherIdv2_isLoaded = false;
   lep_idx_isLoaded = false;
   lep_id_isLoaded = false;
+  lep_isWVZVeto_isLoaded = false;
+  lep_isWVZNominal_isLoaded = false;
+  lep_isVVVVeto_isLoaded = false;
+  lep_isVVVNominal_isLoaded = false;
   lep_isTightPOG_isLoaded = false;
   lep_isMediumPOG_isLoaded = false;
   lep_isMVAwp80NoIsoPOG_isLoaded = false;
@@ -393,6 +568,12 @@ void wvztree::GetEntry(unsigned int idx) {
   lep_isCutBasedIsoLoosePOG_isLoaded = false;
   lep_isCutBasedIsoMediumPOG_isLoaded = false;
   lep_isCutBasedIsoTightPOG_isLoaded = false;
+  met_orig_pt_isLoaded = false;
+  met_orig_phi_isLoaded = false;
+  met_orig_up_pt_isLoaded = false;
+  met_orig_up_phi_isLoaded = false;
+  met_orig_dn_pt_isLoaded = false;
+  met_orig_dn_phi_isLoaded = false;
   met_p4_isLoaded = false;
   met_pt_isLoaded = false;
   met_phi_isLoaded = false;
@@ -400,6 +581,14 @@ void wvztree::GetEntry(unsigned int idx) {
   met_up_phi_isLoaded = false;
   met_dn_pt_isLoaded = false;
   met_dn_phi_isLoaded = false;
+  met_smearup_pt_isLoaded = false;
+  met_smearup_phi_isLoaded = false;
+  met_smeardn_pt_isLoaded = false;
+  met_smeardn_phi_isLoaded = false;
+  met_pileupup_pt_isLoaded = false;
+  met_pileupup_phi_isLoaded = false;
+  met_pileupdn_pt_isLoaded = false;
+  met_pileupdn_phi_isLoaded = false;
   met_gen_pt_isLoaded = false;
   met_gen_phi_isLoaded = false;
   passesMETfiltersRun2_isLoaded = false;
@@ -420,6 +609,7 @@ void wvztree::GetEntry(unsigned int idx) {
   rawjets_phi_isLoaded = false;
   rawjets_mass_isLoaded = false;
   rawjets_JEC_isLoaded = false;
+  rawjets_btag_score_isLoaded = false;
   rawjets_passJetID_isLoaded = false;
   rawjets_isORwLep_isLoaded = false;
   nj_isLoaded = false;
@@ -429,6 +619,11 @@ void wvztree::GetEntry(unsigned int idx) {
   nb_up_isLoaded = false;
   nb_dn_isLoaded = false;
   nbmed_isLoaded = false;
+  nbmed_up_isLoaded = false;
+  nbmed_dn_isLoaded = false;
+  nbtight_isLoaded = false;
+  nbtight_up_isLoaded = false;
+  nbtight_dn_isLoaded = false;
   ht_isLoaded = false;
   nj_cen_isLoaded = false;
   nj_cen_up_isLoaded = false;
@@ -438,6 +633,48 @@ void wvztree::GetEntry(unsigned int idx) {
   weight_btagsf_heavy_UP_isLoaded = false;
   weight_btagsf_light_DN_isLoaded = false;
   weight_btagsf_light_UP_isLoaded = false;
+  weight_med_btagsf_isLoaded = false;
+  weight_med_btagsf_heavy_DN_isLoaded = false;
+  weight_med_btagsf_heavy_UP_isLoaded = false;
+  weight_med_btagsf_light_DN_isLoaded = false;
+  weight_med_btagsf_light_UP_isLoaded = false;
+  weight_tight_btagsf_isLoaded = false;
+  weight_tight_btagsf_heavy_DN_isLoaded = false;
+  weight_tight_btagsf_heavy_UP_isLoaded = false;
+  weight_tight_btagsf_light_DN_isLoaded = false;
+  weight_tight_btagsf_light_UP_isLoaded = false;
+  J_p4_isLoaded = false;
+  J_pt_isLoaded = false;
+  J_eta_isLoaded = false;
+  J_phi_isLoaded = false;
+  J_mass_isLoaded = false;
+  J_energy_isLoaded = false;
+  J_SD_mass_isLoaded = false;
+  J_tau31_isLoaded = false;
+  J_tau32_isLoaded = false;
+  J_tau21_isLoaded = false;
+  J_tau1_isLoaded = false;
+  J_tau2_isLoaded = false;
+  J_tau3_isLoaded = false;
+  J_undoJEC_isLoaded = false;
+  J_shift_isLoaded = false;
+  J_deep_rawdisc_h4q_isLoaded = false;
+  J_deep_rawdisc_hbb_isLoaded = false;
+  J_deep_rawdisc_qcd_isLoaded = false;
+  J_deep_rawdisc_top_isLoaded = false;
+  J_deep_rawdisc_w_isLoaded = false;
+  J_deep_rawdisc_z_isLoaded = false;
+  J_deep_rawdisc_zbb_isLoaded = false;
+  J_softdropPuppiSubjet1_pt_isLoaded = false;
+  J_softdropPuppiSubjet1_eta_isLoaded = false;
+  J_softdropPuppiSubjet1_phi_isLoaded = false;
+  J_softdropPuppiSubjet1_mass_isLoaded = false;
+  J_softdropPuppiSubjet1_energy_isLoaded = false;
+  J_softdropPuppiSubjet2_pt_isLoaded = false;
+  J_softdropPuppiSubjet2_eta_isLoaded = false;
+  J_softdropPuppiSubjet2_phi_isLoaded = false;
+  J_softdropPuppiSubjet2_mass_isLoaded = false;
+  J_softdropPuppiSubjet2_energy_isLoaded = false;
 }
 
 void wvztree::LoadAllBranches() {
@@ -447,6 +684,7 @@ void wvztree::LoadAllBranches() {
   if (evt_branch != 0) evt();
   if (isData_branch != 0) isData();
   if (evt_scale1fb_branch != 0) evt_scale1fb();
+  if (nevents_branch != 0) nevents();
   if (genps_weight_branch != 0) genps_weight();
   if (xsec_br_branch != 0) xsec_br();
   if (evt_passgoodrunlist_branch != 0) evt_passgoodrunlist();
@@ -465,6 +703,7 @@ void wvztree::LoadAllBranches() {
   if (weight_pdf_down_branch != 0) weight_pdf_down();
   if (weight_alphas_down_branch != 0) weight_alphas_down();
   if (weight_alphas_up_branch != 0) weight_alphas_up();
+  if (weight_nominal_branch != 0) weight_nominal();
   if (HLT_DoubleMu_branch != 0) HLT_DoubleMu();
   if (HLT_DoubleEl_branch != 0) HLT_DoubleEl();
   if (HLT_MuEG_branch != 0) HLT_MuEG();
@@ -483,6 +722,12 @@ void wvztree::LoadAllBranches() {
   if (gen_lep_phi_branch != 0) gen_lep_phi();
   if (gen_lep_mass_branch != 0) gen_lep_mass();
   if (gen_lep_id_branch != 0) gen_lep_id();
+  if (gen_child_p4_branch != 0) gen_child_p4();
+  if (gen_child_pt_branch != 0) gen_child_pt();
+  if (gen_child_eta_branch != 0) gen_child_eta();
+  if (gen_child_phi_branch != 0) gen_child_phi();
+  if (gen_child_mass_branch != 0) gen_child_mass();
+  if (gen_child_id_branch != 0) gen_child_id();
   if (gen_part_p4_branch != 0) gen_part_p4();
   if (gen_part_pt_branch != 0) gen_part_pt();
   if (gen_part_eta_branch != 0) gen_part_eta();
@@ -501,6 +746,10 @@ void wvztree::LoadAllBranches() {
   if (firstgoodvertex_branch != 0) firstgoodvertex();
   if (nvtx_branch != 0) nvtx();
   if (nTrueInt_branch != 0) nTrueInt();
+  if (lumival_branch != 0) lumival();
+  if (puwgt_branch != 0) puwgt();
+  if (puwgt_up_branch != 0) puwgt_up();
+  if (puwgt_dn_branch != 0) puwgt_dn();
   if (lep_p4_branch != 0) lep_p4();
   if (lep_pt_branch != 0) lep_pt();
   if (lep_eta_branch != 0) lep_eta();
@@ -513,6 +762,7 @@ void wvztree::LoadAllBranches() {
   if (lep_relIso03EA_branch != 0) lep_relIso03EA();
   if (lep_relIso03EAv4_branch != 0) lep_relIso03EAv4();
   if (lep_relIso03EAwLep_branch != 0) lep_relIso03EAwLep();
+  if (lep_relIso03EAv4wLep_branch != 0) lep_relIso03EAv4wLep();
   if (lep_ip3d_branch != 0) lep_ip3d();
   if (lep_sip3d_branch != 0) lep_sip3d();
   if (lep_dxy_branch != 0) lep_dxy();
@@ -522,6 +772,10 @@ void wvztree::LoadAllBranches() {
   if (lep_motherIdv2_branch != 0) lep_motherIdv2();
   if (lep_idx_branch != 0) lep_idx();
   if (lep_id_branch != 0) lep_id();
+  if (lep_isWVZVeto_branch != 0) lep_isWVZVeto();
+  if (lep_isWVZNominal_branch != 0) lep_isWVZNominal();
+  if (lep_isVVVVeto_branch != 0) lep_isVVVVeto();
+  if (lep_isVVVNominal_branch != 0) lep_isVVVNominal();
   if (lep_isTightPOG_branch != 0) lep_isTightPOG();
   if (lep_isMediumPOG_branch != 0) lep_isMediumPOG();
   if (lep_isMVAwp80NoIsoPOG_branch != 0) lep_isMVAwp80NoIsoPOG();
@@ -539,6 +793,12 @@ void wvztree::LoadAllBranches() {
   if (lep_isCutBasedIsoLoosePOG_branch != 0) lep_isCutBasedIsoLoosePOG();
   if (lep_isCutBasedIsoMediumPOG_branch != 0) lep_isCutBasedIsoMediumPOG();
   if (lep_isCutBasedIsoTightPOG_branch != 0) lep_isCutBasedIsoTightPOG();
+  if (met_orig_pt_branch != 0) met_orig_pt();
+  if (met_orig_phi_branch != 0) met_orig_phi();
+  if (met_orig_up_pt_branch != 0) met_orig_up_pt();
+  if (met_orig_up_phi_branch != 0) met_orig_up_phi();
+  if (met_orig_dn_pt_branch != 0) met_orig_dn_pt();
+  if (met_orig_dn_phi_branch != 0) met_orig_dn_phi();
   if (met_p4_branch != 0) met_p4();
   if (met_pt_branch != 0) met_pt();
   if (met_phi_branch != 0) met_phi();
@@ -546,6 +806,14 @@ void wvztree::LoadAllBranches() {
   if (met_up_phi_branch != 0) met_up_phi();
   if (met_dn_pt_branch != 0) met_dn_pt();
   if (met_dn_phi_branch != 0) met_dn_phi();
+  if (met_smearup_pt_branch != 0) met_smearup_pt();
+  if (met_smearup_phi_branch != 0) met_smearup_phi();
+  if (met_smeardn_pt_branch != 0) met_smeardn_pt();
+  if (met_smeardn_phi_branch != 0) met_smeardn_phi();
+  if (met_pileupup_pt_branch != 0) met_pileupup_pt();
+  if (met_pileupup_phi_branch != 0) met_pileupup_phi();
+  if (met_pileupdn_pt_branch != 0) met_pileupdn_pt();
+  if (met_pileupdn_phi_branch != 0) met_pileupdn_phi();
   if (met_gen_pt_branch != 0) met_gen_pt();
   if (met_gen_phi_branch != 0) met_gen_phi();
   if (passesMETfiltersRun2_branch != 0) passesMETfiltersRun2();
@@ -566,6 +834,7 @@ void wvztree::LoadAllBranches() {
   if (rawjets_phi_branch != 0) rawjets_phi();
   if (rawjets_mass_branch != 0) rawjets_mass();
   if (rawjets_JEC_branch != 0) rawjets_JEC();
+  if (rawjets_btag_score_branch != 0) rawjets_btag_score();
   if (rawjets_passJetID_branch != 0) rawjets_passJetID();
   if (rawjets_isORwLep_branch != 0) rawjets_isORwLep();
   if (nj_branch != 0) nj();
@@ -575,6 +844,11 @@ void wvztree::LoadAllBranches() {
   if (nb_up_branch != 0) nb_up();
   if (nb_dn_branch != 0) nb_dn();
   if (nbmed_branch != 0) nbmed();
+  if (nbmed_up_branch != 0) nbmed_up();
+  if (nbmed_dn_branch != 0) nbmed_dn();
+  if (nbtight_branch != 0) nbtight();
+  if (nbtight_up_branch != 0) nbtight_up();
+  if (nbtight_dn_branch != 0) nbtight_dn();
   if (ht_branch != 0) ht();
   if (nj_cen_branch != 0) nj_cen();
   if (nj_cen_up_branch != 0) nj_cen_up();
@@ -584,6 +858,48 @@ void wvztree::LoadAllBranches() {
   if (weight_btagsf_heavy_UP_branch != 0) weight_btagsf_heavy_UP();
   if (weight_btagsf_light_DN_branch != 0) weight_btagsf_light_DN();
   if (weight_btagsf_light_UP_branch != 0) weight_btagsf_light_UP();
+  if (weight_med_btagsf_branch != 0) weight_med_btagsf();
+  if (weight_med_btagsf_heavy_DN_branch != 0) weight_med_btagsf_heavy_DN();
+  if (weight_med_btagsf_heavy_UP_branch != 0) weight_med_btagsf_heavy_UP();
+  if (weight_med_btagsf_light_DN_branch != 0) weight_med_btagsf_light_DN();
+  if (weight_med_btagsf_light_UP_branch != 0) weight_med_btagsf_light_UP();
+  if (weight_tight_btagsf_branch != 0) weight_tight_btagsf();
+  if (weight_tight_btagsf_heavy_DN_branch != 0) weight_tight_btagsf_heavy_DN();
+  if (weight_tight_btagsf_heavy_UP_branch != 0) weight_tight_btagsf_heavy_UP();
+  if (weight_tight_btagsf_light_DN_branch != 0) weight_tight_btagsf_light_DN();
+  if (weight_tight_btagsf_light_UP_branch != 0) weight_tight_btagsf_light_UP();
+  if (J_p4_branch != 0) J_p4();
+  if (J_pt_branch != 0) J_pt();
+  if (J_eta_branch != 0) J_eta();
+  if (J_phi_branch != 0) J_phi();
+  if (J_mass_branch != 0) J_mass();
+  if (J_energy_branch != 0) J_energy();
+  if (J_SD_mass_branch != 0) J_SD_mass();
+  if (J_tau31_branch != 0) J_tau31();
+  if (J_tau32_branch != 0) J_tau32();
+  if (J_tau21_branch != 0) J_tau21();
+  if (J_tau1_branch != 0) J_tau1();
+  if (J_tau2_branch != 0) J_tau2();
+  if (J_tau3_branch != 0) J_tau3();
+  if (J_undoJEC_branch != 0) J_undoJEC();
+  if (J_shift_branch != 0) J_shift();
+  if (J_deep_rawdisc_h4q_branch != 0) J_deep_rawdisc_h4q();
+  if (J_deep_rawdisc_hbb_branch != 0) J_deep_rawdisc_hbb();
+  if (J_deep_rawdisc_qcd_branch != 0) J_deep_rawdisc_qcd();
+  if (J_deep_rawdisc_top_branch != 0) J_deep_rawdisc_top();
+  if (J_deep_rawdisc_w_branch != 0) J_deep_rawdisc_w();
+  if (J_deep_rawdisc_z_branch != 0) J_deep_rawdisc_z();
+  if (J_deep_rawdisc_zbb_branch != 0) J_deep_rawdisc_zbb();
+  if (J_softdropPuppiSubjet1_pt_branch != 0) J_softdropPuppiSubjet1_pt();
+  if (J_softdropPuppiSubjet1_eta_branch != 0) J_softdropPuppiSubjet1_eta();
+  if (J_softdropPuppiSubjet1_phi_branch != 0) J_softdropPuppiSubjet1_phi();
+  if (J_softdropPuppiSubjet1_mass_branch != 0) J_softdropPuppiSubjet1_mass();
+  if (J_softdropPuppiSubjet1_energy_branch != 0) J_softdropPuppiSubjet1_energy();
+  if (J_softdropPuppiSubjet2_pt_branch != 0) J_softdropPuppiSubjet2_pt();
+  if (J_softdropPuppiSubjet2_eta_branch != 0) J_softdropPuppiSubjet2_eta();
+  if (J_softdropPuppiSubjet2_phi_branch != 0) J_softdropPuppiSubjet2_phi();
+  if (J_softdropPuppiSubjet2_mass_branch != 0) J_softdropPuppiSubjet2_mass();
+  if (J_softdropPuppiSubjet2_energy_branch != 0) J_softdropPuppiSubjet2_energy();
 }
 
 const int &wvztree::run() {
@@ -649,6 +965,19 @@ const float &wvztree::evt_scale1fb() {
     evt_scale1fb_isLoaded = true;
   }
   return evt_scale1fb_;
+}
+
+const int &wvztree::nevents() {
+  if (not nevents_isLoaded) {
+    if (nevents_branch != 0) {
+      nevents_branch->GetEntry(index);
+    } else {
+      printf("branch nevents_branch does not exist!\n");
+      exit(1);
+    }
+    nevents_isLoaded = true;
+  }
+  return nevents_;
 }
 
 const float &wvztree::genps_weight() {
@@ -885,6 +1214,19 @@ const float &wvztree::weight_alphas_up() {
   return weight_alphas_up_;
 }
 
+const float &wvztree::weight_nominal() {
+  if (not weight_nominal_isLoaded) {
+    if (weight_nominal_branch != 0) {
+      weight_nominal_branch->GetEntry(index);
+    } else {
+      printf("branch weight_nominal_branch does not exist!\n");
+      exit(1);
+    }
+    weight_nominal_isLoaded = true;
+  }
+  return weight_nominal_;
+}
+
 const int &wvztree::HLT_DoubleMu() {
   if (not HLT_DoubleMu_isLoaded) {
     if (HLT_DoubleMu_branch != 0) {
@@ -1117,6 +1459,84 @@ const vector<int> &wvztree::gen_lep_id() {
     gen_lep_id_isLoaded = true;
   }
   return *gen_lep_id_;
+}
+
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &wvztree::gen_child_p4() {
+  if (not gen_child_p4_isLoaded) {
+    if (gen_child_p4_branch != 0) {
+      gen_child_p4_branch->GetEntry(index);
+    } else {
+      printf("branch gen_child_p4_branch does not exist!\n");
+      exit(1);
+    }
+    gen_child_p4_isLoaded = true;
+  }
+  return *gen_child_p4_;
+}
+
+const vector<float> &wvztree::gen_child_pt() {
+  if (not gen_child_pt_isLoaded) {
+    if (gen_child_pt_branch != 0) {
+      gen_child_pt_branch->GetEntry(index);
+    } else {
+      printf("branch gen_child_pt_branch does not exist!\n");
+      exit(1);
+    }
+    gen_child_pt_isLoaded = true;
+  }
+  return *gen_child_pt_;
+}
+
+const vector<float> &wvztree::gen_child_eta() {
+  if (not gen_child_eta_isLoaded) {
+    if (gen_child_eta_branch != 0) {
+      gen_child_eta_branch->GetEntry(index);
+    } else {
+      printf("branch gen_child_eta_branch does not exist!\n");
+      exit(1);
+    }
+    gen_child_eta_isLoaded = true;
+  }
+  return *gen_child_eta_;
+}
+
+const vector<float> &wvztree::gen_child_phi() {
+  if (not gen_child_phi_isLoaded) {
+    if (gen_child_phi_branch != 0) {
+      gen_child_phi_branch->GetEntry(index);
+    } else {
+      printf("branch gen_child_phi_branch does not exist!\n");
+      exit(1);
+    }
+    gen_child_phi_isLoaded = true;
+  }
+  return *gen_child_phi_;
+}
+
+const vector<float> &wvztree::gen_child_mass() {
+  if (not gen_child_mass_isLoaded) {
+    if (gen_child_mass_branch != 0) {
+      gen_child_mass_branch->GetEntry(index);
+    } else {
+      printf("branch gen_child_mass_branch does not exist!\n");
+      exit(1);
+    }
+    gen_child_mass_isLoaded = true;
+  }
+  return *gen_child_mass_;
+}
+
+const vector<int> &wvztree::gen_child_id() {
+  if (not gen_child_id_isLoaded) {
+    if (gen_child_id_branch != 0) {
+      gen_child_id_branch->GetEntry(index);
+    } else {
+      printf("branch gen_child_id_branch does not exist!\n");
+      exit(1);
+    }
+    gen_child_id_isLoaded = true;
+  }
+  return *gen_child_id_;
 }
 
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &wvztree::gen_part_p4() {
@@ -1353,6 +1773,58 @@ const int &wvztree::nTrueInt() {
   return nTrueInt_;
 }
 
+const float &wvztree::lumival() {
+  if (not lumival_isLoaded) {
+    if (lumival_branch != 0) {
+      lumival_branch->GetEntry(index);
+    } else {
+      printf("branch lumival_branch does not exist!\n");
+      exit(1);
+    }
+    lumival_isLoaded = true;
+  }
+  return lumival_;
+}
+
+const float &wvztree::puwgt() {
+  if (not puwgt_isLoaded) {
+    if (puwgt_branch != 0) {
+      puwgt_branch->GetEntry(index);
+    } else {
+      printf("branch puwgt_branch does not exist!\n");
+      exit(1);
+    }
+    puwgt_isLoaded = true;
+  }
+  return puwgt_;
+}
+
+const float &wvztree::puwgt_up() {
+  if (not puwgt_up_isLoaded) {
+    if (puwgt_up_branch != 0) {
+      puwgt_up_branch->GetEntry(index);
+    } else {
+      printf("branch puwgt_up_branch does not exist!\n");
+      exit(1);
+    }
+    puwgt_up_isLoaded = true;
+  }
+  return puwgt_up_;
+}
+
+const float &wvztree::puwgt_dn() {
+  if (not puwgt_dn_isLoaded) {
+    if (puwgt_dn_branch != 0) {
+      puwgt_dn_branch->GetEntry(index);
+    } else {
+      printf("branch puwgt_dn_branch does not exist!\n");
+      exit(1);
+    }
+    puwgt_dn_isLoaded = true;
+  }
+  return puwgt_dn_;
+}
+
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &wvztree::lep_p4() {
   if (not lep_p4_isLoaded) {
     if (lep_p4_branch != 0) {
@@ -1509,6 +1981,19 @@ const vector<float> &wvztree::lep_relIso03EAwLep() {
   return *lep_relIso03EAwLep_;
 }
 
+const vector<float> &wvztree::lep_relIso03EAv4wLep() {
+  if (not lep_relIso03EAv4wLep_isLoaded) {
+    if (lep_relIso03EAv4wLep_branch != 0) {
+      lep_relIso03EAv4wLep_branch->GetEntry(index);
+    } else {
+      printf("branch lep_relIso03EAv4wLep_branch does not exist!\n");
+      exit(1);
+    }
+    lep_relIso03EAv4wLep_isLoaded = true;
+  }
+  return *lep_relIso03EAv4wLep_;
+}
+
 const vector<float> &wvztree::lep_ip3d() {
   if (not lep_ip3d_isLoaded) {
     if (lep_ip3d_branch != 0) {
@@ -1624,6 +2109,58 @@ const vector<int> &wvztree::lep_id() {
     lep_id_isLoaded = true;
   }
   return *lep_id_;
+}
+
+const vector<int> &wvztree::lep_isWVZVeto() {
+  if (not lep_isWVZVeto_isLoaded) {
+    if (lep_isWVZVeto_branch != 0) {
+      lep_isWVZVeto_branch->GetEntry(index);
+    } else {
+      printf("branch lep_isWVZVeto_branch does not exist!\n");
+      exit(1);
+    }
+    lep_isWVZVeto_isLoaded = true;
+  }
+  return *lep_isWVZVeto_;
+}
+
+const vector<int> &wvztree::lep_isWVZNominal() {
+  if (not lep_isWVZNominal_isLoaded) {
+    if (lep_isWVZNominal_branch != 0) {
+      lep_isWVZNominal_branch->GetEntry(index);
+    } else {
+      printf("branch lep_isWVZNominal_branch does not exist!\n");
+      exit(1);
+    }
+    lep_isWVZNominal_isLoaded = true;
+  }
+  return *lep_isWVZNominal_;
+}
+
+const vector<int> &wvztree::lep_isVVVVeto() {
+  if (not lep_isVVVVeto_isLoaded) {
+    if (lep_isVVVVeto_branch != 0) {
+      lep_isVVVVeto_branch->GetEntry(index);
+    } else {
+      printf("branch lep_isVVVVeto_branch does not exist!\n");
+      exit(1);
+    }
+    lep_isVVVVeto_isLoaded = true;
+  }
+  return *lep_isVVVVeto_;
+}
+
+const vector<int> &wvztree::lep_isVVVNominal() {
+  if (not lep_isVVVNominal_isLoaded) {
+    if (lep_isVVVNominal_branch != 0) {
+      lep_isVVVNominal_branch->GetEntry(index);
+    } else {
+      printf("branch lep_isVVVNominal_branch does not exist!\n");
+      exit(1);
+    }
+    lep_isVVVNominal_isLoaded = true;
+  }
+  return *lep_isVVVNominal_;
 }
 
 const vector<int> &wvztree::lep_isTightPOG() {
@@ -1847,6 +2384,84 @@ const vector<int> &wvztree::lep_isCutBasedIsoTightPOG() {
   return *lep_isCutBasedIsoTightPOG_;
 }
 
+const float &wvztree::met_orig_pt() {
+  if (not met_orig_pt_isLoaded) {
+    if (met_orig_pt_branch != 0) {
+      met_orig_pt_branch->GetEntry(index);
+    } else {
+      printf("branch met_orig_pt_branch does not exist!\n");
+      exit(1);
+    }
+    met_orig_pt_isLoaded = true;
+  }
+  return met_orig_pt_;
+}
+
+const float &wvztree::met_orig_phi() {
+  if (not met_orig_phi_isLoaded) {
+    if (met_orig_phi_branch != 0) {
+      met_orig_phi_branch->GetEntry(index);
+    } else {
+      printf("branch met_orig_phi_branch does not exist!\n");
+      exit(1);
+    }
+    met_orig_phi_isLoaded = true;
+  }
+  return met_orig_phi_;
+}
+
+const float &wvztree::met_orig_up_pt() {
+  if (not met_orig_up_pt_isLoaded) {
+    if (met_orig_up_pt_branch != 0) {
+      met_orig_up_pt_branch->GetEntry(index);
+    } else {
+      printf("branch met_orig_up_pt_branch does not exist!\n");
+      exit(1);
+    }
+    met_orig_up_pt_isLoaded = true;
+  }
+  return met_orig_up_pt_;
+}
+
+const float &wvztree::met_orig_up_phi() {
+  if (not met_orig_up_phi_isLoaded) {
+    if (met_orig_up_phi_branch != 0) {
+      met_orig_up_phi_branch->GetEntry(index);
+    } else {
+      printf("branch met_orig_up_phi_branch does not exist!\n");
+      exit(1);
+    }
+    met_orig_up_phi_isLoaded = true;
+  }
+  return met_orig_up_phi_;
+}
+
+const float &wvztree::met_orig_dn_pt() {
+  if (not met_orig_dn_pt_isLoaded) {
+    if (met_orig_dn_pt_branch != 0) {
+      met_orig_dn_pt_branch->GetEntry(index);
+    } else {
+      printf("branch met_orig_dn_pt_branch does not exist!\n");
+      exit(1);
+    }
+    met_orig_dn_pt_isLoaded = true;
+  }
+  return met_orig_dn_pt_;
+}
+
+const float &wvztree::met_orig_dn_phi() {
+  if (not met_orig_dn_phi_isLoaded) {
+    if (met_orig_dn_phi_branch != 0) {
+      met_orig_dn_phi_branch->GetEntry(index);
+    } else {
+      printf("branch met_orig_dn_phi_branch does not exist!\n");
+      exit(1);
+    }
+    met_orig_dn_phi_isLoaded = true;
+  }
+  return met_orig_dn_phi_;
+}
+
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &wvztree::met_p4() {
   if (not met_p4_isLoaded) {
     if (met_p4_branch != 0) {
@@ -1936,6 +2551,110 @@ const float &wvztree::met_dn_phi() {
     met_dn_phi_isLoaded = true;
   }
   return met_dn_phi_;
+}
+
+const float &wvztree::met_smearup_pt() {
+  if (not met_smearup_pt_isLoaded) {
+    if (met_smearup_pt_branch != 0) {
+      met_smearup_pt_branch->GetEntry(index);
+    } else {
+      printf("branch met_smearup_pt_branch does not exist!\n");
+      exit(1);
+    }
+    met_smearup_pt_isLoaded = true;
+  }
+  return met_smearup_pt_;
+}
+
+const float &wvztree::met_smearup_phi() {
+  if (not met_smearup_phi_isLoaded) {
+    if (met_smearup_phi_branch != 0) {
+      met_smearup_phi_branch->GetEntry(index);
+    } else {
+      printf("branch met_smearup_phi_branch does not exist!\n");
+      exit(1);
+    }
+    met_smearup_phi_isLoaded = true;
+  }
+  return met_smearup_phi_;
+}
+
+const float &wvztree::met_smeardn_pt() {
+  if (not met_smeardn_pt_isLoaded) {
+    if (met_smeardn_pt_branch != 0) {
+      met_smeardn_pt_branch->GetEntry(index);
+    } else {
+      printf("branch met_smeardn_pt_branch does not exist!\n");
+      exit(1);
+    }
+    met_smeardn_pt_isLoaded = true;
+  }
+  return met_smeardn_pt_;
+}
+
+const float &wvztree::met_smeardn_phi() {
+  if (not met_smeardn_phi_isLoaded) {
+    if (met_smeardn_phi_branch != 0) {
+      met_smeardn_phi_branch->GetEntry(index);
+    } else {
+      printf("branch met_smeardn_phi_branch does not exist!\n");
+      exit(1);
+    }
+    met_smeardn_phi_isLoaded = true;
+  }
+  return met_smeardn_phi_;
+}
+
+const float &wvztree::met_pileupup_pt() {
+  if (not met_pileupup_pt_isLoaded) {
+    if (met_pileupup_pt_branch != 0) {
+      met_pileupup_pt_branch->GetEntry(index);
+    } else {
+      printf("branch met_pileupup_pt_branch does not exist!\n");
+      exit(1);
+    }
+    met_pileupup_pt_isLoaded = true;
+  }
+  return met_pileupup_pt_;
+}
+
+const float &wvztree::met_pileupup_phi() {
+  if (not met_pileupup_phi_isLoaded) {
+    if (met_pileupup_phi_branch != 0) {
+      met_pileupup_phi_branch->GetEntry(index);
+    } else {
+      printf("branch met_pileupup_phi_branch does not exist!\n");
+      exit(1);
+    }
+    met_pileupup_phi_isLoaded = true;
+  }
+  return met_pileupup_phi_;
+}
+
+const float &wvztree::met_pileupdn_pt() {
+  if (not met_pileupdn_pt_isLoaded) {
+    if (met_pileupdn_pt_branch != 0) {
+      met_pileupdn_pt_branch->GetEntry(index);
+    } else {
+      printf("branch met_pileupdn_pt_branch does not exist!\n");
+      exit(1);
+    }
+    met_pileupdn_pt_isLoaded = true;
+  }
+  return met_pileupdn_pt_;
+}
+
+const float &wvztree::met_pileupdn_phi() {
+  if (not met_pileupdn_phi_isLoaded) {
+    if (met_pileupdn_phi_branch != 0) {
+      met_pileupdn_phi_branch->GetEntry(index);
+    } else {
+      printf("branch met_pileupdn_phi_branch does not exist!\n");
+      exit(1);
+    }
+    met_pileupdn_phi_isLoaded = true;
+  }
+  return met_pileupdn_phi_;
 }
 
 const float &wvztree::met_gen_pt() {
@@ -2198,6 +2917,19 @@ const vector<float> &wvztree::rawjets_JEC() {
   return *rawjets_JEC_;
 }
 
+const vector<float> &wvztree::rawjets_btag_score() {
+  if (not rawjets_btag_score_isLoaded) {
+    if (rawjets_btag_score_branch != 0) {
+      rawjets_btag_score_branch->GetEntry(index);
+    } else {
+      printf("branch rawjets_btag_score_branch does not exist!\n");
+      exit(1);
+    }
+    rawjets_btag_score_isLoaded = true;
+  }
+  return *rawjets_btag_score_;
+}
+
 const vector<int> &wvztree::rawjets_passJetID() {
   if (not rawjets_passJetID_isLoaded) {
     if (rawjets_passJetID_branch != 0) {
@@ -2313,6 +3045,71 @@ const int &wvztree::nbmed() {
     nbmed_isLoaded = true;
   }
   return nbmed_;
+}
+
+const int &wvztree::nbmed_up() {
+  if (not nbmed_up_isLoaded) {
+    if (nbmed_up_branch != 0) {
+      nbmed_up_branch->GetEntry(index);
+    } else {
+      printf("branch nbmed_up_branch does not exist!\n");
+      exit(1);
+    }
+    nbmed_up_isLoaded = true;
+  }
+  return nbmed_up_;
+}
+
+const int &wvztree::nbmed_dn() {
+  if (not nbmed_dn_isLoaded) {
+    if (nbmed_dn_branch != 0) {
+      nbmed_dn_branch->GetEntry(index);
+    } else {
+      printf("branch nbmed_dn_branch does not exist!\n");
+      exit(1);
+    }
+    nbmed_dn_isLoaded = true;
+  }
+  return nbmed_dn_;
+}
+
+const int &wvztree::nbtight() {
+  if (not nbtight_isLoaded) {
+    if (nbtight_branch != 0) {
+      nbtight_branch->GetEntry(index);
+    } else {
+      printf("branch nbtight_branch does not exist!\n");
+      exit(1);
+    }
+    nbtight_isLoaded = true;
+  }
+  return nbtight_;
+}
+
+const int &wvztree::nbtight_up() {
+  if (not nbtight_up_isLoaded) {
+    if (nbtight_up_branch != 0) {
+      nbtight_up_branch->GetEntry(index);
+    } else {
+      printf("branch nbtight_up_branch does not exist!\n");
+      exit(1);
+    }
+    nbtight_up_isLoaded = true;
+  }
+  return nbtight_up_;
+}
+
+const int &wvztree::nbtight_dn() {
+  if (not nbtight_dn_isLoaded) {
+    if (nbtight_dn_branch != 0) {
+      nbtight_dn_branch->GetEntry(index);
+    } else {
+      printf("branch nbtight_dn_branch does not exist!\n");
+      exit(1);
+    }
+    nbtight_dn_isLoaded = true;
+  }
+  return nbtight_dn_;
 }
 
 const float &wvztree::ht() {
@@ -2432,6 +3229,552 @@ const float &wvztree::weight_btagsf_light_UP() {
   return weight_btagsf_light_UP_;
 }
 
+const float &wvztree::weight_med_btagsf() {
+  if (not weight_med_btagsf_isLoaded) {
+    if (weight_med_btagsf_branch != 0) {
+      weight_med_btagsf_branch->GetEntry(index);
+    } else {
+      printf("branch weight_med_btagsf_branch does not exist!\n");
+      exit(1);
+    }
+    weight_med_btagsf_isLoaded = true;
+  }
+  return weight_med_btagsf_;
+}
+
+const float &wvztree::weight_med_btagsf_heavy_DN() {
+  if (not weight_med_btagsf_heavy_DN_isLoaded) {
+    if (weight_med_btagsf_heavy_DN_branch != 0) {
+      weight_med_btagsf_heavy_DN_branch->GetEntry(index);
+    } else {
+      printf("branch weight_med_btagsf_heavy_DN_branch does not exist!\n");
+      exit(1);
+    }
+    weight_med_btagsf_heavy_DN_isLoaded = true;
+  }
+  return weight_med_btagsf_heavy_DN_;
+}
+
+const float &wvztree::weight_med_btagsf_heavy_UP() {
+  if (not weight_med_btagsf_heavy_UP_isLoaded) {
+    if (weight_med_btagsf_heavy_UP_branch != 0) {
+      weight_med_btagsf_heavy_UP_branch->GetEntry(index);
+    } else {
+      printf("branch weight_med_btagsf_heavy_UP_branch does not exist!\n");
+      exit(1);
+    }
+    weight_med_btagsf_heavy_UP_isLoaded = true;
+  }
+  return weight_med_btagsf_heavy_UP_;
+}
+
+const float &wvztree::weight_med_btagsf_light_DN() {
+  if (not weight_med_btagsf_light_DN_isLoaded) {
+    if (weight_med_btagsf_light_DN_branch != 0) {
+      weight_med_btagsf_light_DN_branch->GetEntry(index);
+    } else {
+      printf("branch weight_med_btagsf_light_DN_branch does not exist!\n");
+      exit(1);
+    }
+    weight_med_btagsf_light_DN_isLoaded = true;
+  }
+  return weight_med_btagsf_light_DN_;
+}
+
+const float &wvztree::weight_med_btagsf_light_UP() {
+  if (not weight_med_btagsf_light_UP_isLoaded) {
+    if (weight_med_btagsf_light_UP_branch != 0) {
+      weight_med_btagsf_light_UP_branch->GetEntry(index);
+    } else {
+      printf("branch weight_med_btagsf_light_UP_branch does not exist!\n");
+      exit(1);
+    }
+    weight_med_btagsf_light_UP_isLoaded = true;
+  }
+  return weight_med_btagsf_light_UP_;
+}
+
+const float &wvztree::weight_tight_btagsf() {
+  if (not weight_tight_btagsf_isLoaded) {
+    if (weight_tight_btagsf_branch != 0) {
+      weight_tight_btagsf_branch->GetEntry(index);
+    } else {
+      printf("branch weight_tight_btagsf_branch does not exist!\n");
+      exit(1);
+    }
+    weight_tight_btagsf_isLoaded = true;
+  }
+  return weight_tight_btagsf_;
+}
+
+const float &wvztree::weight_tight_btagsf_heavy_DN() {
+  if (not weight_tight_btagsf_heavy_DN_isLoaded) {
+    if (weight_tight_btagsf_heavy_DN_branch != 0) {
+      weight_tight_btagsf_heavy_DN_branch->GetEntry(index);
+    } else {
+      printf("branch weight_tight_btagsf_heavy_DN_branch does not exist!\n");
+      exit(1);
+    }
+    weight_tight_btagsf_heavy_DN_isLoaded = true;
+  }
+  return weight_tight_btagsf_heavy_DN_;
+}
+
+const float &wvztree::weight_tight_btagsf_heavy_UP() {
+  if (not weight_tight_btagsf_heavy_UP_isLoaded) {
+    if (weight_tight_btagsf_heavy_UP_branch != 0) {
+      weight_tight_btagsf_heavy_UP_branch->GetEntry(index);
+    } else {
+      printf("branch weight_tight_btagsf_heavy_UP_branch does not exist!\n");
+      exit(1);
+    }
+    weight_tight_btagsf_heavy_UP_isLoaded = true;
+  }
+  return weight_tight_btagsf_heavy_UP_;
+}
+
+const float &wvztree::weight_tight_btagsf_light_DN() {
+  if (not weight_tight_btagsf_light_DN_isLoaded) {
+    if (weight_tight_btagsf_light_DN_branch != 0) {
+      weight_tight_btagsf_light_DN_branch->GetEntry(index);
+    } else {
+      printf("branch weight_tight_btagsf_light_DN_branch does not exist!\n");
+      exit(1);
+    }
+    weight_tight_btagsf_light_DN_isLoaded = true;
+  }
+  return weight_tight_btagsf_light_DN_;
+}
+
+const float &wvztree::weight_tight_btagsf_light_UP() {
+  if (not weight_tight_btagsf_light_UP_isLoaded) {
+    if (weight_tight_btagsf_light_UP_branch != 0) {
+      weight_tight_btagsf_light_UP_branch->GetEntry(index);
+    } else {
+      printf("branch weight_tight_btagsf_light_UP_branch does not exist!\n");
+      exit(1);
+    }
+    weight_tight_btagsf_light_UP_isLoaded = true;
+  }
+  return weight_tight_btagsf_light_UP_;
+}
+
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &wvztree::J_p4() {
+  if (not J_p4_isLoaded) {
+    if (J_p4_branch != 0) {
+      J_p4_branch->GetEntry(index);
+    } else {
+      printf("branch J_p4_branch does not exist!\n");
+      exit(1);
+    }
+    J_p4_isLoaded = true;
+  }
+  return *J_p4_;
+}
+
+const vector<float> &wvztree::J_pt() {
+  if (not J_pt_isLoaded) {
+    if (J_pt_branch != 0) {
+      J_pt_branch->GetEntry(index);
+    } else {
+      printf("branch J_pt_branch does not exist!\n");
+      exit(1);
+    }
+    J_pt_isLoaded = true;
+  }
+  return *J_pt_;
+}
+
+const vector<float> &wvztree::J_eta() {
+  if (not J_eta_isLoaded) {
+    if (J_eta_branch != 0) {
+      J_eta_branch->GetEntry(index);
+    } else {
+      printf("branch J_eta_branch does not exist!\n");
+      exit(1);
+    }
+    J_eta_isLoaded = true;
+  }
+  return *J_eta_;
+}
+
+const vector<float> &wvztree::J_phi() {
+  if (not J_phi_isLoaded) {
+    if (J_phi_branch != 0) {
+      J_phi_branch->GetEntry(index);
+    } else {
+      printf("branch J_phi_branch does not exist!\n");
+      exit(1);
+    }
+    J_phi_isLoaded = true;
+  }
+  return *J_phi_;
+}
+
+const vector<float> &wvztree::J_mass() {
+  if (not J_mass_isLoaded) {
+    if (J_mass_branch != 0) {
+      J_mass_branch->GetEntry(index);
+    } else {
+      printf("branch J_mass_branch does not exist!\n");
+      exit(1);
+    }
+    J_mass_isLoaded = true;
+  }
+  return *J_mass_;
+}
+
+const vector<float> &wvztree::J_energy() {
+  if (not J_energy_isLoaded) {
+    if (J_energy_branch != 0) {
+      J_energy_branch->GetEntry(index);
+    } else {
+      printf("branch J_energy_branch does not exist!\n");
+      exit(1);
+    }
+    J_energy_isLoaded = true;
+  }
+  return *J_energy_;
+}
+
+const vector<float> &wvztree::J_SD_mass() {
+  if (not J_SD_mass_isLoaded) {
+    if (J_SD_mass_branch != 0) {
+      J_SD_mass_branch->GetEntry(index);
+    } else {
+      printf("branch J_SD_mass_branch does not exist!\n");
+      exit(1);
+    }
+    J_SD_mass_isLoaded = true;
+  }
+  return *J_SD_mass_;
+}
+
+const vector<float> &wvztree::J_tau31() {
+  if (not J_tau31_isLoaded) {
+    if (J_tau31_branch != 0) {
+      J_tau31_branch->GetEntry(index);
+    } else {
+      printf("branch J_tau31_branch does not exist!\n");
+      exit(1);
+    }
+    J_tau31_isLoaded = true;
+  }
+  return *J_tau31_;
+}
+
+const vector<float> &wvztree::J_tau32() {
+  if (not J_tau32_isLoaded) {
+    if (J_tau32_branch != 0) {
+      J_tau32_branch->GetEntry(index);
+    } else {
+      printf("branch J_tau32_branch does not exist!\n");
+      exit(1);
+    }
+    J_tau32_isLoaded = true;
+  }
+  return *J_tau32_;
+}
+
+const vector<float> &wvztree::J_tau21() {
+  if (not J_tau21_isLoaded) {
+    if (J_tau21_branch != 0) {
+      J_tau21_branch->GetEntry(index);
+    } else {
+      printf("branch J_tau21_branch does not exist!\n");
+      exit(1);
+    }
+    J_tau21_isLoaded = true;
+  }
+  return *J_tau21_;
+}
+
+const vector<float> &wvztree::J_tau1() {
+  if (not J_tau1_isLoaded) {
+    if (J_tau1_branch != 0) {
+      J_tau1_branch->GetEntry(index);
+    } else {
+      printf("branch J_tau1_branch does not exist!\n");
+      exit(1);
+    }
+    J_tau1_isLoaded = true;
+  }
+  return *J_tau1_;
+}
+
+const vector<float> &wvztree::J_tau2() {
+  if (not J_tau2_isLoaded) {
+    if (J_tau2_branch != 0) {
+      J_tau2_branch->GetEntry(index);
+    } else {
+      printf("branch J_tau2_branch does not exist!\n");
+      exit(1);
+    }
+    J_tau2_isLoaded = true;
+  }
+  return *J_tau2_;
+}
+
+const vector<float> &wvztree::J_tau3() {
+  if (not J_tau3_isLoaded) {
+    if (J_tau3_branch != 0) {
+      J_tau3_branch->GetEntry(index);
+    } else {
+      printf("branch J_tau3_branch does not exist!\n");
+      exit(1);
+    }
+    J_tau3_isLoaded = true;
+  }
+  return *J_tau3_;
+}
+
+const vector<float> &wvztree::J_undoJEC() {
+  if (not J_undoJEC_isLoaded) {
+    if (J_undoJEC_branch != 0) {
+      J_undoJEC_branch->GetEntry(index);
+    } else {
+      printf("branch J_undoJEC_branch does not exist!\n");
+      exit(1);
+    }
+    J_undoJEC_isLoaded = true;
+  }
+  return *J_undoJEC_;
+}
+
+const vector<float> &wvztree::J_shift() {
+  if (not J_shift_isLoaded) {
+    if (J_shift_branch != 0) {
+      J_shift_branch->GetEntry(index);
+    } else {
+      printf("branch J_shift_branch does not exist!\n");
+      exit(1);
+    }
+    J_shift_isLoaded = true;
+  }
+  return *J_shift_;
+}
+
+const vector<float> &wvztree::J_deep_rawdisc_h4q() {
+  if (not J_deep_rawdisc_h4q_isLoaded) {
+    if (J_deep_rawdisc_h4q_branch != 0) {
+      J_deep_rawdisc_h4q_branch->GetEntry(index);
+    } else {
+      printf("branch J_deep_rawdisc_h4q_branch does not exist!\n");
+      exit(1);
+    }
+    J_deep_rawdisc_h4q_isLoaded = true;
+  }
+  return *J_deep_rawdisc_h4q_;
+}
+
+const vector<float> &wvztree::J_deep_rawdisc_hbb() {
+  if (not J_deep_rawdisc_hbb_isLoaded) {
+    if (J_deep_rawdisc_hbb_branch != 0) {
+      J_deep_rawdisc_hbb_branch->GetEntry(index);
+    } else {
+      printf("branch J_deep_rawdisc_hbb_branch does not exist!\n");
+      exit(1);
+    }
+    J_deep_rawdisc_hbb_isLoaded = true;
+  }
+  return *J_deep_rawdisc_hbb_;
+}
+
+const vector<float> &wvztree::J_deep_rawdisc_qcd() {
+  if (not J_deep_rawdisc_qcd_isLoaded) {
+    if (J_deep_rawdisc_qcd_branch != 0) {
+      J_deep_rawdisc_qcd_branch->GetEntry(index);
+    } else {
+      printf("branch J_deep_rawdisc_qcd_branch does not exist!\n");
+      exit(1);
+    }
+    J_deep_rawdisc_qcd_isLoaded = true;
+  }
+  return *J_deep_rawdisc_qcd_;
+}
+
+const vector<float> &wvztree::J_deep_rawdisc_top() {
+  if (not J_deep_rawdisc_top_isLoaded) {
+    if (J_deep_rawdisc_top_branch != 0) {
+      J_deep_rawdisc_top_branch->GetEntry(index);
+    } else {
+      printf("branch J_deep_rawdisc_top_branch does not exist!\n");
+      exit(1);
+    }
+    J_deep_rawdisc_top_isLoaded = true;
+  }
+  return *J_deep_rawdisc_top_;
+}
+
+const vector<float> &wvztree::J_deep_rawdisc_w() {
+  if (not J_deep_rawdisc_w_isLoaded) {
+    if (J_deep_rawdisc_w_branch != 0) {
+      J_deep_rawdisc_w_branch->GetEntry(index);
+    } else {
+      printf("branch J_deep_rawdisc_w_branch does not exist!\n");
+      exit(1);
+    }
+    J_deep_rawdisc_w_isLoaded = true;
+  }
+  return *J_deep_rawdisc_w_;
+}
+
+const vector<float> &wvztree::J_deep_rawdisc_z() {
+  if (not J_deep_rawdisc_z_isLoaded) {
+    if (J_deep_rawdisc_z_branch != 0) {
+      J_deep_rawdisc_z_branch->GetEntry(index);
+    } else {
+      printf("branch J_deep_rawdisc_z_branch does not exist!\n");
+      exit(1);
+    }
+    J_deep_rawdisc_z_isLoaded = true;
+  }
+  return *J_deep_rawdisc_z_;
+}
+
+const vector<float> &wvztree::J_deep_rawdisc_zbb() {
+  if (not J_deep_rawdisc_zbb_isLoaded) {
+    if (J_deep_rawdisc_zbb_branch != 0) {
+      J_deep_rawdisc_zbb_branch->GetEntry(index);
+    } else {
+      printf("branch J_deep_rawdisc_zbb_branch does not exist!\n");
+      exit(1);
+    }
+    J_deep_rawdisc_zbb_isLoaded = true;
+  }
+  return *J_deep_rawdisc_zbb_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet1_pt() {
+  if (not J_softdropPuppiSubjet1_pt_isLoaded) {
+    if (J_softdropPuppiSubjet1_pt_branch != 0) {
+      J_softdropPuppiSubjet1_pt_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet1_pt_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet1_pt_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet1_pt_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet1_eta() {
+  if (not J_softdropPuppiSubjet1_eta_isLoaded) {
+    if (J_softdropPuppiSubjet1_eta_branch != 0) {
+      J_softdropPuppiSubjet1_eta_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet1_eta_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet1_eta_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet1_eta_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet1_phi() {
+  if (not J_softdropPuppiSubjet1_phi_isLoaded) {
+    if (J_softdropPuppiSubjet1_phi_branch != 0) {
+      J_softdropPuppiSubjet1_phi_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet1_phi_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet1_phi_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet1_phi_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet1_mass() {
+  if (not J_softdropPuppiSubjet1_mass_isLoaded) {
+    if (J_softdropPuppiSubjet1_mass_branch != 0) {
+      J_softdropPuppiSubjet1_mass_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet1_mass_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet1_mass_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet1_mass_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet1_energy() {
+  if (not J_softdropPuppiSubjet1_energy_isLoaded) {
+    if (J_softdropPuppiSubjet1_energy_branch != 0) {
+      J_softdropPuppiSubjet1_energy_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet1_energy_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet1_energy_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet1_energy_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet2_pt() {
+  if (not J_softdropPuppiSubjet2_pt_isLoaded) {
+    if (J_softdropPuppiSubjet2_pt_branch != 0) {
+      J_softdropPuppiSubjet2_pt_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet2_pt_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet2_pt_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet2_pt_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet2_eta() {
+  if (not J_softdropPuppiSubjet2_eta_isLoaded) {
+    if (J_softdropPuppiSubjet2_eta_branch != 0) {
+      J_softdropPuppiSubjet2_eta_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet2_eta_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet2_eta_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet2_eta_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet2_phi() {
+  if (not J_softdropPuppiSubjet2_phi_isLoaded) {
+    if (J_softdropPuppiSubjet2_phi_branch != 0) {
+      J_softdropPuppiSubjet2_phi_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet2_phi_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet2_phi_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet2_phi_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet2_mass() {
+  if (not J_softdropPuppiSubjet2_mass_isLoaded) {
+    if (J_softdropPuppiSubjet2_mass_branch != 0) {
+      J_softdropPuppiSubjet2_mass_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet2_mass_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet2_mass_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet2_mass_;
+}
+
+const vector<float> &wvztree::J_softdropPuppiSubjet2_energy() {
+  if (not J_softdropPuppiSubjet2_energy_isLoaded) {
+    if (J_softdropPuppiSubjet2_energy_branch != 0) {
+      J_softdropPuppiSubjet2_energy_branch->GetEntry(index);
+    } else {
+      printf("branch J_softdropPuppiSubjet2_energy_branch does not exist!\n");
+      exit(1);
+    }
+    J_softdropPuppiSubjet2_energy_isLoaded = true;
+  }
+  return *J_softdropPuppiSubjet2_energy_;
+}
+
 
 void wvztree::progress( int nEventsTotal, int nEventsChain ){
   int period = 1000;
@@ -2460,6 +3803,7 @@ const int &lumi() { return wvz.lumi(); }
 const unsigned long long &evt() { return wvz.evt(); }
 const int &isData() { return wvz.isData(); }
 const float &evt_scale1fb() { return wvz.evt_scale1fb(); }
+const int &nevents() { return wvz.nevents(); }
 const float &genps_weight() { return wvz.genps_weight(); }
 const float &xsec_br() { return wvz.xsec_br(); }
 const int &evt_passgoodrunlist() { return wvz.evt_passgoodrunlist(); }
@@ -2478,6 +3822,7 @@ const float &weight_pdf_up() { return wvz.weight_pdf_up(); }
 const float &weight_pdf_down() { return wvz.weight_pdf_down(); }
 const float &weight_alphas_down() { return wvz.weight_alphas_down(); }
 const float &weight_alphas_up() { return wvz.weight_alphas_up(); }
+const float &weight_nominal() { return wvz.weight_nominal(); }
 const int &HLT_DoubleMu() { return wvz.HLT_DoubleMu(); }
 const int &HLT_DoubleEl() { return wvz.HLT_DoubleEl(); }
 const int &HLT_MuEG() { return wvz.HLT_MuEG(); }
@@ -2496,6 +3841,12 @@ const vector<float> &gen_lep_eta() { return wvz.gen_lep_eta(); }
 const vector<float> &gen_lep_phi() { return wvz.gen_lep_phi(); }
 const vector<float> &gen_lep_mass() { return wvz.gen_lep_mass(); }
 const vector<int> &gen_lep_id() { return wvz.gen_lep_id(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &gen_child_p4() { return wvz.gen_child_p4(); }
+const vector<float> &gen_child_pt() { return wvz.gen_child_pt(); }
+const vector<float> &gen_child_eta() { return wvz.gen_child_eta(); }
+const vector<float> &gen_child_phi() { return wvz.gen_child_phi(); }
+const vector<float> &gen_child_mass() { return wvz.gen_child_mass(); }
+const vector<int> &gen_child_id() { return wvz.gen_child_id(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &gen_part_p4() { return wvz.gen_part_p4(); }
 const vector<float> &gen_part_pt() { return wvz.gen_part_pt(); }
 const vector<float> &gen_part_eta() { return wvz.gen_part_eta(); }
@@ -2514,6 +3865,10 @@ const int &nLightLep() { return wvz.nLightLep(); }
 const int &firstgoodvertex() { return wvz.firstgoodvertex(); }
 const int &nvtx() { return wvz.nvtx(); }
 const int &nTrueInt() { return wvz.nTrueInt(); }
+const float &lumival() { return wvz.lumival(); }
+const float &puwgt() { return wvz.puwgt(); }
+const float &puwgt_up() { return wvz.puwgt_up(); }
+const float &puwgt_dn() { return wvz.puwgt_dn(); }
 const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &lep_p4() { return wvz.lep_p4(); }
 const vector<float> &lep_pt() { return wvz.lep_pt(); }
 const vector<float> &lep_eta() { return wvz.lep_eta(); }
@@ -2526,6 +3881,7 @@ const vector<float> &lep_relIso04DB() { return wvz.lep_relIso04DB(); }
 const vector<float> &lep_relIso03EA() { return wvz.lep_relIso03EA(); }
 const vector<float> &lep_relIso03EAv4() { return wvz.lep_relIso03EAv4(); }
 const vector<float> &lep_relIso03EAwLep() { return wvz.lep_relIso03EAwLep(); }
+const vector<float> &lep_relIso03EAv4wLep() { return wvz.lep_relIso03EAv4wLep(); }
 const vector<float> &lep_ip3d() { return wvz.lep_ip3d(); }
 const vector<float> &lep_sip3d() { return wvz.lep_sip3d(); }
 const vector<float> &lep_dxy() { return wvz.lep_dxy(); }
@@ -2535,6 +3891,10 @@ const vector<int> &lep_mc_id() { return wvz.lep_mc_id(); }
 const vector<int> &lep_motherIdv2() { return wvz.lep_motherIdv2(); }
 const vector<int> &lep_idx() { return wvz.lep_idx(); }
 const vector<int> &lep_id() { return wvz.lep_id(); }
+const vector<int> &lep_isWVZVeto() { return wvz.lep_isWVZVeto(); }
+const vector<int> &lep_isWVZNominal() { return wvz.lep_isWVZNominal(); }
+const vector<int> &lep_isVVVVeto() { return wvz.lep_isVVVVeto(); }
+const vector<int> &lep_isVVVNominal() { return wvz.lep_isVVVNominal(); }
 const vector<int> &lep_isTightPOG() { return wvz.lep_isTightPOG(); }
 const vector<int> &lep_isMediumPOG() { return wvz.lep_isMediumPOG(); }
 const vector<int> &lep_isMVAwp80NoIsoPOG() { return wvz.lep_isMVAwp80NoIsoPOG(); }
@@ -2552,6 +3912,12 @@ const vector<int> &lep_isCutBasedIsoVetoPOG() { return wvz.lep_isCutBasedIsoVeto
 const vector<int> &lep_isCutBasedIsoLoosePOG() { return wvz.lep_isCutBasedIsoLoosePOG(); }
 const vector<int> &lep_isCutBasedIsoMediumPOG() { return wvz.lep_isCutBasedIsoMediumPOG(); }
 const vector<int> &lep_isCutBasedIsoTightPOG() { return wvz.lep_isCutBasedIsoTightPOG(); }
+const float &met_orig_pt() { return wvz.met_orig_pt(); }
+const float &met_orig_phi() { return wvz.met_orig_phi(); }
+const float &met_orig_up_pt() { return wvz.met_orig_up_pt(); }
+const float &met_orig_up_phi() { return wvz.met_orig_up_phi(); }
+const float &met_orig_dn_pt() { return wvz.met_orig_dn_pt(); }
+const float &met_orig_dn_phi() { return wvz.met_orig_dn_phi(); }
 const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &met_p4() { return wvz.met_p4(); }
 const float &met_pt() { return wvz.met_pt(); }
 const float &met_phi() { return wvz.met_phi(); }
@@ -2559,6 +3925,14 @@ const float &met_up_pt() { return wvz.met_up_pt(); }
 const float &met_up_phi() { return wvz.met_up_phi(); }
 const float &met_dn_pt() { return wvz.met_dn_pt(); }
 const float &met_dn_phi() { return wvz.met_dn_phi(); }
+const float &met_smearup_pt() { return wvz.met_smearup_pt(); }
+const float &met_smearup_phi() { return wvz.met_smearup_phi(); }
+const float &met_smeardn_pt() { return wvz.met_smeardn_pt(); }
+const float &met_smeardn_phi() { return wvz.met_smeardn_phi(); }
+const float &met_pileupup_pt() { return wvz.met_pileupup_pt(); }
+const float &met_pileupup_phi() { return wvz.met_pileupup_phi(); }
+const float &met_pileupdn_pt() { return wvz.met_pileupdn_pt(); }
+const float &met_pileupdn_phi() { return wvz.met_pileupdn_phi(); }
 const float &met_gen_pt() { return wvz.met_gen_pt(); }
 const float &met_gen_phi() { return wvz.met_gen_phi(); }
 const int &passesMETfiltersRun2() { return wvz.passesMETfiltersRun2(); }
@@ -2579,6 +3953,7 @@ const vector<float> &rawjets_eta() { return wvz.rawjets_eta(); }
 const vector<float> &rawjets_phi() { return wvz.rawjets_phi(); }
 const vector<float> &rawjets_mass() { return wvz.rawjets_mass(); }
 const vector<float> &rawjets_JEC() { return wvz.rawjets_JEC(); }
+const vector<float> &rawjets_btag_score() { return wvz.rawjets_btag_score(); }
 const vector<int> &rawjets_passJetID() { return wvz.rawjets_passJetID(); }
 const vector<int> &rawjets_isORwLep() { return wvz.rawjets_isORwLep(); }
 const int &nj() { return wvz.nj(); }
@@ -2588,6 +3963,11 @@ const int &nb() { return wvz.nb(); }
 const int &nb_up() { return wvz.nb_up(); }
 const int &nb_dn() { return wvz.nb_dn(); }
 const int &nbmed() { return wvz.nbmed(); }
+const int &nbmed_up() { return wvz.nbmed_up(); }
+const int &nbmed_dn() { return wvz.nbmed_dn(); }
+const int &nbtight() { return wvz.nbtight(); }
+const int &nbtight_up() { return wvz.nbtight_up(); }
+const int &nbtight_dn() { return wvz.nbtight_dn(); }
 const float &ht() { return wvz.ht(); }
 const int &nj_cen() { return wvz.nj_cen(); }
 const int &nj_cen_up() { return wvz.nj_cen_up(); }
@@ -2597,6 +3977,48 @@ const float &weight_btagsf_heavy_DN() { return wvz.weight_btagsf_heavy_DN(); }
 const float &weight_btagsf_heavy_UP() { return wvz.weight_btagsf_heavy_UP(); }
 const float &weight_btagsf_light_DN() { return wvz.weight_btagsf_light_DN(); }
 const float &weight_btagsf_light_UP() { return wvz.weight_btagsf_light_UP(); }
+const float &weight_med_btagsf() { return wvz.weight_med_btagsf(); }
+const float &weight_med_btagsf_heavy_DN() { return wvz.weight_med_btagsf_heavy_DN(); }
+const float &weight_med_btagsf_heavy_UP() { return wvz.weight_med_btagsf_heavy_UP(); }
+const float &weight_med_btagsf_light_DN() { return wvz.weight_med_btagsf_light_DN(); }
+const float &weight_med_btagsf_light_UP() { return wvz.weight_med_btagsf_light_UP(); }
+const float &weight_tight_btagsf() { return wvz.weight_tight_btagsf(); }
+const float &weight_tight_btagsf_heavy_DN() { return wvz.weight_tight_btagsf_heavy_DN(); }
+const float &weight_tight_btagsf_heavy_UP() { return wvz.weight_tight_btagsf_heavy_UP(); }
+const float &weight_tight_btagsf_light_DN() { return wvz.weight_tight_btagsf_light_DN(); }
+const float &weight_tight_btagsf_light_UP() { return wvz.weight_tight_btagsf_light_UP(); }
+const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &J_p4() { return wvz.J_p4(); }
+const vector<float> &J_pt() { return wvz.J_pt(); }
+const vector<float> &J_eta() { return wvz.J_eta(); }
+const vector<float> &J_phi() { return wvz.J_phi(); }
+const vector<float> &J_mass() { return wvz.J_mass(); }
+const vector<float> &J_energy() { return wvz.J_energy(); }
+const vector<float> &J_SD_mass() { return wvz.J_SD_mass(); }
+const vector<float> &J_tau31() { return wvz.J_tau31(); }
+const vector<float> &J_tau32() { return wvz.J_tau32(); }
+const vector<float> &J_tau21() { return wvz.J_tau21(); }
+const vector<float> &J_tau1() { return wvz.J_tau1(); }
+const vector<float> &J_tau2() { return wvz.J_tau2(); }
+const vector<float> &J_tau3() { return wvz.J_tau3(); }
+const vector<float> &J_undoJEC() { return wvz.J_undoJEC(); }
+const vector<float> &J_shift() { return wvz.J_shift(); }
+const vector<float> &J_deep_rawdisc_h4q() { return wvz.J_deep_rawdisc_h4q(); }
+const vector<float> &J_deep_rawdisc_hbb() { return wvz.J_deep_rawdisc_hbb(); }
+const vector<float> &J_deep_rawdisc_qcd() { return wvz.J_deep_rawdisc_qcd(); }
+const vector<float> &J_deep_rawdisc_top() { return wvz.J_deep_rawdisc_top(); }
+const vector<float> &J_deep_rawdisc_w() { return wvz.J_deep_rawdisc_w(); }
+const vector<float> &J_deep_rawdisc_z() { return wvz.J_deep_rawdisc_z(); }
+const vector<float> &J_deep_rawdisc_zbb() { return wvz.J_deep_rawdisc_zbb(); }
+const vector<float> &J_softdropPuppiSubjet1_pt() { return wvz.J_softdropPuppiSubjet1_pt(); }
+const vector<float> &J_softdropPuppiSubjet1_eta() { return wvz.J_softdropPuppiSubjet1_eta(); }
+const vector<float> &J_softdropPuppiSubjet1_phi() { return wvz.J_softdropPuppiSubjet1_phi(); }
+const vector<float> &J_softdropPuppiSubjet1_mass() { return wvz.J_softdropPuppiSubjet1_mass(); }
+const vector<float> &J_softdropPuppiSubjet1_energy() { return wvz.J_softdropPuppiSubjet1_energy(); }
+const vector<float> &J_softdropPuppiSubjet2_pt() { return wvz.J_softdropPuppiSubjet2_pt(); }
+const vector<float> &J_softdropPuppiSubjet2_eta() { return wvz.J_softdropPuppiSubjet2_eta(); }
+const vector<float> &J_softdropPuppiSubjet2_phi() { return wvz.J_softdropPuppiSubjet2_phi(); }
+const vector<float> &J_softdropPuppiSubjet2_mass() { return wvz.J_softdropPuppiSubjet2_mass(); }
+const vector<float> &J_softdropPuppiSubjet2_energy() { return wvz.J_softdropPuppiSubjet2_energy(); }
 
 }
 
