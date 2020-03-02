@@ -175,6 +175,12 @@ def write_datacards(ntuple_version, tag):
         thissyst["six{}_".format(year) + proc] = "1.02"
     systs.append( ("FlatSystsTrigSF{}".format(year), "lnN", [], thissyst) )
 
+    # Flat additional systematics
+    thissyst = {}
+    for proc in mcprocs:
+        thissyst["six{}_".format(year) + proc] = "1.00"
+    systs.append( ("FlatSystsTrigMatchingSF{}".format(year), "lnN", [], thissyst) )
+
     # Now create data card writer
     sig = hists_db["sig"]["Nominal"]
     bgs = [ hists_db[proc]["Nominal"] for proc in bkgprocs ]
