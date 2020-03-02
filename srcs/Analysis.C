@@ -1683,20 +1683,21 @@ void Analysis::loadScaleFactors()
     histmap_2018_elec_veto_sf           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2018_ElectronWPVeto_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
     histmap_2016_muon_BCDEF_id_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_eta_pt"); // x=eta, y=pt
     histmap_2016_muon_BCDEF_id_lowpt_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_lowpt_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
-    histmap_2016_muon_BCDEF_tightiso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_RunBCDEF_SF_ISO.root:NUM_TightRelIso_DEN_MediumID_eta_pt"); // x=eta, y=pt
-    histmap_2016_muon_BCDEF_looseiso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_RunBCDEF_SF_ISO.root:NUM_LooseRelIso_DEN_MediumID_eta_pt"); // x=eta, y=pt
+    histmap_2016_muon_veto_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2016vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
+    histmap_2016_muon_zid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2016_muon_wid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
     histmap_2016_muon_GH_id_sf          = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_RunGH_SF_ID.root:NUM_MediumID_DEN_genTracks_eta_pt"); // x=eta, y=pt 45% of 2016 data
     histmap_2016_muon_GH_id_lowpt_sf    = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_lowpt_RunGH_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta 45% of 2016 data
-    histmap_2016_muon_GH_tightiso_sf    = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_RunGH_SF_ISO.root:NUM_TightRelIso_DEN_MediumID_eta_pt"); // x=eta, y=pt 45% of 2016 data
-    histmap_2016_muon_GH_looseiso_sf    = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_RunGH_SF_ISO.root:NUM_LooseRelIso_DEN_MediumID_eta_pt"); // x=eta, y=pt 45% of 2016 data
     histmap_2017_muon_id_sf             = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2017_rootfiles_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
     histmap_2017_muon_id_lowpt_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2017_rootfiles_lowpt_RunBCDEF_SF_ID_JPsi.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
-    histmap_2017_muon_tightiso_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2017_rootfiles_RunBCDEF_SF_ISO.root:NUM_TightRelIso_DEN_MediumID_pt_abseta"); // x=pt, y=abseta
-    histmap_2017_muon_looseiso_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2017_rootfiles_RunBCDEF_SF_ISO.root:NUM_LooseRelIso_DEN_MediumID_pt_abseta"); // x=pt, y=abseta
+    histmap_2017_muon_veto_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2017vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
+    histmap_2017_muon_zid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2017_muon_wid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
     histmap_2018_muon_id_sf             = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2018_rootfiles_RunABCD_SF_ID.root:NUM_MediumID_DEN_TrackerMuons_pt_abseta"); // x=pt, y=abseta
     histmap_2018_muon_id_lowpt_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2018_rootfiles_lowpt_RunABCD_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
-    histmap_2018_muon_tightiso_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2018_rootfiles_RunABCD_SF_ISO.root:NUM_TightRelIso_DEN_MediumID_pt_abseta"); // x=pt, y=abseta
-    histmap_2018_muon_looseiso_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2018_rootfiles_RunABCD_SF_ISO.root:NUM_LooseRelIso_DEN_MediumID_pt_abseta"); // x=pt, y=abseta
+    histmap_2018_muon_veto_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2018vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
+    histmap_2018_muon_zid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2018_muon_wid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
     histmap_2016_fake_rate_el           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_el_2016.root:fake_rate_el_data");
     histmap_2016_fake_rate_mu           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_mu_2016.root:fake_rate_mu_data");
     histmap_2017_fake_rate_el           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_el_2017.root:fake_rate_el_data");
@@ -2887,13 +2888,15 @@ float Analysis::LeptonScaleFactorv1()
                 }
                 if (passNominalMuonID(lep_idx))
                 {
-                    scalefactor *= 0.550 * histmap_2016_muon_BCDEF_tightiso_sf ->eval(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
-                                  +0.450 * histmap_2016_muon_GH_tightiso_sf    ->eval(eta, std::max((double) pt, 20.1)); // x=eta, y=pt 0.450 of 2016 data
+                    scalefactor *= histmap_2016_muon_wid_iso_sf ->eval(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
+                }
+                else if(passZCandMuonID(lep_idx))
+                {
+                    scalefactor *= histmap_2016_muon_zid_iso_sf ->eval(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
                 }
                 else
                 {
-                    scalefactor *= 0.550 * histmap_2016_muon_BCDEF_looseiso_sf ->eval(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
-                                  +0.450 * histmap_2016_muon_GH_looseiso_sf    ->eval(eta, std::max((double) pt, 20.1)); // x=eta, y=pt 0.450 of 2016 data
+                    scalefactor *= histmap_2016_muon_veto_iso_sf ->eval(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
                 }
             }
             else if (year == 2017)
@@ -2908,11 +2911,15 @@ float Analysis::LeptonScaleFactorv1()
                 }
                 if (passNominalMuonID(lep_idx))
                 {
-                    scalefactor *= histmap_2017_muon_tightiso_sf       ->eval(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2017_muon_wid_iso_sf       ->eval(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
+                }
+                else if(passZCandMuonID(lep_idx))
+                {
+                    scalefactor *= histmap_2017_muon_zid_iso_sf       ->eval(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
                 }
                 else
                 {
-                    scalefactor *= histmap_2017_muon_looseiso_sf       ->eval(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2017_muon_veto_iso_sf       ->eval(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 }
             }
             else if (year == 2018)
@@ -2927,11 +2934,15 @@ float Analysis::LeptonScaleFactorv1()
                 }
                 if (passNominalMuonID(lep_idx))
                 {
-                    scalefactor *= histmap_2018_muon_tightiso_sf       ->eval(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2018_muon_wid_iso_sf       ->eval(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 }
+                else if(passZCandMuonID(lep_idx))
+                {
+                    scalefactor *= histmap_2018_muon_zid_iso_sf       ->eval(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
+                } 
                 else
                 {
-                    scalefactor *= histmap_2018_muon_looseiso_sf       ->eval(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2018_muon_veto_iso_sf       ->eval(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 }
             }
         }
@@ -3066,26 +3077,29 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
             if (leptonId == LeptonID::WCandidate)
             {
                 if (varm == 0)
-                    scalefactor *= 0.550 * histmap_2016_muon_BCDEF_tightiso_sf ->eval(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
-                                  +0.450 * histmap_2016_muon_GH_tightiso_sf    ->eval(eta, std::max((double) pt, 20.1)); // x=eta, y=pt 0.450 of 2016 data
+                    scalefactor *= histmap_2016_muon_wid_iso_sf ->eval(abseta, std::max((double) pt, 10.1));  // x=abseta, y=pt
                 if (varm == 1)
-                    scalefactor *= 0.550 * histmap_2016_muon_BCDEF_tightiso_sf ->eval_up(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
-                                  +0.450 * histmap_2016_muon_GH_tightiso_sf    ->eval_up(eta, std::max((double) pt, 20.1)); // x=eta, y=pt 0.450 of 2016 data
+                    scalefactor *= histmap_2016_muon_wid_iso_sf ->eval_up(abseta, std::max((double) pt, 10.1));  // x=abseta, y=pt
                 if (varm ==-1)
-                    scalefactor *= 0.550 * histmap_2016_muon_BCDEF_tightiso_sf ->eval_down(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
-                                  +0.450 * histmap_2016_muon_GH_tightiso_sf    ->eval_down(eta, std::max((double) pt, 20.1)); // x=eta, y=pt 0.450 of 2016 data
+                    scalefactor *= histmap_2016_muon_wid_iso_sf ->eval_down(abseta, std::max((double) pt, 10.1));  // x=abseta, y=pt
+            }
+            else if(leptonId == LeptonID::ZCandidate)
+            {
+                if (varm == 0)
+                    scalefactor *= histmap_2016_muon_zid_iso_sf ->eval(abseta, std::max((double) pt, 10.1));  // x=abseta, y=pt
+                if (varm == 1)
+                    scalefactor *= histmap_2016_muon_zid_iso_sf ->eval_up(abseta, std::max((double) pt, 10.1));  // x=abseta, y=pt
+                if (varm ==-1)
+                    scalefactor *= histmap_2016_muon_zid_iso_sf ->eval_down(abseta, std::max((double) pt, 10.1));  // x=abseta, y=pt
             }
             else
             {
                 if (varm == 0)
-                    scalefactor *= 0.550 * histmap_2016_muon_BCDEF_looseiso_sf ->eval(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
-                        +0.450           * histmap_2016_muon_GH_looseiso_sf    ->eval(eta, std::max((double) pt, 20.1)); // x=eta, y=pt 0.450 of 2016 data
+                    scalefactor *= histmap_2016_muon_veto_iso_sf ->eval(abseta, std::max((double) pt, 10.1));  // x=abseta, y=pt
                 if (varm == 1)
-                    scalefactor *= 0.550 * histmap_2016_muon_BCDEF_looseiso_sf ->eval_up(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
-                        +0.450           * histmap_2016_muon_GH_looseiso_sf    ->eval_up(eta, std::max((double) pt, 20.1)); // x=eta, y=pt 0.450 of 2016 data
+                    scalefactor *= histmap_2016_muon_veto_iso_sf ->eval_up(abseta, std::max((double) pt, 10.1));  // x=abseta, y=pt
                 if (varm ==-1)
-                    scalefactor *= 0.550 * histmap_2016_muon_BCDEF_looseiso_sf ->eval_down(eta, std::max((double) pt, 20.1))  // x=eta, y=pt
-                        +0.450           * histmap_2016_muon_GH_looseiso_sf    ->eval_down(eta, std::max((double) pt, 20.1)); // x=eta, y=pt 0.450 of 2016 data
+                    scalefactor *= histmap_2016_muon_veto_iso_sf ->eval_down(abseta, std::max((double) pt, 10.1)); // x=abseta, y=pt
             }
         }
         else if (year == 2017)
@@ -3111,20 +3125,29 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
             if (leptonId == LeptonID::WCandidate)
             {
                 if (varm == 0)
-                    scalefactor *= histmap_2017_muon_tightiso_sf       ->eval(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2017_muon_wid_iso_sf       ->eval(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 if (varm == 1)
-                    scalefactor *= histmap_2017_muon_tightiso_sf       ->eval_up(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2017_muon_wid_iso_sf       ->eval_up(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 if (varm ==-1)
-                    scalefactor *= histmap_2017_muon_tightiso_sf       ->eval_down(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2017_muon_wid_iso_sf       ->eval_down(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
+            }
+            else if(leptonId == LeptonID::ZCandidate)
+            {   
+                if (varm == 0)
+                    scalefactor *= histmap_2017_muon_zid_iso_sf ->eval(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
+                if (varm == 1)
+                    scalefactor *= histmap_2017_muon_zid_iso_sf ->eval_up(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
+                if (varm ==-1)
+                    scalefactor *= histmap_2017_muon_zid_iso_sf ->eval_down(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
             }
             else
             {
                 if (varm == 0)
-                    scalefactor *= histmap_2017_muon_looseiso_sf       ->eval(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2017_muon_veto_iso_sf       ->eval(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 if (varm == 1)
-                    scalefactor *= histmap_2017_muon_looseiso_sf       ->eval_up(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2017_muon_veto_iso_sf       ->eval_up(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 if (varm ==-1)
-                    scalefactor *= histmap_2017_muon_looseiso_sf       ->eval_down(std::max((double) pt, 20.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2017_muon_veto_iso_sf       ->eval_down(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
             }
         }
         else if (year == 2018)
@@ -3150,20 +3173,29 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
             if (leptonId == LeptonID::WCandidate)
             {
                 if (varm == 0)
-                    scalefactor *= histmap_2018_muon_tightiso_sf       ->eval(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2018_muon_wid_iso_sf       ->eval(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 if (varm == 1)
-                    scalefactor *= histmap_2018_muon_tightiso_sf       ->eval_up(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2018_muon_wid_iso_sf       ->eval_up(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 if (varm ==-1)
-                    scalefactor *= histmap_2018_muon_tightiso_sf       ->eval_down(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2018_muon_wid_iso_sf       ->eval_down(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
             }
+            else if(leptonId == LeptonID::ZCandidate)
+            {    
+                if (varm == 0)
+                    scalefactor *= histmap_2018_muon_zid_iso_sf ->eval(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
+                if (varm == 1)
+                    scalefactor *= histmap_2018_muon_zid_iso_sf ->eval_up(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
+                if (varm ==-1)
+                    scalefactor *= histmap_2018_muon_zid_iso_sf ->eval_down(abseta, std::max((double) pt, 10.1));  // x=eta, y=pt
+            }       
             else
             {
                 if (varm == 0)
-                    scalefactor *= histmap_2018_muon_looseiso_sf       ->eval(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2018_muon_veto_iso_sf       ->eval(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 if (varm == 1)
-                    scalefactor *= histmap_2018_muon_looseiso_sf       ->eval_up(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2018_muon_veto_iso_sf       ->eval_up(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
                 if (varm ==-1)
-                    scalefactor *= histmap_2018_muon_looseiso_sf       ->eval_down(std::max((double) pt, 15.1), abseta); // x=pt, y=abseta
+                    scalefactor *= histmap_2018_muon_veto_iso_sf       ->eval_down(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
             }
         }
     }
