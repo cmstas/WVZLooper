@@ -193,50 +193,31 @@ public:
     int year;
 
     // Scale factors
-    RooUtil::HistMap* histmap_2016_elec_reco_highpt_sf;
-    RooUtil::HistMap* histmap_2016_elec_reco_lowpt_sf;
-    RooUtil::HistMap* histmap_2016_elec_medium_sf;
-    RooUtil::HistMap* histmap_2016_elec_veto_sf;
-    RooUtil::HistMap* histmap_2017_elec_reco_highpt_sf;
-    RooUtil::HistMap* histmap_2017_elec_reco_lowpt_sf;
-    RooUtil::HistMap* histmap_2017_elec_medium_sf;
-    RooUtil::HistMap* histmap_2017_elec_veto_sf;
-    RooUtil::HistMap* histmap_2018_elec_reco_sf;
-    RooUtil::HistMap* histmap_2018_elec_medium_sf;
-    RooUtil::HistMap* histmap_2018_elec_veto_sf;
     RooUtil::HistMap* histmap_2016_muon_BCDEF_id_sf;
     RooUtil::HistMap* histmap_2016_muon_BCDEF_id_lowpt_sf;
     RooUtil::HistMap* histmap_2016_muon_GH_id_sf;
     RooUtil::HistMap* histmap_2016_muon_GH_id_lowpt_sf;
+    RooUtil::HistMap* histmap_2016_muon_BCDEF_looseid_sf;
+    RooUtil::HistMap* histmap_2016_muon_BCDEF_looseid_lowpt_sf;
+    RooUtil::HistMap* histmap_2016_muon_GH_looseid_sf;
+    RooUtil::HistMap* histmap_2016_muon_GH_looseid_lowpt_sf;
     RooUtil::HistMap* histmap_2016_muon_veto_iso_sf;
     RooUtil::HistMap* histmap_2016_muon_zid_iso_sf;
     RooUtil::HistMap* histmap_2016_muon_wid_iso_sf;
     RooUtil::HistMap* histmap_2017_muon_id_sf;
     RooUtil::HistMap* histmap_2017_muon_id_lowpt_sf;
+    RooUtil::HistMap* histmap_2017_muon_looseid_sf;
+    RooUtil::HistMap* histmap_2017_muon_looseid_lowpt_sf;
     RooUtil::HistMap* histmap_2017_muon_veto_iso_sf;
     RooUtil::HistMap* histmap_2017_muon_zid_iso_sf;
     RooUtil::HistMap* histmap_2017_muon_wid_iso_sf;
     RooUtil::HistMap* histmap_2018_muon_id_sf;
     RooUtil::HistMap* histmap_2018_muon_id_lowpt_sf;
+    RooUtil::HistMap* histmap_2018_muon_looseid_sf;
+    RooUtil::HistMap* histmap_2018_muon_looseid_lowpt_sf;
     RooUtil::HistMap* histmap_2018_muon_veto_iso_sf;
     RooUtil::HistMap* histmap_2018_muon_zid_iso_sf;
     RooUtil::HistMap* histmap_2018_muon_wid_iso_sf;
-    RooUtil::HistMap* histmap_2016_fake_rate_el;
-    RooUtil::HistMap* histmap_2016_fake_rate_mu;
-    RooUtil::HistMap* histmap_2017_fake_rate_el;
-    RooUtil::HistMap* histmap_2017_fake_rate_mu;
-    RooUtil::HistMap* histmap_2018_fake_rate_el;
-    RooUtil::HistMap* histmap_2018_fake_rate_mu;
-    RooUtil::HistMap* histmap_2016_elec_mva_medium_sf;
-    RooUtil::HistMap* histmap_2016_elec_mva_veto_sf;
-    RooUtil::HistMap* histmap_2017_elec_mva_medium_sf;
-    RooUtil::HistMap* histmap_2017_elec_mva_veto_sf;
-    RooUtil::HistMap* histmap_2018_elec_mva_medium_sf;
-    RooUtil::HistMap* histmap_2018_elec_mva_veto_sf;
-
-    RooUtil::HistMap* histmap_2016_elec_mva_loose_sf;
-    RooUtil::HistMap* histmap_2017_elec_mva_loose_sf;
-    RooUtil::HistMap* histmap_2018_elec_mva_loose_sf;
 
     L1PrefireWeight l1prefireweight;
 
@@ -360,9 +341,9 @@ public:
     float LeptonScaleFactorZZ4l();
     float LeptonScaleFactor5Lep(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
     float LeptonScaleFactor6Lep(SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
-    float LeptonScaleFactorv1();
+    // float LeptonScaleFactorv1(); // Deprecated
     float IndividualLeptonScaleFactor(int, LeptonID, SystematicVariation electronVariation=SystematicVariation::Nominal, int=0);
-    float FakeFactor();
+    // float FakeFactor(); // Deprecated
     float BTagSF();
 
     bool passZCandLeptonID(int idx);
