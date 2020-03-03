@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     //
     // e.g.  If we have,
     //
-    // /nfs-7/userdata/phchang/babies/WVZ2018_v0.0.5/
+    // ${WVZ_DATA_PATH}/babies/WVZ2018_v0.0.5/
     //      dy_m1050_madgraph_1.root
     //      dy_m50_madgraph_1.root
     //      ggh_hzz4l_powheg_1.root
@@ -81,12 +81,17 @@ int main(int argc, char** argv)
     // if argv[1] is of the format "file.root" with a ".root" extension
     // take the argument as the file name to be run over
 
+    const char * userDataPath = std::getenv("WVZ_DATA_PATH");
+    if(!userDataPath) {
+        throw std::runtime_error("WVZ_DATA_PATH not set!");
+    }
+
     for (auto& InputRoot : filenamelist)
     {
 
         // Form full path to the input root file
         TString RootName = InputRoot;
-        TString RootAdd = "/nfs-7/userdata/phchang/babies/" + (TString)argv[2] + "/" + (TString)InputRoot + ".root";
+        TString RootAdd = (TString)(std::string(userDataPath) + "/babies/" + argv[2] + "/" + InputRoot + ".root");
 
         // Increase # of input files ran over
         count++;

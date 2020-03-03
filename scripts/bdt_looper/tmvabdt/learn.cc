@@ -71,7 +71,12 @@ int main(int argc, char** argv)
 
     // sample parent directory
     TString version = "v0.1.12.7";
-    TString dirpath = "/nfs-7/userdata/phchang/babies/BDT_" + version;
+
+    const char * userDataPath = std::getenv("WVZ_DATA_PATH");
+    if(!userDataPath) {
+        throw std::runtime_error("WVZ_DATA_PATH not set!");
+    }
+    TString dirpath = std::string(userDataPath) + "/babies/BDT_" + version;
 
     // Get signal sample TChain
     TString SigSampleGlobber = "";

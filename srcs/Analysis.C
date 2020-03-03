@@ -7,6 +7,8 @@
 #include "METObject.cc"
 #include "lester_mt2_bisect.h"
 
+#include <stdexcept>
+
 TheoryWeight theoryweight;
 
 //______________________________________________________________________________________________
@@ -1670,44 +1672,52 @@ void Analysis::fillSkimTree(std::vector<int> region_flags)
 //______________________________________________________________________________________________
 void Analysis::loadScaleFactors()
 {
-    histmap_2016_elec_reco_highpt_sf    = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2016_elec_reco_lowpt_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EGM2D_BtoH_low_RecoSF_Legacy2016.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2016_elec_medium_sf         = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2016LegacyReReco_ElectronMedium_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2016_elec_veto_sf           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2016_ElectronWPVeto_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2017_elec_reco_highpt_sf    = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2017_elec_reco_lowpt_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/egammaEffi.txt_EGM2D_runBCDEF_passingRECO_lowEt.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2017_elec_medium_sf         = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2017_ElectronMedium.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2017_elec_veto_sf           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2017_ElectronWPVeto_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2018_elec_reco_sf           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/egammaEffi.txt_EGM2D_updatedAll.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2018_elec_medium_sf         = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2018_ElectronMedium.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2018_elec_veto_sf           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2018_ElectronWPVeto_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2016_muon_BCDEF_id_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_eta_pt"); // x=eta, y=pt
-    histmap_2016_muon_BCDEF_id_lowpt_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_lowpt_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
-    histmap_2016_muon_veto_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2016vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
-    histmap_2016_muon_zid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
-    histmap_2016_muon_wid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2016vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
-    histmap_2016_muon_GH_id_sf          = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_RunGH_SF_ID.root:NUM_MediumID_DEN_genTracks_eta_pt"); // x=eta, y=pt 45% of 2016 data
-    histmap_2016_muon_GH_id_lowpt_sf    = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2016_rootfiles_lowpt_RunGH_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta 45% of 2016 data
-    histmap_2017_muon_id_sf             = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2017_rootfiles_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
-    histmap_2017_muon_id_lowpt_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2017_rootfiles_lowpt_RunBCDEF_SF_ID_JPsi.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
-    histmap_2017_muon_veto_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2017vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
-    histmap_2017_muon_zid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
-    histmap_2017_muon_wid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2017vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
-    histmap_2018_muon_id_sf             = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2018_rootfiles_RunABCD_SF_ID.root:NUM_MediumID_DEN_TrackerMuons_pt_abseta"); // x=pt, y=abseta
-    histmap_2018_muon_id_lowpt_sf       = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/EfficiencyStudies_2018_rootfiles_lowpt_RunABCD_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
-    histmap_2018_muon_veto_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2018vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
-    histmap_2018_muon_zid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
-    histmap_2018_muon_wid_iso_sf = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v2/MuonID_2018vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
-    histmap_2016_fake_rate_el           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_el_2016.root:fake_rate_el_data");
-    histmap_2016_fake_rate_mu           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_mu_2016.root:fake_rate_mu_data");
-    histmap_2017_fake_rate_el           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_el_2017.root:fake_rate_el_data");
-    histmap_2017_fake_rate_mu           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_mu_2017.root:fake_rate_mu_data");
-    histmap_2018_fake_rate_el           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_el_2018.root:fake_rate_el_data");
-    histmap_2018_fake_rate_mu           = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/fake_rate_mu_2018.root:fake_rate_mu_data");
+    const char * userDataPath = std::getenv("WVZ_DATA_PATH");
+    if(!userDataPath) {
+        throw std::runtime_error("WVZ_DATA_PATH not set!");
+    }
+    std::string scaleFactorPath = std::string(userDataPath) + "/analysis_data/scalefactors/wvz/";
 
-    histmap_2016_elec_mva_medium_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2016LegacyReReco_ElectronMVA90_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2017_elec_mva_medium_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2017_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
-    histmap_2018_elec_mva_medium_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2018_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
+    using RooUtil::HistMap;
+
+    histmap_2016_elec_reco_highpt_sf    = new HistMap(scaleFactorPath + "v1/EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2016_elec_reco_lowpt_sf     = new HistMap(scaleFactorPath + "v1/EGM2D_BtoH_low_RecoSF_Legacy2016.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2016_elec_medium_sf         = new HistMap(scaleFactorPath + "v1/2016LegacyReReco_ElectronMedium_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2016_elec_veto_sf           = new HistMap(scaleFactorPath + "v1/2016_ElectronWPVeto_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2017_elec_reco_highpt_sf    = new HistMap(scaleFactorPath + "v1/egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2017_elec_reco_lowpt_sf     = new HistMap(scaleFactorPath + "v1/egammaEffi.txt_EGM2D_runBCDEF_passingRECO_lowEt.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2017_elec_medium_sf         = new HistMap(scaleFactorPath + "v1/2017_ElectronMedium.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2017_elec_veto_sf           = new HistMap(scaleFactorPath + "v1/2017_ElectronWPVeto_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2018_elec_reco_sf           = new HistMap(scaleFactorPath + "v1/egammaEffi.txt_EGM2D_updatedAll.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2018_elec_medium_sf         = new HistMap(scaleFactorPath + "v1/2018_ElectronMedium.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2018_elec_veto_sf           = new HistMap(scaleFactorPath + "v1/2018_ElectronWPVeto_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2016_muon_BCDEF_id_sf       = new HistMap(scaleFactorPath + "v1/EfficiencyStudies_2016_rootfiles_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_eta_pt"); // x=eta, y=pt
+    histmap_2016_muon_BCDEF_id_lowpt_sf = new HistMap(scaleFactorPath + "v1/EfficiencyStudies_2016_rootfiles_lowpt_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
+    histmap_2016_muon_veto_iso_sf = new HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2016vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
+    histmap_2016_muon_zid_iso_sf = new HistMap(scaleFactorPath + "v2/MuonID_2016vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2016_muon_wid_iso_sf = new HistMap(scaleFactorPath + "v2/MuonID_2016vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2016_muon_GH_id_sf          = new HistMap(scaleFactorPath + "v1/EfficiencyStudies_2016_rootfiles_RunGH_SF_ID.root:NUM_MediumID_DEN_genTracks_eta_pt"); // x=eta, y=pt 45% of 2016 data
+    histmap_2016_muon_GH_id_lowpt_sf    = new HistMap(scaleFactorPath + "v1/EfficiencyStudies_2016_rootfiles_lowpt_RunGH_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta 45% of 2016 data
+    histmap_2017_muon_id_sf             = new HistMap(scaleFactorPath + "v1/EfficiencyStudies_2017_rootfiles_RunBCDEF_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
+    histmap_2017_muon_id_lowpt_sf       = new HistMap(scaleFactorPath + "v1/EfficiencyStudies_2017_rootfiles_lowpt_RunBCDEF_SF_ID_JPsi.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
+    histmap_2017_muon_veto_iso_sf = new HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2017vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
+    histmap_2017_muon_zid_iso_sf = new HistMap(scaleFactorPath + "v2/MuonID_2017vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2017_muon_wid_iso_sf = new HistMap(scaleFactorPath + "v2/MuonID_2017vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2018_muon_id_sf             = new HistMap(scaleFactorPath + "v1/EfficiencyStudies_2018_rootfiles_RunABCD_SF_ID.root:NUM_MediumID_DEN_TrackerMuons_pt_abseta"); // x=pt, y=abseta
+    histmap_2018_muon_id_lowpt_sf       = new HistMap(scaleFactorPath + "v1/EfficiencyStudies_2018_rootfiles_lowpt_RunABCD_SF_ID.root:NUM_MediumID_DEN_genTracks_pt_abseta"); // x=pt, y=abseta
+    histmap_2018_muon_veto_iso_sf = new HistMap("/nfs-7/userdata/sapta/MuonSFs/wvz/v3/MuonID_2018vvv/muon/MuLoosePOG_MuVetoVVV/sf.root:h_sf_pt_vs_eta");
+    histmap_2018_muon_zid_iso_sf = new HistMap(scaleFactorPath + "v2/MuonID_2018vvv/muon/MuVetoVVV_MuLooseVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2018_muon_wid_iso_sf = new HistMap(scaleFactorPath + "v2/MuonID_2018vvv/muon/MuVetoVVV_MuTightVVV4l/sf.root:h_sf_pt_vs_eta");
+    histmap_2016_fake_rate_el           = new HistMap(scaleFactorPath + "v1/fake_rate_el_2016.root:fake_rate_el_data");
+    histmap_2016_fake_rate_mu           = new HistMap(scaleFactorPath + "v1/fake_rate_mu_2016.root:fake_rate_mu_data");
+    histmap_2017_fake_rate_el           = new HistMap(scaleFactorPath + "v1/fake_rate_el_2017.root:fake_rate_el_data");
+    histmap_2017_fake_rate_mu           = new HistMap(scaleFactorPath + "v1/fake_rate_mu_2017.root:fake_rate_mu_data");
+    histmap_2018_fake_rate_el           = new HistMap(scaleFactorPath + "v1/fake_rate_el_2018.root:fake_rate_el_data");
+    histmap_2018_fake_rate_mu           = new HistMap(scaleFactorPath + "v1/fake_rate_mu_2018.root:fake_rate_mu_data");
+
+    histmap_2016_elec_mva_medium_sf     = new HistMap(scaleFactorPath + "v1/2016LegacyReReco_ElectronMVA90_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2017_elec_mva_medium_sf     = new HistMap(scaleFactorPath + "v1/2017_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
+    histmap_2018_elec_mva_medium_sf     = new HistMap(scaleFactorPath + "v1/2018_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
     // histmap_2016_elec_mva_loose_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2016LegacyReReco_ElectronMVA90_Fall17V2.root:EGamma_SF2D"); // x=eta, y=pt
     // histmap_2017_elec_mva_loose_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2017_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt
     // histmap_2018_elec_mva_loose_sf     = new RooUtil::HistMap("/nfs-7/userdata/phchang/analysis_data/scalefactors/wvz/v1/2018_ElectronMVA90.root:EGamma_SF2D"); // x=eta, y=pt

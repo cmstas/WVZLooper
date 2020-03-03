@@ -9,6 +9,8 @@
     make clean
     make -j
 
+    export WVZ_DATA_PATH=/nfs-7/userdata/phchang
+
 ## Quick run
 
     sh runall.sh -b baseline_0709            -t WVZ -v v0.1.11
