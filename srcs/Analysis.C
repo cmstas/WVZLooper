@@ -3015,7 +3015,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
         {
             if (leptonId == LeptonID::CommonVeto)
             {
-                if (pt > 20)
+                if (pt >= 20)
                 {
                     if (varm == 0)
                         scalefactor *= 0.550 * histmap_2016_muon_BCDEF_looseid_sf       ->eval(eta, pt)  // x=eta, y=pt
@@ -3042,7 +3042,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
             }
             else
             {
-                if (pt > 20)
+                if (pt >= 20)
                 {
                     if (varm == 0)
                         scalefactor *= 0.550 * histmap_2016_muon_BCDEF_id_sf       ->eval(eta, pt)  // x=eta, y=pt
@@ -3099,7 +3099,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
         {
             if (leptonId == LeptonID::CommonVeto)
             {
-                if (pt > 20)
+                if (pt >= 20)
                 {
                     if (varm == 0)
                         scalefactor *= histmap_2017_muon_looseid_sf             ->eval(pt, abseta); // x=pt, y=abseta
@@ -3120,7 +3120,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
             }
             else
             {
-                if (pt > 20)
+                if (pt >= 20)
                 {
                     if (varm == 0)
                         scalefactor *= histmap_2017_muon_id_sf             ->eval(pt, abseta); // x=pt, y=abseta
@@ -3171,7 +3171,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
         {
             if (leptonId == LeptonID::CommonVeto)
             {
-                if (pt > 20)
+                if (pt >= 20)
                 {
                     if (varm == 0)
                         scalefactor *= histmap_2018_muon_looseid_sf             ->eval(pt, abseta); // x=pt, y=abseta
@@ -3192,7 +3192,7 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
             }
             else
             {
-                if (pt > 20)
+                if (pt >= 20)
                 {
                     if (varm == 0)
                         scalefactor *= histmap_2018_muon_id_sf             ->eval(pt, abseta); // x=pt, y=abseta
@@ -3238,10 +3238,6 @@ float Analysis::IndividualLeptonScaleFactor(int lep_idx, LeptonID leptonId, Syst
                 if (varm ==-1)
                     scalefactor *= histmap_2018_muon_veto_iso_sf       ->eval_down(abseta, std::max((double) pt, 10.1)); // x=pt, y=abseta
             }
-        }
-        if (abs(scalefactor - 1) > 0.18)
-        {
-            std::cout << "Warning! The Muon SF is more than 18 percent different.  Is this correct?" << std::endl;
         }
 
         // Adding extra 1% in quadrature for tag and probe IP correlation
