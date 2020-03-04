@@ -156,7 +156,7 @@ def write_datacards(ntuple_version, tag):
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        if proc == "zz" or proc == "ttz" or proc == "twz": thissyst["five{}_".format(year) + proc] = "1.3"
+        if proc == "zz" or proc == "ttz" or proc == "twz": thissyst["five{}_".format(year) + proc] = "1.304"
         else: thissyst["five{}_".format(year) + proc] = 0
     systs.append( ("FlatSystFiveZZ{}".format(year), "lnN", [], thissyst) )
 
