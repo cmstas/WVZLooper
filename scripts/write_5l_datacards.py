@@ -156,7 +156,7 @@ def write_datacards(ntuple_version, tag):
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        if proc == "zz": thissyst["five{}_".format(year) + proc] = "1.3"
+        if proc == "zz" or proc == "ttz" or proc == "twz": thissyst["five{}_".format(year) + proc] = "1.3"
         else: thissyst["five{}_".format(year) + proc] = 0
     systs.append( ("FlatSystFiveZZ{}".format(year), "lnN", [], thissyst) )
 
@@ -178,11 +178,11 @@ def write_datacards(ntuple_version, tag):
     #     thissyst["five{}_".format(year) + proc] = "1.032"
     # systs.append( ("FlatSystsTrigSF{}".format(year), "lnN", [], thissyst) )
 
-    # Flat additional systematics
-    thissyst = {}
-    for proc in mcprocs:
-        thissyst["five{}_".format(year) + proc] = "1.00"
-    systs.append( ("FlatSystsTrigMatchingSF{}".format(year), "lnN", [], thissyst) )
+    # # Flat additional systematics
+    # thissyst = {}
+    # for proc in mcprocs:
+    #     thissyst["five{}_".format(year) + proc] = "1.00"
+    # systs.append( ("FlatSystsTrigMatchingSF{}".format(year), "lnN", [], thissyst) )
 
     # Now create data card writer
     sig = hists_db["sig"]["Nominal"]
