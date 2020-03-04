@@ -166,17 +166,17 @@ def write_datacards(ntuple_version, tag):
         thissyst["five{}_".format(year) + proc] = "1.025"
     systs.append( ("FlatSystLumi{}".format(year), "lnN", [], thissyst) )
 
-    # Flat additional systematics
-    thissyst = {}
-    for proc in mcprocs:
-        thissyst["five{}_".format(year) + proc] = "1.03"
-    systs.append( ("FlatSystsIP3D{}".format(year), "lnN", [], thissyst) )
-
     # # Flat additional systematics
     # thissyst = {}
     # for proc in mcprocs:
-    #     thissyst["five{}_".format(year) + proc] = "1.032"
-    # systs.append( ("FlatSystsTrigSF{}".format(year), "lnN", [], thissyst) )
+    #     thissyst["five{}_".format(year) + proc] = "1.03"
+    # systs.append( ("FlatSystsIP3D{}".format(year), "lnN", [], thissyst) )
+
+    # Flat additional systematics
+    thissyst = {}
+    for proc in mcprocs:
+        thissyst["five{}_".format(year) + proc] = "1.032"
+    systs.append( ("FlatSystsTrigSF{}".format(year), "lnN", [], thissyst) )
 
     # # Flat additional systematics
     # thissyst = {}
