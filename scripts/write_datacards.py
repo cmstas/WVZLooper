@@ -119,7 +119,7 @@ def write_datacards(ntuple_version, tag):
             nonttzbkg = [              fname_wwz , fname_wzz , fname_zzz , fname_zz  ,             fname_twz , fname_wz  , fname_higgs , fname_othernoh]
 
 
-    systcategs = ["BTagHF", "BTagLF", "JES", "Pileup", "Qsq", "PDF", "AlphaS", "MET", "JER", "METPileup"] # Null string is the nominal variation
+    systcategs = ["BTagHF", "BTagLF", "JES", "Pileup", "Qsq", "PDF", "AlphaS", "MET", "JER", "METPileup","ElLepSF","MuLepSF"] # Null string is the nominal variation
     systnames = ["Nominal"] # Nominal always exist
     for systcateg in systcategs:
         systnames.append(systcateg+"Up")
