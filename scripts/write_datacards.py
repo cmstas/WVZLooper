@@ -336,7 +336,7 @@ def write_datacards(ntuple_version, tag):
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        thissyst["emu{}_".format(year) + proc] = "1.03"
+        thissyst["emu{}_".format(year) + proc] = "1.032"
     systs.append( ("FlatSystsTrigSF{}".format(year), "lnN", [], thissyst) )
 
     # Now create data card writer
@@ -537,7 +537,7 @@ def write_datacards(ntuple_version, tag):
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        thissyst["offz{}_".format(year) + proc] = "1.03"
+        thissyst["offz{}_".format(year) + proc] = "1.032"
     systs.append( ("FlatSystsTrigSF{}".format(year), "lnN", [], thissyst) )
 
     # Now create data card writer
