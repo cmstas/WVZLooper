@@ -24,3 +24,6 @@ python scripts/write_datacards.py -b v8 -t WVZMVA -v v0.1.21  -y -w -1 -s
 python scripts/write_datacards_bdt.py -b v8 -t WVZMVA -v v0.1.21  -y -w -s
 python scripts/write_datacards_bdt.py -b v8 -t WVZMVA -v v0.1.21  -y -w -1 -s
 
+# 5/6L
+python scripts/write_5l_datacards.py -b v8 -t WVZMVA -v v0.1.21 -w
+python scripts/write_6l_datacards.py -b v8 -t WVZMVA -v v0.1.21 -w
