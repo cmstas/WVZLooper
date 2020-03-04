@@ -48,6 +48,7 @@ def write_datacards(ntuple_version, tag):
     fname_wwz     = "outputs/{}/{}/wwz.root".format(ntuple_version, tag)
     fname_wzz     = "outputs/{}/{}/wzz.root".format(ntuple_version, tag)
     fname_zzz     = "outputs/{}/{}/zzz.root".format(ntuple_version, tag)
+    fname_zh      = "outputs/{}/{}/zh_zzz.root".format(ntuple_version, tag)
     fname_ttz     = "outputs/{}/{}/ttz.root".format(ntuple_version, tag)
     fname_zz      = "outputs/{}/{}/zz.root".format(ntuple_version, tag)
     fname_wz      = "outputs/{}/{}/wz.root".format(ntuple_version, tag)
@@ -78,12 +79,14 @@ def write_datacards(ntuple_version, tag):
     nonttzbkg = [fname_sig, fname_zz, fname_wz, fname_twz, fname_higgs, fname_othernoh]
 
     if args.wzz_only:
-        procs = ["data_obs", "sig", "wzz", "zzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
+        #procs = ["data_obs", "wzz", "zzz", "zh", "zz", "ttz", "twz", "wz", "higgs", "other"]
+        procs = ["data_obs", "sig", "wzz", "zzz", "zh", "zz", "ttz", "twz", "wz", "higgs", "other"]
+        #procs = ["data_obs", "sig", "wzz", "zzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
         mcprocs = procs[1:]
-        bkgprocs = procs[2:]
-        fnames =    [ fname_data , fname_wwz , fname_wzz , fname_zzz , fname_zz  , fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
-        nonzzbkg =  [              fname_wwz , fname_wzz , fname_zzz ,             fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
-        nonttzbkg = [              fname_wwz , fname_wzz , fname_zzz , fname_zz  ,             fname_twz , fname_wz  , fname_higgs , fname_othernoh]
+        bkgprocs = procs[3:]
+        fnames =    [ fname_data , fname_wwz , fname_wzz , fname_zzz , fname_zh, fname_zz  , fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
+        nonzzbkg =  [              fname_wwz , fname_wzz , fname_zzz , fname_zh,             fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
+        nonttzbkg = [              fname_wwz , fname_wzz , fname_zzz , fname_zh, fname_zz  ,             fname_twz , fname_wz  , fname_higgs , fname_othernoh]
 
     #systcategs = ["BTagHF", "BTagLF", "JES", "Pileup", "Qsq", "PDF", "AlphaS", "MET", "JER", "METPileup"] # Null string is the nominal variation
     systcategs = ["ElLepSF", "MuLepSF", "JES", "Pileup", "Qsq", "PDF", "AlphaS", "MET", "JER", "METPileup"] # Null string is the nominal variation
@@ -156,7 +159,7 @@ def write_datacards(ntuple_version, tag):
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        if proc == "zz": thissyst["five{}_".format(year) + proc] = "1.3"
+        if proc == "zz" or proc == "ttz" or proc == "twz": thissyst["five{}_".format(year) + proc] = "1.304"
         else: thissyst["five{}_".format(year) + proc] = 0
     systs.append( ("FlatSystFiveZZ{}".format(year), "lnN", [], thissyst) )
 
@@ -166,30 +169,36 @@ def write_datacards(ntuple_version, tag):
         thissyst["five{}_".format(year) + proc] = "1.025"
     systs.append( ("FlatSystLumi{}".format(year), "lnN", [], thissyst) )
 
-    # Flat additional systematics
-    thissyst = {}
-    for proc in mcprocs:
-        thissyst["five{}_".format(year) + proc] = "1.03"
-    systs.append( ("FlatSystsIP3D{}".format(year), "lnN", [], thissyst) )
+    # # Flat additional systematics
+    # thissyst = {}
+    # for proc in mcprocs:
+    #     thissyst["five{}_".format(year) + proc] = "1.03"
+    # systs.append( ("FlatSystsIP3D{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}
     for proc in mcprocs:
-        thissyst["five{}_".format(year) + proc] = "1.02"
+        thissyst["five{}_".format(year) + proc] = "1.032"
     systs.append( ("FlatSystsTrigSF{}".format(year), "lnN", [], thissyst) )
 
-    # Flat additional systematics
-    thissyst = {}
-    for proc in mcprocs:
-        thissyst["five{}_".format(year) + proc] = "1.00"
-    systs.append( ("FlatSystsTrigMatchingSF{}".format(year), "lnN", [], thissyst) )
+    # # Flat additional systematics
+    # thissyst = {}
+    # for proc in mcprocs:
+    #     thissyst["five{}_".format(year) + proc] = "1.00"
+    # systs.append( ("FlatSystsTrigMatchingSF{}".format(year), "lnN", [], thissyst) )
 
     # Now create data card writer
-    sig = hists_db["sig"]["Nominal"]
+    if (not args.wzz_only):
+        sig = hists_db["sig"]["Nominal"]
+    else:
+        sig = hists_db["wzz"]["Nominal"]
     bgs = [ hists_db[proc]["Nominal"] for proc in bkgprocs ]
     data = hists_db["data_obs"]["Nominal"]
+    #if (not args.wzz_only):
+    #    d = dw.DataCardWriter(sig=sig, bgs=bgs, data=None, systs=systs, no_stat_procs=[])
+    #else:
     d = dw.DataCardWriter(sig=sig, bgs=bgs, data=None, systs=systs, no_stat_procs=[])
-
+  
     finalyields = []
     d.set_bin(1)
     d.set_region_name("bin{}".format(1))
