@@ -299,7 +299,8 @@ def write_datacards(ntuple_version, tag):
     for systcateg in systcategs:
         thissyst = {}
         for proc in mcprocs:
-            if proc not in ["zz", "ttz", "wz", "twz"]:
+            # if proc not in ["zz", "ttz", "wz", "twz"]:
+            if proc not in ["zz", "ttz", "wz"]:
                 thissyst["emu{}_".format(year) + proc] = [hists_db[proc][systcateg+"Up"], hists_db[proc][systcateg+"Down"]]
             else:
                 thissyst["emu{}_".format(year) + proc] = 0
@@ -330,12 +331,12 @@ def write_datacards(ntuple_version, tag):
         else: thissyst["emu{}_".format(year) + proc] = 0
     systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
 
-    # Flat additional systematics
-    thissyst = {}
-    for proc in mcprocs:
-        if proc == "twz": thissyst["emu{}_".format(year) + proc] = "1.47" # TWZ Syst
-        else: thissyst["emu{}_".format(year) + proc] = 0
-    systs.append( ("FlatSystTWZ{}".format(year), "lnN", [], thissyst) )
+    # # Flat additional systematics
+    # thissyst = {}
+    # for proc in mcprocs:
+    #     if proc == "twz": thissyst["emu{}_".format(year) + proc] = "1.47" # TWZ Syst
+    #     else: thissyst["emu{}_".format(year) + proc] = 0
+    # systs.append( ("FlatSystTWZ{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}
@@ -467,7 +468,8 @@ def write_datacards(ntuple_version, tag):
     for systcateg in systcategs:
         thissyst = {}
         for proc in mcprocs:
-            if proc not in ["zz", "ttz", "wz", "twz"]:
+            # if proc not in ["zz", "ttz", "wz", "twz"]:
+            if proc not in ["zz", "ttz", "wz"]:
                 thissyst["offz{}_".format(year) + proc] = [hists_db[proc][systcateg+"Up"], hists_db[proc][systcateg+"Down"]]
             else:
                 thissyst["offz{}_".format(year) + proc] = 0
@@ -499,12 +501,12 @@ def write_datacards(ntuple_version, tag):
         else: thissyst["offz{}_".format(year) + proc] = 0
     systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
 
-    # Flat additional systematics
-    thissyst = {}
-    for proc in mcprocs:
-        if proc == "twz": thissyst["offz{}_".format(year) + proc] = "1.47" # TWZ Syst
-        else: thissyst["offz{}_".format(year) + proc] = 0
-    systs.append( ("FlatSystTWZ{}".format(year), "lnN", [], thissyst) )
+    # # Flat additional systematics
+    # thissyst = {}
+    # for proc in mcprocs:
+    #     if proc == "twz": thissyst["offz{}_".format(year) + proc] = "1.47" # TWZ Syst
+    #     else: thissyst["offz{}_".format(year) + proc] = 0
+    # systs.append( ("FlatSystTWZ{}".format(year), "lnN", [], thissyst) )
 
     # Flat additional systematics
     thissyst = {}

@@ -18,7 +18,7 @@ from six.moves import zip
 # Baseline_Version = "syst"
 Ntuple_Type = "WVZMVA"
 Ntuple_Version = "v0.1.21"
-Baseline_Version = "v3"
+Baseline_Version = "v8"
 
 syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
 # syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "PDF", "Qsq", "AlphaS"]
