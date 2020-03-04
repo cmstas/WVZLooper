@@ -1672,11 +1672,7 @@ void Analysis::fillSkimTree(std::vector<int> region_flags)
 //______________________________________________________________________________________________
 void Analysis::loadScaleFactors()
 {
-    const char * userDataPath = std::getenv("WVZ_DATA_PATH");
-    if(!userDataPath) {
-        throw std::runtime_error("WVZ_DATA_PATH not set!");
-    }
-    std::string scaleFactorPath = std::string(userDataPath) + "/analysis_data/scalefactors/wvz/";
+    std::string scaleFactorPath = "scale_factors/muons/";
 
     using RooUtil::HistMap;
 
