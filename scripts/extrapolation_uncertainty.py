@@ -18,7 +18,7 @@ from six.moves import zip
 # Baseline_Version = "syst"
 Ntuple_Type = "WVZMVA"
 Ntuple_Version = "v0.1.21"
-Baseline_Version = "v8"
+Baseline_Version = "v9"
 
 syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "MET", "PDF", "Qsq", "AlphaS", "METPileup"]
 # syst_list_all = ["Nominal", "ElLepSF", "MuLepSF", "JES", "Pileup", "BTagHF", "BTagLF", "PDF", "Qsq", "AlphaS"]
@@ -716,6 +716,12 @@ if __name__ == "__main__":
 
     main_zz_onz_cut_efficiency_check()
     main_ttz_btag_cut_efficiency_check()
-    main()
-    main_bdt()
+    # main()
+    # main_bdt()
+
+    # # MET/Mll combined extrapolation
+    # print("TF OnZ -> OffZ SR")
+    # hists = get_alpha_hists("zz", "ChannelOffZSR", "ChannelOnZ")
+    # p.print_yield_table_from_list(hists, "exp/zz_eemm_tf.txt", prec=4, binrange=[1,2,3], noerror=True)
+    # p.print_yield_tex_table_from_list(hists, "exp/zz_eemm_tf.tex", prec=4, caption="eemm zz transfer factor", noerror=True)
 

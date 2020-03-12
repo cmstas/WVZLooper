@@ -19,7 +19,7 @@ parser.add_argument('-t' , '--ntuple_type'     , dest='ntuple_type'     , help='
 parser.add_argument('-v' , '--ntuple_version'  , dest='ntuple_version'  , help='v0.1.6, v0.1.7, etc.'                         , required=True)
 parser.add_argument('-1' , '--emu_one_bin'     , dest='emu_one_bin'     , help='write emu in one bin'                         , action='store_true', default=False)
 parser.add_argument('-4' , '--emu_four_bin'    , dest='emu_four_bin'    , help='write emu in four bin'                        , action='store_true', default=True)
-parser.add_argument('-3' , '--eemm_three_bin'  , dest='eemm_three_bin'  , help='write eemm in three bin'                      , action='store_true', default=True)
+parser.add_argument('-3' , '--eemm_three_bin'  , dest='eemm_three_bin'  , help='write eemm in three bin'                      , action='store_true', default=False)
 parser.add_argument('-y' , '--print_yields'    , dest='print_yields'    , help='to print wysiwyg yields'                      , action='store_true', default=False)
 parser.add_argument('-d' , '--print_detail'    , dest='print_detail'    , help='to print wysiwyg uncertainty detail'          , action='store_true', default=False)
 parser.add_argument('-w' , '--wwz_only'        , dest='wwz_only'        , help='to write wwz only signal datacards'           , action='store_true', default=False)
@@ -104,14 +104,14 @@ def write_datacards(ntuple_version, tag):
 
     if args.wwz_only:
         if args.nonh_vh_split:
-            procs = ["data_obs", "sig", "zhwwz", "nonhwzz", "whwzz", "nonhzzz", "zhzzz", "zz", "ttz", "wz", "twz", "higgs", "other"]
+            procs = ["data_obs", "sig", "zhwwz", "nonhwzz", "whwzz", "nonhzzz", "zhzzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
             mcprocs = procs[1:]
             bkgprocs = procs[2:]
             fnames =    [ fname_data , fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz , fname_zz  , fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
             nonzzbkg =  [              fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz ,             fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
             nonttzbkg = [              fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz , fname_zz  ,             fname_twz , fname_wz  , fname_higgs , fname_othernoh]
         else:
-            procs = ["data_obs", "sig", "wzz", "zzz", "zz", "ttz", "wz", "higgs", "twz", "other"]
+            procs = ["data_obs", "sig", "wzz", "zzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
             mcprocs = procs[1:]
             bkgprocs = procs[2:]
             fnames =    [ fname_data , fname_wwz , fname_wzz , fname_zzz , fname_zz  , fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
@@ -307,12 +307,12 @@ def write_datacards(ntuple_version, tag):
     #     else: thissyst["emu{}_".format(year) + proc] = 0
     # systs.append( ("FlatSystMTexpZZ{}".format(year), "lnN", [], thissyst) )
 
-    # # Flat additional systematics
-    # thissyst = {}
-    # for proc in mcprocs:
-    #     if proc == "wz": thissyst["emu{}_".format(year) + proc] = "1.3" # Fake Syst
-    #     else: thissyst["emu{}_".format(year) + proc] = 0
-    # systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
+    # Flat additional systematics
+    thissyst = {}
+    for proc in mcprocs:
+        if proc == "wz": thissyst["emu{}_".format(year) + proc] = "1.3" # Fake Syst
+        else: thissyst["emu{}_".format(year) + proc] = 0
+    systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
 
     # # Flat additional systematics
     # thissyst = {}
@@ -355,10 +355,10 @@ def write_datacards(ntuple_version, tag):
                 vals = d.print_yields(detail=args.print_detail)
                 if vals:
                     if args.nonh_vh_split:
-                        print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}{}".format(wwzonlysuffix, year, i))
+                        print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}{}".format(wwzonlysuffix, year, i), vals[2])
                         finalyields.append(vals)
                     else:
-                        print_yield_table(vals[0], vals[1], "textable/emu{}{}{}".format(wwzonlysuffix, year, i))
+                        print_yield_table(vals[0], vals[1], "textable/emu{}{}{}".format(wwzonlysuffix, year, i), vals[2])
                         finalyields.append(vals)
     elif nbins == 1:
         d.set_bin(1)
@@ -368,9 +368,9 @@ def write_datacards(ntuple_version, tag):
             vals = d.print_yields(detail=args.print_detail)
             if vals:
                 if args.nonh_vh_split:
-                    print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}".format(wwzonlysuffix, year))
+                    print_yield_table(vals[0], vals[1], "textable/emuSplit{}{}".format(wwzonlysuffix, year), vals[2])
                 else:
-                    print_yield_table(vals[0], vals[1], "textable/emu{}{}".format(wwzonlysuffix, year))
+                    print_yield_table(vals[0], vals[1], "textable/emu{}{}".format(wwzonlysuffix, year), vals[2])
 
     # colors = [2005, 2001, 2003, 2007, 920, 2012, 2011, 2002]
     # p.plot_hist(data=None, bgs=bgs, sigs=[sig], options={"bkg_sort_method":"ascending", "yaxis_range":[0.,2.5]}, colors=colors, sig_labels=["sig"], legend_labels=bkgprocs)
@@ -428,7 +428,6 @@ def write_datacards(ntuple_version, tag):
                 after_scale = h.Integral()
                 if syst == "Nominal":
                     print(year, "zz", before_scale, after_scale)
-            if proc == "wz": h.Scale(2.0)
 
             hists_db[proc][syst] = h
 
@@ -508,12 +507,12 @@ def write_datacards(ntuple_version, tag):
     #     else: thissyst["offz{}_".format(year) + proc] = 0
     # systs.append( ("FlatSystMETexpZZ{}".format(year), "lnN", [], thissyst) )
 
-    # # Flat additional systematics
-    # thissyst = {}
-    # for proc in mcprocs:
-    #     if proc == "wz": thissyst["offz{}_".format(year) + proc] = "1.3" # Fake Syst
-    #     else: thissyst["offz{}_".format(year) + proc] = 0
-    # systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
+    # Flat additional systematics
+    thissyst = {}
+    for proc in mcprocs:
+        if proc == "wz": thissyst["offz{}_".format(year) + proc] = "1.3" # Fake Syst
+        else: thissyst["offz{}_".format(year) + proc] = 0
+    systs.append( ("FlatSystWZ{}".format(year), "lnN", [], thissyst) )
 
     # # Flat additional systematics
     # thissyst = {}
@@ -555,10 +554,10 @@ def write_datacards(ntuple_version, tag):
                 vals = d.print_yields(detail=args.print_detail)
                 if vals:
                     if args.nonh_vh_split:
-                        print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}{}".format(wwzonlysuffix, year, i))
+                        print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}{}".format(wwzonlysuffix, year, i), vals[2])
                         finalyields.append(vals)
                     else:
-                        print_yield_table(vals[0], vals[1], "textable/offz{}{}{}".format(wwzonlysuffix, year, i))
+                        print_yield_table(vals[0], vals[1], "textable/offz{}{}{}".format(wwzonlysuffix, year, i), vals[2])
                         finalyields.append(vals)
     elif nbins == 1:
         d.set_bin(1)
@@ -568,9 +567,9 @@ def write_datacards(ntuple_version, tag):
             vals = d.print_yields(detail=args.print_detail)
             if vals:
                 if args.nonh_vh_split:
-                    print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}".format(wwzonlysuffix, year))
+                    print_yield_table(vals[0], vals[1], "textable/offzSplit{}{}".format(wwzonlysuffix, year), vals[2])
                 else:
-                    print_yield_table(vals[0], vals[1], "textable/offz{}{}".format(wwzonlysuffix, year))
+                    print_yield_table(vals[0], vals[1], "textable/offz{}{}".format(wwzonlysuffix, year), vals[2])
 
 
     if len(finalyields) > 5:
@@ -659,7 +658,7 @@ def rebin36(h):
 
     return h
 
-def print_yield_table(procs, rates, output_name):
+def print_yield_table(procs, rates, output_name, datayield):
 
     hists = []
     bkgh = r.TH1F("Total", "Total", 1, 0, 1)
@@ -680,7 +679,7 @@ def print_yield_table(procs, rates, output_name):
     bkgh.SetBinError(1, total_rate.err)
     hists.insert(0, bkgh)
     obsh = bkgh.Clone("obs")
-    obsh.Reset()
+    obsh.SetBinContent(1, datayield)
     hists.insert(0, obsh)
 
     p.print_yield_table_from_list(hists, output_name + ".txt", prec=2, binrange=[1])

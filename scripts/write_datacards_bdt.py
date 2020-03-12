@@ -123,14 +123,14 @@ def write_datacards(ntuple_version, tag):
 
     if args.wwz_only:
         if args.nonh_vh_split:
-            procs = ["data_obs", "sig", "zhwwz", "nonhwzz", "whwzz", "nonhzzz", "zhzzz", "zz", "ttz", "wz", "twz", "higgs", "other"]
+            procs = ["data_obs", "sig", "zhwwz", "nonhwzz", "whwzz", "nonhzzz", "zhzzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
             mcprocs = procs[1:]
             bkgprocs = procs[2:]
             fnames =    [ fname_data , fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz , fname_zz  , fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
             nonzzbkg =  [              fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz ,             fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
             nonttzbkg = [              fname_nonh_wwz , fname_zh_wwz , fname_nonh_wzz , fname_wh_wzz , fname_nonh_zzz , fname_zh_zzz , fname_zz  ,             fname_twz , fname_wz  , fname_higgs , fname_othernoh]
         else:
-            procs = ["data_obs", "sig", "wzz", "zzz", "zz", "ttz", "wz", "higgs", "twz", "other"]
+            procs = ["data_obs", "sig", "wzz", "zzz", "zz", "ttz", "twz", "wz", "higgs", "other"]
             mcprocs = procs[1:]
             bkgprocs = procs[2:]
             fnames =    [ fname_data , fname_wwz , fname_wzz , fname_zzz , fname_zz  , fname_ttz , fname_twz , fname_wz  , fname_higgs , fname_othernoh]
@@ -372,10 +372,10 @@ def write_datacards(ntuple_version, tag):
             if vals:
                 if n_emu_bdt_bins == 1: i = "One"
                 if args.nonh_vh_split:
-                    print_yield_table(vals[0], vals[1], "textable/bdtemuSplit{}{}{}".format(wwzonlysuffix, year, i))
+                    print_yield_table(vals[0], vals[1], "textable/bdtemuSplit{}{}{}".format(wwzonlysuffix, year, i), vals[2])
                     finalyields.append(vals)
                 else:
-                    print_yield_table(vals[0], vals[1], "textable/bdtemu{}{}{}".format(wwzonlysuffix, year, i))
+                    print_yield_table(vals[0], vals[1], "textable/bdtemu{}{}{}".format(wwzonlysuffix, year, i), vals[2])
                     finalyields.append(vals)
 
     ###############################
@@ -541,10 +541,10 @@ def write_datacards(ntuple_version, tag):
             if vals:
                 if n_offz_bdt_bins == 1: i = "One"
                 if args.nonh_vh_split:
-                    print_yield_table(vals[0], vals[1], "textable/bdtoffzSplit{}{}{}".format(wwzonlysuffix, year, i))
+                    print_yield_table(vals[0], vals[1], "textable/bdtoffzSplit{}{}{}".format(wwzonlysuffix, year, i), vals[2])
                     finalyields.append(vals)
                 else:
-                    print_yield_table(vals[0], vals[1], "textable/bdtoffz{}{}{}".format(wwzonlysuffix, year, i))
+                    print_yield_table(vals[0], vals[1], "textable/bdtoffz{}{}{}".format(wwzonlysuffix, year, i), vals[2])
                     finalyields.append(vals)
 
     # # colors = [2005, 2001, 2003, 2007, 920, 2012, 2011, 2002]
@@ -818,7 +818,10 @@ def write_datacards(ntuple_version, tag):
                 # sig_labels = ["WWZ","WZZ","ZZZ"]
                 )
 
-def print_yield_table(procs, rates, output_name):
+def print_yield_table(procs, rates, output_name, datayield=0):
+
+    print(procs)
+    print(rates)
 
     hists = []
     bkgh = r.TH1F("Total", "Total", 1, 0, 1)
@@ -840,6 +843,7 @@ def print_yield_table(procs, rates, output_name):
     hists.insert(0, bkgh)
     obsh = bkgh.Clone("obs")
     obsh.Reset()
+    obsh.SetBinContent(1, datayield)
     hists.insert(0, obsh)
 
     p.print_yield_table_from_list(hists, output_name + ".txt", prec=2, binrange=[1])

@@ -6,6 +6,7 @@
 #
 ###########################################
 
+
 #____________________________________________________________________________________
 from __future__ import absolute_import
 import six
@@ -31,6 +32,7 @@ def main_analysis_make_plot_userfilter():
     parser.add_argument('-S' , '--signal_scale'    , dest='signal_scale'    , help='signal scale'        , default=1                                                                                                 )
     parser.add_argument('-U' , '--remove_underflow', dest='remove_underflow', help='remove underflow'    , default=False, action='store_true'                                                                        )
     # parser.add_argument('-U' , '--remove_underflow', dest='remove_underflow', help='remove underflow'    , default=True, action='store_true'                                                                        )
+    parser.add_argument('-5' , '--five_background' , dest='five_background' , help='plot with five bkg'  , default=True, action='store_true'                                                                        )
     
     args = parser.parse_args()
 
@@ -46,20 +48,21 @@ def main_analysis_make_plot_userfilter():
     filter_pattern = args.filter_pattern
     unblind = args.unblind
 
-    bkgfiles = [
-            "outputs/{}/{}/zz.root".format(ntuple_version, tag),
-            "outputs/{}/{}/ttz.root".format(ntuple_version, tag),
-            "outputs/{}/{}/twz.root".format(ntuple_version, tag),
-            "outputs/{}/{}/wz.root".format(ntuple_version, tag),
-            # "outputs/{}/{}/rare.root".format(ntuple_version, tag),
-            # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
-            "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
-            # # "outputs/{}/{}/other.root".format(ntuple_version, tag),
-            "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
-            # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
-            # "outputs/{}/{}/othernodyttbar.root".format(ntuple_version, tag),
-            ]
-    if args.stack_signal:
+    if args.five_background:
+        bkgfiles = [
+                "outputs/{}/{}/other.root".format(ntuple_version, tag),
+                "outputs/{}/{}/wz.root".format(ntuple_version, tag),
+                "outputs/{}/{}/twz.root".format(ntuple_version, tag),
+                "outputs/{}/{}/ttz.root".format(ntuple_version, tag),
+                "outputs/{}/{}/zz.root".format(ntuple_version, tag),
+                # "outputs/{}/{}/rare.root".format(ntuple_version, tag),
+                # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
+                # "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
+                # "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
+                # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
+                # "outputs/{}/{}/othernodyttbar.root".format(ntuple_version, tag),
+                ]
+    else:
         bkgfiles = [
                 "outputs/{}/{}/zz.root".format(ntuple_version, tag),
                 "outputs/{}/{}/ttz.root".format(ntuple_version, tag),
@@ -70,11 +73,39 @@ def main_analysis_make_plot_userfilter():
                 "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
                 # "outputs/{}/{}/other.root".format(ntuple_version, tag),
                 "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
-                "outputs/{}/{}/wwz.root".format(ntuple_version, tag),
-                "outputs/{}/{}/wzz.root".format(ntuple_version, tag),
-                "outputs/{}/{}/zzz.root".format(ntuple_version, tag),
+                # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
+                # "outputs/{}/{}/othernodyttbar.root".format(ntuple_version, tag),
                 ]
-        if args.one_signal:
+    if args.stack_signal:
+        if args.five_background:
+            bkgfiles = [
+                    "outputs/{}/{}/other.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/wz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/twz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/ttz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/zz.root".format(ntuple_version, tag),
+                    # "outputs/{}/{}/rare.root".format(ntuple_version, tag),
+                    # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
+                    # "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
+                    # "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/zzz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/wzz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/wwz.root".format(ntuple_version, tag),
+                    ]
+            if args.one_signal:
+                bkgfiles = [
+                        "outputs/{}/{}/zz.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/ttz.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/twz.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/wz.root".format(ntuple_version, tag),
+                        # "outputs/{}/{}/rare.root".format(ntuple_version, tag),
+                        # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
+                        # "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/other.root".format(ntuple_version, tag),
+                        # "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/sig.root".format(ntuple_version, tag),
+                        ]
+        else:
             bkgfiles = [
                     "outputs/{}/{}/zz.root".format(ntuple_version, tag),
                     "outputs/{}/{}/ttz.root".format(ntuple_version, tag),
@@ -85,14 +116,38 @@ def main_analysis_make_plot_userfilter():
                     "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
                     # "outputs/{}/{}/other.root".format(ntuple_version, tag),
                     "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
-                    "outputs/{}/{}/sig.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/wwz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/wzz.root".format(ntuple_version, tag),
+                    "outputs/{}/{}/zzz.root".format(ntuple_version, tag),
                     ]
-    # bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Other"]
-    bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other"]
-    if args.stack_signal:
-        bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other", "WWZ", "WZZ", "ZZZ"]
-        if args.one_signal:
-            bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other", "VVV"]
+            if args.one_signal:
+                bkgfiles = [
+                        "outputs/{}/{}/zz.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/ttz.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/twz.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/wz.root".format(ntuple_version, tag),
+                        # "outputs/{}/{}/rare.root".format(ntuple_version, tag),
+                        # "outputs/{}/{}/dyttbar.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/higgs.root".format(ntuple_version, tag),
+                        # "outputs/{}/{}/other.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/othernoh.root".format(ntuple_version, tag),
+                        "outputs/{}/{}/sig.root".format(ntuple_version, tag),
+                        ]
+    if args.five_background:
+        # bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Other"]
+        bkgnames = ["Other", "WZ", "t#bar{t}Z", "tWZ", "ZZ", "ZZZ", "WZZ", "WWZ"]
+    else:
+        bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other"]
+    if args.five_background:
+        if args.stack_signal:
+            bkgnames = ["Other", "WZ", "t#bar{t}Z", "tWZ", "ZZ", "ZZZ", "WZZ", "WWZ"]
+            if args.one_signal:
+                bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Other", "VVV"]
+    else:
+        if args.stack_signal:
+            bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other", "WWZ", "WZZ", "ZZZ"]
+            if args.one_signal:
+                bkgnames = ["ZZ", "t#bar{t}Z", "tWZ", "WZ", "Higgs", "Other", "VVV"]
     # bkgnames = ["t#bar{t}Z", "ZZ", "WZ", "tWZ", "Other"]
     # bkgnames = ["t#bar{t}Z", "ZZ", "WZ", "tWZ", "Other", "Z/Z#gamma/t#bar{t}", "Higgs"]
     sigfiles = [
@@ -140,9 +195,14 @@ def main_analysis_make_plot_userfilter():
         suffix = " [x{}]".format(args.signal_scale)
         sig_labels = ["WWZ"+suffix, "WZZ"+suffix, "ZZZ"+suffix, "VVV"+suffix]
 
-    colors = [2001, 2005, 2007, 2003, 2011, 920, 2012, 2011, 2002]
-    if args.stack_signal:
-        colors = [2001, 2005, 2007, 2003, 2011, 920, 2, 4, 1]
+    if args.five_background:
+        colors = [920, 7013, 4024, 4305, 4020, 4103, 4, 4102]
+        if args.stack_signal:
+            colors = [920, 7013, 4024, 4305, 4020, 4103, 4, 4102]
+    else:
+        colors = [2001, 2005, 2007, 2003, 2011, 920, 2012, 2011, 2002]
+        if args.stack_signal:
+            colors = [2001, 2005, 2007, 2003, 2011, 920, 2, 4, 1]
     fakeVRcolors = [920, 2012, 2011, 2003]
 
     if "2016" in ntuple_version: lumi = 35.9
@@ -163,6 +223,7 @@ def main_analysis_make_plot_userfilter():
                 "print_yield":True,
                 "nbins":int(args.nbins),
                 "signal_scale": float(args.signal_scale),
+                "bkg_sort_method":"unsorted",
                 # "signal_scale": 20,
                 # "signal_scale": 10,
                 # "signal_scale": "auto",
@@ -182,7 +243,9 @@ def main_analysis_make_plot_userfilter():
                 "ratio_xaxis_title":args.xaxis_label,
                 "yaxis_range":[float(x) for x in args.yaxis_range.split(",")] if isinstance(args.yaxis_range, six.string_types) and len(args.yaxis_range) > 0 else [],
                 "no_ratio": False if unblind else True,
+                # "no_ratio": True,
                 "yield_prec":4,
+                "stack_signal":True,
                 },
             # _plotter=p.plot_cut_scan,
             )
