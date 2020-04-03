@@ -505,6 +505,9 @@ class wvztree {
   int      nj_dn_;
   TBranch *nj_dn_branch;
   bool     nj_dn_isLoaded;
+  int      nPartons_;
+  TBranch *nPartons_branch;
+  bool     nPartons_isLoaded;
   int      nb_;
   TBranch *nb_branch;
   bool     nb_isLoaded;
@@ -851,6 +854,7 @@ void LoadAllBranches();
   const int &nj_up();
   const int &nj_dn();
   const int &nb();
+  const int &nPartons();
   const int &nb_up();
   const int &nb_dn();
   const int &nbmed();
@@ -1080,6 +1084,7 @@ namespace tas {
   const int &nj();
   const int &nj_up();
   const int &nj_dn();
+  const int &nPartons();
   const int &nb();
   const int &nb_up();
   const int &nb_dn();
