@@ -347,6 +347,8 @@ void wvztree::Init(TTree *tree) {
   if (nbtight_up_branch) nbtight_up_branch->SetAddress(&nbtight_up_);
   nbtight_dn_branch = tree->GetBranch("nbtight_dn");
   if (nbtight_dn_branch) nbtight_dn_branch->SetAddress(&nbtight_dn_);
+  nPartons_branch = tree->GetBranch("nPartons");
+  if (nPartons_branch) nPartons_branch->SetAddress(&nPartons_);
   ht_branch = tree->GetBranch("ht");
   if (ht_branch) ht_branch->SetAddress(&ht_);
   nj_cen_branch = tree->GetBranch("nj_cen");
@@ -615,6 +617,7 @@ void wvztree::GetEntry(unsigned int idx) {
   nj_isLoaded = false;
   nj_up_isLoaded = false;
   nj_dn_isLoaded = false;
+  nPartons_isLoaded = false;
   nb_isLoaded = false;
   nb_up_isLoaded = false;
   nb_dn_isLoaded = false;
@@ -840,6 +843,7 @@ void wvztree::LoadAllBranches() {
   if (nj_branch != 0) nj();
   if (nj_up_branch != 0) nj_up();
   if (nj_dn_branch != 0) nj_dn();
+  if (nPartons_branch != 0) nPartons();
   if (nb_branch != 0) nb();
   if (nb_up_branch != 0) nb_up();
   if (nb_dn_branch != 0) nb_dn();
@@ -2995,6 +2999,20 @@ const int &wvztree::nj_dn() {
   return nj_dn_;
 }
 
+const int &wvztree::nPartons() {
+  if (not nPartons_isLoaded) {
+    if (nPartons_branch != 0) {
+      nPartons_branch->GetEntry(index);
+    } else {
+      printf("branch nPartons_branch does not exist!\n");
+      exit(1);
+    }
+    nPartons_isLoaded = true;
+  }
+  return nPartons_;
+}
+
+
 const int &wvztree::nb() {
   if (not nb_isLoaded) {
     if (nb_branch != 0) {
@@ -3960,6 +3978,7 @@ const int &nj() { return wvz.nj(); }
 const int &nj_up() { return wvz.nj_up(); }
 const int &nj_dn() { return wvz.nj_dn(); }
 const int &nb() { return wvz.nb(); }
+const int &nPartons() { return wvz.nPartons();}
 const int &nb_up() { return wvz.nb_up(); }
 const int &nb_dn() { return wvz.nb_dn(); }
 const int &nbmed() { return wvz.nbmed(); }
